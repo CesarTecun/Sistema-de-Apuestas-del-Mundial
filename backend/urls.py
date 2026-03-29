@@ -20,6 +20,10 @@ from django.urls import path, include
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 @api_view(['GET'])
 @renderer_classes([JSONRenderer])
@@ -28,7 +32,7 @@ def api_root(request):
         'message': 'Sistema de Apuestas del Mundial 2026 - API',
         'endpoints': {
             'admin': '/admin/',
-            'auth': '/api-auth/login/',
+            'auth': '/api/auth/',
             'docs': '/api/docs/',
         }
     })
@@ -42,8 +46,8 @@ def home_view(request):
         'endpoints': {
             'admin': '/admin/',
             'api': '/api/',
-            'auth_login': '/api-auth/login/',
-            'auth_logout': '/api-auth/logout/',
+            'auth_login': '/api/auth/login/',
+            'auth_logout': '/api/auth/logout/',
         }
     })
 
@@ -52,4 +56,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("api/", api_root),
+    path("api/auth/", include("backend.autenticacion.urls")),
+    # JWT endpoints
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
