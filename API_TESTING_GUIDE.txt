@@ -1,0 +1,225 @@
+GUÍA PARA PROBAR EL BACKEND SIN FRONTEND
+==========================================
+
+SISTEMA:
+Django Backend: http://127.0.0.1:8000/
+React Frontend: http://localhost:3001/
+Admin Panel: http://127.0.0.1:8000/admin/
+
+URLS DISPONIBLES PARA TESTING:
+==============================
+
+1. HOME - Verificación del sistema
+   URL: http://127.0.0.1:8000/
+   Método: GET
+   Respuesta: JSON con información del proyecto y endpoints
+
+2. ADMIN PANEL - Gestión completa de datos
+   URL: http://127.0.0.1:8000/admin/
+   Usuario: admin
+   Contraseña: admin123
+   Uso: Crear, editar, eliminar cualquier dato del sistema
+   IMPORTANTE: Aquí pueden probar todos sus modelos sin frontend
+
+3. API ROOT - Información de la API
+   URL: http://127.0.0.1:8000/api/
+   Método: GET
+   Respuesta: JSON con endpoints disponibles
+
+4. AUTENTICACIÓN - Login/Logout
+   Login: http://127.0.0.1:8000/api-auth/login/
+   Logout: http://127.0.0.1:8000/api-auth/logout/
+   Método: POST
+   Uso: Para probar endpoints protegidos
+
+CÓMO PROBAR ENDPOINTS QUE CREEN:
+=================================
+
+MÉTODO 1: DESDE NAVEGADOR (GET requests)
+----------------------------------------
+- Solo funciona para endpoints GET
+- Ejemplo: http://127.0.0.1:8000/api/ligas/
+- Ven JSON directamente en el navegador
+
+MÉTODO 2: DESDE DJANGO ADMIN
+------------------------------
+1. Creen sus modelos en models.py
+2. Regístrenlos en admin.py:
+   
+   from django.contrib import admin
+   from .models import Liga
+   
+   admin.site.register(Liga)
+
+3. Accedan a http://127.0.0.1:8000/admin/
+4. Podrán crear/editar/eliminar datos con interface web
+5. No necesitan frontend para nada
+
+MÉTODO 3: DESDE TERMINAL con curl
+----------------------------------
+GET request:
+curl http://127.0.0.1:8000/api/ligas/
+
+POST request:
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Liga Test","tipo":"apuesta"}' \
+  http://127.0.0.1:8000/api/ligas/
+
+PUT request:
+curl -X PUT \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Liga Actualizada"}' \
+  http://127.0.0.1:8000/api/ligas/1/
+
+DELETE request:
+curl -X DELETE http://127.0.0.1:8000/api/ligas/1/
+
+MÉTODO 4: DESDE DJANGO SHELL
+-----------------------------
+python manage.py shell
+
+# Ejemplo de uso
+from mi_app.models import Liga
+from django.contrib.auth.models import User
+
+# Crear usuario de prueba
+user = User.objects.create_user('testuser', 'test@example.com', 'password123')
+
+# Crear liga
+liga = Liga.objects.create(
+    nombre='Liga de Prueba',
+    administrador=user,
+    tipo='apuesta',
+    precio_participacion=100.00
+)
+
+# Consultar ligas
+ligas = Liga.objects.all()
+for liga in ligas:
+    print(f"Liga: {liga.nombre}, Admin: {liga.administrador.username}")
+
+MÉTODO 5: POSTMAN o INSOMNIA
+---------------------------
+1. Importante: Primero hagan login en http://127.0.0.1:8000/api-auth/login/
+2. Usen las cookies del navegador para autenticación
+3. Pueden probar todos los métodos HTTP
+4. Ideal para testing completo de APIs
+
+FLUJO DE TRABAJO RECOMENDADO:
+=============================
+
+1. CREAR MODELO
+   - En mi_app/models.py
+   - Ejemplo: class Liga(models.Model): ...
+
+2. CREAR SERIALIZER
+   - En mi_app/serializers.py
+   - Convierte modelos a JSON
+
+3. CREAR VIEWSET
+   - En mi_app/views.py
+   - CRUD automático con ModelViewSet
+
+4. REGISTRAR URLS
+   - En mi_app/urls.py
+   - Y en backend/urls.py
+
+5. REGISTRAR EN ADMIN
+   - En mi_app/admin.py
+   - Para testing visual
+
+6. PROBAR EN ADMIN PANEL
+   - http://127.0.0.1:8000/admin/
+   - Crear datos de prueba
+
+7. PROBAR API ENDPOINTS
+   - Con navegador, curl o Postman
+   - Verificar JSON responses
+
+EJEMPLO COMPLETO - APP DE LIGAS:
+================================
+
+1. Crear app:
+python manage.py startapp ligas
+
+2. En ligas/models.py:
+from django.db import models
+from django.contrib.auth.models import User
+
+class Liga(models.Model):
+    nombre = models.CharField(max_length=100)
+    administrador = models.ForeignKey(User, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=20, choices=[('apuesta', 'Apuesta'), ('diversion', 'Diversión')])
+    precio_participacion = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+3. En ligas/admin.py:
+from django.contrib import admin
+from .models import Liga
+
+@admin.register(Liga)
+class LigaAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'administrador', 'tipo', 'precio_participacion', 'fecha_creacion']
+    list_filter = ['tipo', 'fecha_creacion']
+    search_fields = ['nombre']
+
+4. En ligas/serializers.py:
+from rest_framework import serializers
+from .models import Liga
+
+class LigaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Liga
+        fields = '__all__'
+
+5. En ligas/views.py:
+from rest_framework import viewsets
+from .models import Liga
+from .serializers import LigaSerializer
+
+class LigaViewSet(viewsets.ModelViewSet):
+    queryset = Liga.objects.all()
+    serializer_class = LigaSerializer
+
+6. En ligas/urls.py:
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import LigaViewSet
+
+router = DefaultRouter()
+router.register(r'ligas', LigaViewSet)
+
+urlpatterns = [
+    path('', include(router.urls)),
+]
+
+7. En backend/urls.py agregar:
+path('api/ligas/', include('ligas.urls')),
+
+8. Probar:
+- Admin: http://127.0.0.1:8000/admin/ (crear ligas)
+- API: http://127.0.0.1:8000/api/ligas/ (ver JSON)
+- curl: curl http://127.0.0.1:8000/api/ligas/
+
+NOTAS IMPORTANTES:
+==================
+- NO necesitan frontend para desarrollar el backend
+- Pueden probar TODO desde el Admin Panel
+- Los endpoints REST son para cuando el frontend necesite consumir datos
+- SQLite es temporal, cambiarán a PostgreSQL con Docker
+- Documenten sus endpoints para el equipo frontend
+
+COMUNICACIÓN CON EQUIPO FRONTEND:
+=================================
+Cuando terminen un módulo, comuniquen:
+1. Endpoint URL (ej: /api/ligas/)
+2. Método HTTP (GET, POST, PUT, DELETE)
+3. Estructura JSON request/response
+4. Autenticación requerida (si/no)
+
+Ejemplo:
+POST /api/ligas/
+Request: {"nombre": "Liga Mundial", "tipo": "apuesta", "precio_participacion": 100}
+Response: {"id": 1, "nombre": "Liga Mundial", ...}
+Auth: Requiere login

@@ -1,0 +1,178 @@
+GUÍA PARA CREAR MÓDULO DJANGO Y PROBAR EN ADMIN
+=================================================
+
+PASO 1: CREAR LA APP DJANGO
+============================
+
+Ejecuta en terminal:
+python manage.py startapp ligas
+
+Esto creará la carpeta:
+ligas/
+├── __init__.py
+├── admin.py      ← Para registrar en Admin Panel
+├── apps.py       ← Configuración de la app
+├── migrations/   ← Para cambios en BD
+├── models.py     ← Para definir modelos
+├── tests.py      ← Para pruebas
+└── views.py      ← Para lógica/API
+
+
+PASO 2: AGREGAR APP A SETTINGS.PY
+=================================
+
+En backend/settings.py, agrega 'ligas' a INSTALLED_APPS:
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "corsheaders",
+    "usuarios",
+    "ligas",        ← AGREGAR ESTA LÍNEA
+]
+
+
+PASO 3: CREAR MODELO EN MODELS.PY
+=================================
+
+En ligas/models.py, agrega:
+
+from django.db import models
+
+class Liga(models.Model):
+    id_liga = models.AutoField(primary_key=True)
+    nombre_liga = models.CharField(max_length=100)
+    fk_administrador = models.IntegerField(null=True, blank=True)
+    monto_total_recaudado = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    estado = models.CharField(max_length=50, null=True, blank=True)
+    tipo_liga = models.CharField(max_length=50, default='Diversion')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'liga'  # Nombre de tu tabla en PostgreSQL
+
+    def __str__(self):
+        return self.nombre_liga
+
+
+PASO 4: REGISTRAR MODELO EN ADMIN.PY
+====================================
+
+En ligas/admin.py, agrega:
+
+from django.contrib import admin
+from .models import Liga
+
+@admin.register(Liga)
+class LigaAdmin(admin.ModelAdmin):
+    list_display = ['id_liga', 'nombre_liga', 'fk_administrador', 'monto_total_recaudado', 'estado', 'tipo_liga', 'fecha_creacion']
+    list_filter = ['estado', 'tipo_liga', 'fecha_creacion']
+    search_fields = ['nombre_liga']
+    ordering = ['-fecha_creacion']
+
+
+PASO 5: CREAR MIGRACIONES
+===========================
+
+Ejecuta en terminal:
+python manage.py makemigrations ligas
+python manage.py migrate ligas
+
+
+PASO 6: ACCEDER AL ADMIN PANEL
+=================================
+
+1. Inicia servidor: python manage.py runserver
+2. Ve a: http://127.0.0.1:8000/admin/
+3. Inicia sesión con:
+   - Username: admin
+   - Password: 123admin
+4. Verás "Ligas" en el panel
+5. Puedes crear, editar, eliminar ligas
+
+
+PASO 7: PROBAR DESDE NAVEGADOR (API)
+======================================
+
+Para probar endpoints REST, crea serializers.py en ligas/:
+
+from rest_framework import serializers
+from .models import Liga
+
+class LigaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Liga
+        fields = '__all__'
+
+Y en ligas/views.py:
+
+from rest_framework import viewsets
+from .models import Liga
+from .serializers import LigaSerializer
+
+class LigaViewSet(viewsets.ModelViewSet):
+    queryset = Liga.objects.all()
+    serializer_class = LigaSerializer
+
+Crea ligas/urls.py:
+
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import LigaViewSet
+
+router = DefaultRouter()
+router.register(r'ligas', LigaViewSet)
+
+urlpatterns = [
+    path('', include(router.urls)),
+]
+
+Y en backend/urls.py agrega:
+
+path('api/ligas/', include('ligas.urls')),
+
+AHORA PUEDES PROBAR:
+- Admin: http://127.0.0.1:8000/admin/
+- API: http://127.0.0.1:8000/api/ligas/
+
+
+RESUMEN RÁPIDO - COMANDOS EJECUTAR
+===================================
+
+# 1. Crear app
+python manage.py startapp ligas
+
+# 2. Agregar a INSTALLED_APPS en settings.py
+# (editar archivo manualmente)
+
+# 3. Crear modelo en ligas/models.py
+# (editar archivo manualmente)
+
+# 4. Registrar en admin en ligas/admin.py
+# (editar archivo manualmente)
+
+# 5. Migrar
+python manage.py makemigrations ligas
+python manage.py migrate ligas
+
+# 6. Iniciar servidor
+python manage.py runserver
+
+# 7. Probar
+# Admin: http://127.0.0.1:8000/admin/
+# API: http://127.0.0.1:8000/api/ligas/
+
+
+LISTO PARA PROBAR EL BACKEND DESDE DJANGO ADMIN!
+================================================
+
+Con esto puedes:
+- Crear/editar/eliminar datos sin frontend
+- Probar toda la lógica del negocio
+- Ver las tablas reales de PostgreSQL
+- Desarrollar módulos independientemente

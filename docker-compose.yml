@@ -1,0 +1,22 @@
+services:
+  postgres-db:
+    image: postgres:16
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: quiniela
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: PASSWORD
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - quiniela_network
+
+volumes:
+  postgres_data:
+
+networks:
+  quiniela_network:
+    driver: bridge

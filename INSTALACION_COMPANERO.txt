@@ -1,0 +1,278 @@
+GUÍA DE INSTALACIÓN PARA NUEVO DESARROLLADOR
+=================================================
+
+REQUISITOS PREVIOS
+===================
+
+1. Git instalado
+2. Python 3.10+ instalado
+3. Docker Desktop instalado y corriendo
+4. VS Code o editor de código
+
+PASO 1: CLONAR REPOSITORIO
+============================
+
+# Opción A: Si tiene acceso al repositorio
+git clone https://github.com/tu-usuario/sistema-de-apuestas-del-mundial.git
+
+# Opción B: Descargar ZIP y descomprimir
+# Luego abrir carpeta en VS Code
+
+
+PASO 2: CONFIGURAR ENTORNO VIRTUAL
+==================================
+
+# Crear entorno virtual
+python -m venv venv
+
+# Activar entorno virtual
+# En Windows:
+venv\Scripts\activate
+# En Linux/Mac:
+source venv/bin/activate
+
+# Verificar que está activo (verá (venv) al inicio de la línea)
+
+
+PASO 3: INSTALAR DEPENDENCIAS
+==============================
+
+# Instalar dependencias de Python
+pip install -r requirements.txt
+
+# Si requirements.txt no existe, instalar manualmente:
+pip install django djangorestframework django-cors-headers python-dotenv psycopg2-binary
+
+
+PASO 4: CONFIGURAR VARIABLES DE ENTORNO
+=======================================
+
+# Crear archivo .env desde la plantilla
+copy .env.example .env
+
+# Editar .env con tus datos:
+DB_NAME=quiniela
+DB_USER=postgres
+DB_PASSWORD=PASSWORD
+DB_HOST=localhost
+DB_PORT=5432
+
+DEBUG=True
+SECRET_KEY=tu-clave-secreta-aqui
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+
+PASO 5: INICIAR BASE DE DATOS POSTGRESQL
+=======================================
+
+# Iniciar Docker Desktop primero
+# Luego ejecutar:
+docker-compose up -d postgres-db
+
+# Verificar que está corriendo:
+docker compose ps
+
+# Debería ver postgres-db en estado "Up"
+
+
+PASO 6: ESPERAR INICIALIZACIÓN DE BD
+====================================
+
+# Esperar 30-60 segundos para que PostgreSQL inicie
+# El init-db.sql se ejecuta automáticamente
+
+# Verificar conexión (opcional):
+docker exec -it postgres-db psql -U postgres -d quiniela -c "\dt"
+
+
+PASO 7: CREAR SUPERUSUARIO DJANGO
+=================================
+
+# Crear usuario para acceder al Admin Panel
+python manage.py createsuperuser
+
+# Responder:
+Username: admin
+Email: admin@quiniela.com
+Password: 123admin
+# Confirmar password
+
+
+PASO 8: VERIFICAR INSTALACIÓN
+=============================
+
+# Iniciar servidor Django
+python manage.py runserver
+
+# Abrir en navegador:
+http://127.0.0.1:8000/admin/
+
+# Iniciar sesión con:
+- Username: admin
+- Password: 123admin
+
+# Debería ver el Admin Panel de Django
+
+
+PASO 9: VERIFICAR BASE DE DATOS
+=================================
+
+# En el Admin Panel debería ver:
+- Authentication and Authorization (Django default)
+- Usuarios (si está configurado)
+- Otras tablas según la configuración
+
+
+MIGRACIONES NECESARIAS - EXPLICACIÓN DETALLADA
+===============================================
+
+¿QUÉ SON LAS MIGRACIONES?
+==========================
+
+Las migraciones son archivos que registran cambios en la estructura de la base de datos.
+Django las usa para mantener sincronizados los modelos con la BD.
+
+MIGRACIONES INICIALES (OBLIGATORIAS)
+======================================
+
+# 1. Migraciones base de Django
+python manage.py migrate
+
+Esto crea:
+- Tablas de autenticación (auth_user, auth_group, etc.)
+- Tablas de administración (django_admin_log)
+- Tablas de sesiones (django_session)
+- Tablas de contenido (django_content_type)
+
+
+MIGRACIONES PARA APPS PERSONALIZADAS
+====================================
+
+# 2. Si creas nuevas apps, necesitas:
+python manage.py makemigrations nombre_app
+python manage.py migrate nombre_app
+
+Ejemplo con app "ligas":
+python manage.py makemigrations ligas
+python manage.py migrate ligas
+
+
+MIGRACIONES ESPECÍFICAS DEL PROYECTO
+======================================
+
+# Si usas la BD PostgreSQL existente con tablas ya creadas:
+# Opción A: Usar inspectdb (recomendado)
+python manage.py inspectdb > usuarios/models.py
+
+# Opción B: Crear modelos manualmente que coincidan con tablas existentes
+# Luego generar migraciones "falsas" para que Django reconozca las tablas
+
+
+FLUJO COMPLETO DE MIGRACIONES
+================================
+
+ESCENARIO 1: PROYECTO NUEVO (BD VACÍA)
+====================================
+
+1. Crear modelos en models.py
+2. python manage.py makemigrations
+3. python manage.py migrate
+4. Listo
+
+
+ESCENARIO 2: BD EXISTENTE (TU CASO)
+===================================
+
+1. python manage.py inspectdb > app/models.py
+2. Revisar modelos generados
+3. Agregar app a INSTALLED_APPS
+4. NO ejecutar makemigrations (las tablas ya existen)
+5. Opcional: Crear admin.py para gestionar datos
+
+
+ESCENARIO 3: AGREGAR NUEVAS TABLAS
+=================================
+
+1. Crear nuevos modelos
+2. python manage.py makemigrations
+3. python manage.py migrate
+4. Django solo creará las tablas nuevas
+
+
+COMANDOS ÚTILES PARA MIGRACIONES
+=================================
+
+# Ver estado de migraciones
+python manage.py showmigrations
+
+# Ver qué migraciones se aplicaron
+python manage.py showmigrations --applied
+
+# Aplicar migración específica
+python manage.py migrate app 0001
+
+# Deshacer última migración
+python manage.py migrate app zero
+
+# Crear migración vacía
+python manage.py makemigrations --empty app
+
+
+PROBLEMAS COMUNES Y SOLUCIONES
+================================
+
+PROBLEMA: "No such table: django_migrations"
+SOLUCIÓN: Ejecutar primero `python manage.py migrate` sin apps personalizadas
+
+PROBLEMA: "Table already exists"
+SOLUCIÓN: Usar `inspectdb` en lugar de crear migraciones desde cero
+
+PROBLEMA: "Foreign key constraint"
+SOLUCIÓN: Revisar orden de migraciones, las dependencias primero
+
+PROBLEMA: "ModuleNotFoundError: No module named 'psycopg2'"
+SOLUCIÓN: pip install psycopg2-binary
+
+
+RESUMEN DE COMANDOS PARA NUEVO DESARROLLADOR
+============================================
+
+# 1. Clonar repositorio
+git clone [URL]
+
+# 2. Activar entorno virtual
+venv\Scripts\activate
+
+# 3. Instalar dependencias
+pip install -r requirements.txt
+
+# 4. Configurar .env
+copy .env.example .env
+# Editar .env
+
+# 5. Iniciar Docker
+docker-compose up -d postgres-db
+
+# 6. Crear superusuario
+python manage.py createsuperuser
+
+# 7. Iniciar servidor
+python manage.py runserver
+
+# 8. Probar
+http://127.0.0.1:8000/admin/
+
+
+VERIFICACIÓN FINAL
+=================
+
+✅ Docker Desktop corriendo
+✅ Contenedor postgres-db activo
+✅ Entorno virtual activado
+✅ Dependencias instaladas
+✅ Variables de entorno configuradas
+✅ Superusuario creado
+✅ Servidor Django corriendo
+✅ Admin Panel accesible
+
+Si todo esto está funcionando, el nuevo desarrollador puede empezar a trabajar!
