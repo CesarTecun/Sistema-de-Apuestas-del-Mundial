@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'backend.autenticacion',  # App de autenticación
     'usuarios',
+    'backend.ligas',          # App de ligas
+    'backend.partidos',       # App de partidos
 ]
 
 MIDDLEWARE = [

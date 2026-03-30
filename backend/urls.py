@@ -33,6 +33,8 @@ def api_root(request):
         'endpoints': {
             'admin': '/admin/',
             'auth': '/api/auth/',
+            'ligas': '/api/ligas/',
+            'partidos': '/api/partidos/',
             'docs': '/api/docs/',
         }
     })
@@ -57,6 +59,8 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     path("api/", api_root),
     path("api/auth/", include("backend.autenticacion.urls")),
+    path("api/ligas/", include("backend.ligas.urls")),
+    path("api/partidos/", include("backend.partidos.urls")),
     # JWT endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
