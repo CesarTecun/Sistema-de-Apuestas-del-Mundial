@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'usuarios',
     'backend.ligas',          # App de ligas
     'backend.partidos',       # App de partidos
+    'backend.vaticinio',      # App de pronósticos
 ]
 
 MIDDLEWARE = [
