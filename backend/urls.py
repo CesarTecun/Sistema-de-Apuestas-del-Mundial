@@ -36,6 +36,9 @@ def api_root(request):
             'ligas': '/api/ligas/',
             'partidos': '/api/partidos/',
             'pronosticos': '/api/pronosticos/',
+            'posiciones': '/api/posiciones/',
+            'premios': '/api/premios/',
+            'historial': '/api/historial/',
             'docs': '/api/docs/',
         }
     })
@@ -62,7 +65,9 @@ urlpatterns = [
     path("api/auth/", include("backend.autenticacion.urls")),
     path("api/ligas/", include("backend.ligas.urls")),
     path("api/partidos/", include("backend.partidos.urls")),
-    path("api/pronosticos/", include("backend.vaticinio.urls")),
+    path("api/posiciones/", include("backend.posiciones.urls")),
+    path("api/premios/", include("backend.premios.urls")),
+    path("api/historial/", include("backend.historialganador.urls")),
     # JWT endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
