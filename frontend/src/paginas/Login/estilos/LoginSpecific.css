@@ -1,0 +1,74 @@
+/* ========================================
+   ESTILOS ESPECÍFICOS PARA PÁGINA DE LOGIN
+   ======================================== */
+
+/* ========================================
+   FORZAR LAYOUT VERTICAL SOLO PARA LOGIN
+   ======================================== */
+.login-page .form-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+}
+
+.login-page .form-container > * {
+  width: 100% !important;
+  display: block !important;
+  margin-bottom: 15px !important;
+}
+
+.login-page .form-container > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+.login-page .form-container .input-group {
+  display: block !important;
+  width: 100% !important;
+  position: relative !important;
+}
+
+.login-page .form-container .form-input {
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.login-page .form-container .login-button {
+  display: block !important;
+  width: 100% !important;
+}
+
+/* ========================================
+   ESTILOS ADICIONALES ESPECÍFICOS DEL LOGIN
+   ======================================== */
+.login-page .input-group {
+  width: 100% !important;
+  display: block !important;
+  margin-bottom: 15px;
+  clear: both;
+}
+
+.login-page .input-group:last-child {
+  margin-bottom: 0;
+}
+
+/* ========================================
+   RESPONSIVO ESPECÍFICO PARA LOGIN
+   ======================================== */
+@media (max-width: 480px) {
+  .login-page .login-form {
+    margin: 20px;
+    padding: 30px 20px;
+  }
+  
+  .login-page .logo {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .login-page .back-link {
+    top: 20px;
+    left: 20px;
+  }
+}

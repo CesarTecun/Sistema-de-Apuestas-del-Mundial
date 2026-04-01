@@ -23,7 +23,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         required=True,
         validators=[validate_password]
     )
-    password2 = serializers.CharField(write_only=True, required=True)
+    password2 = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = Usuario
@@ -32,15 +32,21 @@ class RegisterSerializer(serializers.ModelSerializer):
             'primer_apellido', 'segundo_apellido', 'telefono',
             'fecha_nacimiento', 'password', 'password2', 'fk_rol'
         )
+        extra_kwargs = {
+            'fk_rol': {'required': False}
+        }
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
+        password2 = attrs.pop('password2', None)
+        if password2 and attrs['password'] != password2:
             raise serializers.ValidationError({"password": "Las contraseñas no coinciden."})
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop('password2')
         password = validated_data.pop('password')
+        # Asignar rol por defecto (rol 2 = usuario normal)
+        if 'fk_rol' not in validated_data:
+            validated_data['fk_rol'] = 2
         user = Usuario.objects.create(**validated_data)
         user.set_password(password)
         user.save()

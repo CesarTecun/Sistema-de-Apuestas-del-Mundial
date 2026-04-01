@@ -1,0 +1,261 @@
+/* ========================================
+   ESTILOS PRINCIPALES DEL CONTENEDOR DE REGISTRO
+   ======================================== */
+.registro-container {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ========================================
+   FONDO CON GRADIENTE Y EFECTOS VISUALES
+   ======================================== */
+.registro-background {
+  height: 100%;
+  width: 100%;
+  background: 
+    linear-gradient(135deg, rgba(168, 50, 121, 0.8) 0%, rgba(217, 74, 110, 0.7) 35%, rgba(106, 76, 147, 0.6) 70%, rgba(74, 105, 189, 0.5) 100%),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%23a83279;stop-opacity:0.8" /><stop offset="50%" style="stop-color:%23d94a6e;stop-opacity:0.6" /><stop offset="100%" style="stop-color:%236a4c93;stop-opacity:0.4" /></linearGradient></defs><rect width="1200" height="800" fill="url(%23sky)"/><path d="M0 400 L300 350 L600 380 L900 320 L1200 360 L1200 800 L0 800 Z" fill="%231a1a2e" opacity="0.3"/><path d="M0 500 L200 450 L400 480 L800 420 L1200 460 L1200 800 L0 800 Z" fill="%23151525" opacity="0.4"/><path d="M0 600 L400 550 L700 580 L1000 520 L1200 560 L1200 800 L0 800 Z" fill="%230a0a15" opacity="0.5"/></svg>');
+  background-size: cover, cover;
+  background-position: center, center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* ========================================
+   FORMULARIO DE REGISTRO CON EFECTO VIDRIO
+   ======================================== */
+.registro-form {
+  background: linear-gradient(135deg, rgba(168, 50, 121, 0.15) 0%, rgba(217, 74, 110, 0.15) 35%, rgba(106, 76, 147, 0.15) 70%, rgba(74, 105, 189, 0.15) 100%);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 600px; /* Más ancho */
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* ========================================
+   CONTENEDOR DEL LOGO
+   ======================================== */
+.logo-container {
+  text-align: center;
+  margin-bottom: 20px;
+  margin-top: 30px; /* Bajar el logo igual que en login */
+}
+
+/* ========================================
+   LOGO CON ANIMACIÓN FLOTANTE
+   ======================================== */
+.logo {
+  width: 100px;
+  height: 100px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========================================
+   CONTENEDOR DEL FORMULARIO EN CUADRÍCULA
+   ======================================== */
+.form-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ========================================
+   MENSAJES DE ERROR (OCUPA TODA LA FILA)
+   ======================================== */
+.error-message {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  grid-column: 1 / -1;
+}
+
+/* ========================================
+   GRUPOS DE INPUTS CON ICONOS
+   ======================================== */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ========================================
+   CAMPO DE EMAIL (OCUPA TODA LA FILA)
+   ======================================== */
+.email-field {
+  grid-column: 1 / -1;
+}
+
+/* ========================================
+   CAMPOS DE TELÉFONO Y FECHA (SEGUNDA FILA)
+   ======================================== */
+.telefono-field {
+  grid-column: 1 / 2;
+}
+
+.fecha-field {
+  grid-column: 2 / 3;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  color: rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ========================================
+   CAMPOS DE FORMULARIO (INPUTS)
+   ======================================== */
+.form-input {
+  width: 100%;
+  padding: 15px 15px 15px 50px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ========================================
+   ESTILOS PARA AUTOCOMPLETADO DEL NAVEGADOR
+   ======================================== */
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus,
+.form-input:-webkit-autofill:active {
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.1) inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ========================================
+   BOTÓN DE REGISTRO (OCUPA TODA LA FILA)
+   ======================================== */
+.registro-button {
+  background: linear-gradient(135deg, #a83279 0%, #d94a6e 100%);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(168, 50, 121, 0.3);
+  grid-column: 1 / -1;
+}
+
+.registro-button:hover {
+  background: linear-gradient(135deg, #b84289 0%, #e95a7e 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(168, 50, 121, 0.4);
+}
+
+.registro-button:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   ENLACES DEL FORMULARIO (OCUPA TODA LA FILA)
+   ======================================== */
+.form-links {
+  text-align: center;
+  margin-top: 20px;
+  grid-column: 1 / -1;
+}
+
+/* ========================================
+   ENLACE PARA IR A LOGIN
+   ======================================== */
+.login-link {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+}
+
+.login-anchor {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.login-anchor:hover {
+  color: #d94a6e;
+}
+
+/* ========================================
+   ANIMACIÓN DEL LOGO CLICKEABLE
+   ======================================== */
+.logo-clickable {
+  transition: all 0.3s ease;
+  animation: float 3s ease-in-out infinite;
+}
+
+.logo-clickable:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+.logo-clickable:active {
+  transform: scale(0.95);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ========================================
+   DISEÑO RESPONSIVO
+   ======================================== */
+@media (max-width: 480px) {
+  .registro-form {
+    margin: 20px;
+    padding: 30px 20px;
+  }
+  
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .form-container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
