@@ -1,11 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
 
 const PanelPrincipal = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logout();
+  };
+
+  const goToLigas = () => {
+    navigate('/ligas');
   };
 
   return (
@@ -27,16 +33,33 @@ const PanelPrincipal = () => {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '30px' }}>
+        <button 
+          onClick={goToLigas}
+          style={{
+            background: '#a83279',
+            color: 'white',
+            border: 'none',
+            padding: '12px 24px',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: '600'
+          }}
+        >
+          🏆 Gestionar Ligas
+        </button>
+        
         <button 
           onClick={handleLogout}
           style={{
             background: '#ff4d85',
             color: 'white',
             border: 'none',
-            padding: '10px 20px',
+            padding: '12px 24px',
             borderRadius: '5px',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            fontSize: '16px'
           }}
         >
           Cerrar Sesión
@@ -44,13 +67,13 @@ const PanelPrincipal = () => {
       </div>
 
       <div style={{ marginTop: '30px' }}>
-        <h3>Próximas funcionalidades:</h3>
+        <h3>Funcionalidades Disponibles:</h3>
         <ul>
-          <li>Ligas y torneos</li>
-          <li>Partidos y pronósticos</li>
-          <li>Tabla de posiciones</li>
-          <li>Premios y recompensas</li>
-          <li>Historial de ganadores</li>
+          <li>✅ <strong>Ligas y torneos</strong> - Gestiona las ligas de apuestas</li>
+          <li>🔄 Partidos y pronósticos (próximamente)</li>
+          <li>📊 Tabla de posiciones (próximamente)</li>
+          <li>🏆 Premios y recompensas (próximamente)</li>
+          <li>📈 Historial de ganadores (próximamente)</li>
         </ul>
       </div>
     </div>

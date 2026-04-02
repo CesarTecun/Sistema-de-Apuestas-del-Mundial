@@ -14,10 +14,11 @@
   height: 100%;
   width: 100%;
   background: 
-    linear-gradient(135deg, rgba(168, 50, 121, 0.8) 0%, rgba(217, 74, 110, 0.7) 35%, rgba(106, 76, 147, 0.6) 70%, rgba(74, 105, 189, 0.5) 100%),
-    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%23a83279;stop-opacity:0.8" /><stop offset="50%" style="stop-color:%23d94a6e;stop-opacity:0.6" /><stop offset="100%" style="stop-color:%236a4c93;stop-opacity:0.4" /></linearGradient></defs><rect width="1200" height="800" fill="url(%23sky)"/><path d="M0 400 L300 350 L600 380 L900 320 L1200 360 L1200 800 L0 800 Z" fill="%231a1a2e" opacity="0.3"/><path d="M0 500 L200 450 L400 480 L800 420 L1200 460 L1200 800 L0 800 Z" fill="%23151525" opacity="0.4"/><path d="M0 600 L400 550 L700 580 L1000 520 L1200 560 L1200 800 L0 800 Z" fill="%230a0a15" opacity="0.5"/></svg>');
-  background-size: cover, cover;
-  background-position: center, center;
+    var(--theme-gradient),
+    var(--theme-radial1),
+    var(--theme-radial2);
+  background-size: cover, cover, cover;
+  background-position: center, center, center;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,12 +129,12 @@
    ======================================== */
 .form-input {
   width: 100%;
-  padding: 14px 14px 14px 50px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 14px 14px 14px 85px;
+  border: 1px solid var(--modulo-input-border, rgba(255, 255, 255, 0.3));
   border-radius: 15px;
   font-size: 15px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  background: var(--modulo-input-bg, rgba(255, 255, 255, 0.12));
+  color: var(--modulo-text-primary, #ffffff);
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
@@ -143,7 +144,7 @@
   border-color: rgba(255, 255, 255, 0.6);
   background: rgba(255, 255, 255, 0.15);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  color: var(--modulo-text-primary, #ffffff);
 }
 
 .form-input::placeholder {
@@ -166,7 +167,7 @@
    BOTÓN DE LOGIN
    ======================================== */
 .login-button {
-  background: linear-gradient(135deg, #6a4c93 0%, #4a69bd 100%);
+  background: linear-gradient(135deg, #a83279 0%, #d94a6e 100%);
   color: white;
   border: none;
   padding: 18px;
@@ -177,13 +178,13 @@
   transition: all 0.3s ease;
   margin-top: 5px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(106, 76, 147, 0.3);
+  box-shadow: 0 4px 15px rgba(168, 50, 121, 0.3);
 }
 
 .login-button:hover {
-  background: linear-gradient(135deg, #7a5ca3 0%, #5a79cd 100%);
+  background: linear-gradient(135deg, #b84289 0%, #e95a7e 100%);
   transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(106, 76, 147, 0.5);
+  box-shadow: 0 12px 25px rgba(168, 50, 121, 0.5);
 }
 
 .login-button:active {
@@ -314,12 +315,20 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease-out, 
+              visibility 0.6s ease-out;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
 }
 
 .modal-content {
@@ -330,7 +339,18 @@
   background: #000;
   border-radius: 12px;
   overflow: hidden;
-  animation: slideIn 0.3s ease;
+  opacity: 0;
+  filter: blur(20px);
+  transform: scale(0.8);
+  transition: opacity 0.6s ease-out 0.1s,
+              filter 0.6s ease-out 0.1s,
+              transform 0.6s ease-out 0.1s;
+}
+
+.modal-overlay.active .modal-content {
+  opacity: 1;
+  filter: blur(0px);
+  transform: scale(1);
 }
 
 .modal-close {

@@ -27,7 +27,7 @@ export const ProveedorAutenticacion = ({ children }) => {
 
   // Configurar axios para incluir token en todas las peticiones
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
@@ -37,22 +37,22 @@ export const ProveedorAutenticacion = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('access_token');
         if (token) {
           const response = await axios.get('http://localhost:8000/api/auth/check/');
           if (response.data.is_authenticated) {
             setUser(response.data.user);
             setIsAuthenticated(true);
           } else {
-            localStorage.removeItem('token');
-            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
             delete axios.defaults.headers.common['Authorization'];
           }
         }
       } catch (error) {
         console.error('Error verificando autenticación:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         delete axios.defaults.headers.common['Authorization'];
       } finally {
         setLoading(false);
@@ -64,12 +64,15 @@ export const ProveedorAutenticacion = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login/', {
+      // Paso 1: Login con el endpoint del backend (autenticación Django)
+      const loginResponse = await axios.post('http://localhost:8000/api/auth/login/', {
         email,
         password
       });
 
-      // Obtener tokens JWT
+      const user = loginResponse.data.user;
+
+      // Paso 2: Obtener tokens JWT
       const tokenResponse = await axios.post('http://localhost:8000/api/token/', {
         email,
         password
@@ -77,21 +80,33 @@ export const ProveedorAutenticacion = ({ children }) => {
 
       const { access, refresh } = tokenResponse.data;
       
-      // Guardar tokens
-      localStorage.setItem('token', access);
-      localStorage.setItem('refreshToken', refresh);
+      // Guardar tokens con nombres consistentes
+      localStorage.setItem('access_token', access);
+      localStorage.setItem('refresh_token', refresh);
       
       // Configurar axios para incluir token
       axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
       
-      setUser(response.data.user);
+      setUser(user);
       setIsAuthenticated(true);
       
-      return { success: true, user: response.data.user };
+      return { success: true, user };
     } catch (error) {
       console.error('Error de login:', error);
-      const errorMessage = error.response?.data?.non_field_errors?.[0] || 
-                          error.response?.data?.detail || 
+      
+      // Si el error es del login del backend
+      if (error.response?.status === 400 && error.response?.data?.non_field_errors) {
+        const errorMessage = error.response.data.non_field_errors[0];
+        return { success: false, error: errorMessage };
+      }
+      
+      // Si el error es de los tokens JWT
+      if (error.response?.status === 401) {
+        return { success: false, error: 'Credenciales incorrectas' };
+      }
+      
+      const errorMessage = error.response?.data?.detail || 
+                          error.response?.data?.message ||
                           'Error al iniciar sesión';
       return { success: false, error: errorMessage };
     }
@@ -100,10 +115,14 @@ export const ProveedorAutenticacion = ({ children }) => {
   const register = async (userData) => {
     try {
       console.log('Enviando datos de registro:', userData);
-      const response = await axios.post('http://localhost:8000/api/auth/register/', userData);
-      console.log('Respuesta del servidor:', response.data);
       
-      // Obtener tokens después del registro
+      // Paso 1: Registrar usuario
+      const registerResponse = await axios.post('http://localhost:8000/api/auth/register/', userData);
+      console.log('Respuesta del servidor:', registerResponse.data);
+      
+      const user = registerResponse.data.user;
+      
+      // Paso 2: Obtener tokens JWT automáticamente
       const tokenResponse = await axios.post('http://localhost:8000/api/token/', {
         email: userData.email,
         password: userData.password
@@ -111,51 +130,29 @@ export const ProveedorAutenticacion = ({ children }) => {
 
       const { access, refresh } = tokenResponse.data;
       
-      // Guardar tokens
-      localStorage.setItem('token', access);
-      localStorage.setItem('refreshToken', refresh);
+      // Guardar tokens con nombres consistentes
+      localStorage.setItem('access_token', access);
+      localStorage.setItem('refresh_token', refresh);
       
       // Configurar axios para incluir token
       axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
       
-      setUser(response.data.user);
+      setUser(user);
       setIsAuthenticated(true);
       
-      return { success: true, user: response.data.user };
+      return { success: true, user };
     } catch (error) {
       console.error('Error de registro:', error);
       console.error('Datos del error:', error.response?.data);
       console.error('Status:', error.response?.status);
       
-      // Mostrar errores más detallados
-      let errorMessage = 'Error al registrar usuario';
-      
-      if (error.response?.data) {
-        const errorData = error.response.data;
-        
-        // Si hay errores de campo específicos
-        if (typeof errorData === 'object') {
-          const errorMessages = [];
-          
-          // Revisar cada campo en busca de errores
-          Object.keys(errorData).forEach(field => {
-            if (Array.isArray(errorData[field])) {
-              errorMessages.push(`${field}: ${errorData[field][0]}`);
-            } else if (typeof errorData[field] === 'string') {
-              errorMessages.push(`${field}: ${errorData[field]}`);
-            }
-          });
-          
-          if (errorMessages.length > 0) {
-            errorMessage = errorMessages.join(', ');
-          }
-        } else if (errorData.detail) {
-          errorMessage = errorData.detail;
-        } else if (errorData.non_field_errors && errorData.non_field_errors[0]) {
-          errorMessage = errorData.non_field_errors[0];
-        }
-      }
-      
+      const errorMessage = error.response?.data?.email?.[0] || 
+                          error.response?.data?.password?.[0] ||
+                          error.response?.data?.password2?.[0] ||
+                          error.response?.data?.non_field_errors?.[0] || 
+                          error.response?.data?.detail || 
+                          error.response?.data?.message ||
+                          'Error al registrarse';
       return { success: false, error: errorMessage };
     }
   };
@@ -166,9 +163,9 @@ export const ProveedorAutenticacion = ({ children }) => {
     } catch (error) {
       console.error('Error de logout:', error);
     } finally {
-      // Limpiar tokens y estado
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+      // Limpiar tokens y estado con nombres consistentes
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
       delete axios.defaults.headers.common['Authorization'];
       setUser(null);
       setIsAuthenticated(false);

@@ -1,12 +1,25 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ProveedorAutenticacion, useAuth } from './contextos/ContextoAutenticacion';
+import { ModulosColorProvider, useModulosColor } from './contextos/ContextoModulos';
 import PaginaLogin from './paginas/Login';
 import PaginaRegistro from './paginas/Registro';
-import PanelPrincipal from './paginas/Panel';
+import { LigasPage } from './paginas/Ligas';
 import RutaProtegida from './componentes/RutaProtegida';
 import PageTransition from './componentes/PageTransition';
 import './App.css';
+
+// Componente que aplica el tema automáticamente al cargar
+const ThemeInitializer = () => {
+  const { aplicarTemaEleganteMundial } = useModulosColor();
+  
+  React.useEffect(() => {
+    // Aplicar el tema elegante automáticamente al cargar la aplicación
+    aplicarTemaEleganteMundial();
+  }, [aplicarTemaEleganteMundial]);
+
+  return null;
+};
 
 function ContenidoApp() {
   const { loading } = useAuth();
@@ -44,7 +57,12 @@ function ContenidoApp() {
       <Route path="/registro" element={<PaginaRegistro />} />
       <Route path="/panel" element={
         <RutaProtegida>
-          <PanelPrincipal />
+          <LigasPage />
+        </RutaProtegida>
+      } />
+      <Route path="/ligas" element={
+        <RutaProtegida>
+          <LigasPage />
         </RutaProtegida>
       } />
       <Route path="/" element={<Navigate to="/panel" replace />} />
@@ -62,13 +80,16 @@ function AppWithRouter() {
 
 function App() {
   return (
-    <ProveedorAutenticacion>
-      <Router>
-        <div className="App">
-          <AppWithRouter />
-        </div>
-      </Router>
-    </ProveedorAutenticacion>
+    <ModulosColorProvider>
+      <ProveedorAutenticacion>
+        <Router>
+          <div className="App">
+            <ThemeInitializer />
+            <AppWithRouter />
+          </div>
+        </Router>
+      </ProveedorAutenticacion>
+    </ModulosColorProvider>
   );
 }
 

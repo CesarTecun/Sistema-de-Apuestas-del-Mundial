@@ -32,6 +32,7 @@
   display: block !important;
   width: 100% !important;
   box-sizing: border-box !important;
+  padding: 14px 14px 14px 85px !important;
 }
 
 .login-page .form-container .login-button {

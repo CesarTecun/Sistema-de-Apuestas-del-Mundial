@@ -3,9 +3,9 @@ from rest_framework.routers import DefaultRouter
 from .views import LigaViewSet, ligas_por_usuario
 
 router = DefaultRouter()
-router.register(r'ligas', LigaViewSet, basename='liga')
+router.register(r'', LigaViewSet, basename='liga')  # Cambiado de 'ligas' a ''
 
 urlpatterns = [
-    path('api/', include(router.urls)),
-    path('api/ligas/por-usuario/', ligas_por_usuario, name='ligas_por_usuario'),
+    path('', include(router.urls)),  # Cambiado de 'api/' a ''
+    path('por-usuario/', ligas_por_usuario, name='ligas_por_usuario'),
 ]
