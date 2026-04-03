@@ -14,3 +14,20 @@ class Liga(models.Model):
     
     def __str__(self):
         return self.nombre_liga
+
+
+class PartidoLiga(models.Model):
+    """
+    Modelo para la tabla partido_liga.
+    Relaciona partidos con ligas (qué partidos están disponibles para apostar en cada liga).
+    """
+    fk_id_liga = models.IntegerField()
+    fk_id_partido = models.IntegerField()
+
+    class Meta:
+        db_table = 'partido_liga'
+        managed = False
+        unique_together = ('fk_id_liga', 'fk_id_partido')
+
+    def __str__(self):
+        return f"Liga {self.fk_id_liga} - Partido {self.fk_id_partido}"

@@ -382,6 +382,19 @@ ALTER SEQUENCE public.partido_id_partido_seq OWNED BY public.partido.id_partido;
 
 
 --
+-- Name: partido_liga; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.partido_liga (
+    fk_id_liga integer NOT NULL,
+    fk_id_partido integer NOT NULL
+);
+
+
+ALTER TABLE public.partido_liga OWNER TO postgres;
+
+
+--
 -- Name: posiciones_torneo; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1090,6 +1103,14 @@ ALTER TABLE ONLY public.equipoliga
 
 
 --
+-- Name: partido_liga partido_liga_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.partido_liga
+    ADD CONSTRAINT partido_liga_pkey PRIMARY KEY (fk_id_liga, fk_id_partido);
+
+
+--
 -- Name: fase_grupo fase_grupo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1281,6 +1302,22 @@ ALTER TABLE ONLY public.equipoliga
 
 ALTER TABLE ONLY public.equipoliga
     ADD CONSTRAINT equipoliga_fk_id_seleccion_fkey FOREIGN KEY (fk_id_seleccion) REFERENCES public.seleccion(id_seleccion) ON DELETE CASCADE;
+
+
+--
+-- Name: partido_liga partido_liga_fk_id_liga_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.partido_liga
+    ADD CONSTRAINT partido_liga_fk_id_liga_fkey FOREIGN KEY (fk_id_liga) REFERENCES public.liga(id_liga) ON DELETE CASCADE;
+
+
+--
+-- Name: partido_liga partido_liga_fk_id_partido_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.partido_liga
+    ADD CONSTRAINT partido_liga_fk_id_partido_fkey FOREIGN KEY (fk_id_partido) REFERENCES public.partido(id_partido) ON DELETE CASCADE;
 
 
 --
