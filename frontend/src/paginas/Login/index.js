@@ -5,7 +5,7 @@ import FormularioLogin from './componentes/FormularioLogin';
 import LogoCopaMundial from './componentes/LogoCopaMundial';
 import ModalVideo from './componentes/ModalVideo';
 import './estilos/PaginaLogin.css';
-import './estilos/LoginSpecific.css';
+import './estilos/LoginModerno.css';
 
 const PaginaLogin = () => {
   const [error, setError] = useState('');
@@ -19,7 +19,7 @@ const PaginaLogin = () => {
     setError('');
     setLoading(true);
 
-    const result = await login(formData.email, formData.password);
+    const result = await login(formData.email, formData.password, formData.rememberMe);
     
     if (result.success) {
       navigate('/panel');

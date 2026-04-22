@@ -8,17 +8,36 @@
 }
 
 /* ========================================
-   FONDO CON GRADIENTE Y EFECTOS VISUALES
+   FONDO CON GRADIENTE Y EFECTOS VISUALES - MUNDIAL 2026
    ======================================== */
 .login-background {
   height: 100%;
   width: 100%;
   background: 
-    var(--theme-gradient),
-    var(--theme-radial1),
-    var(--theme-radial2);
-  background-size: cover, cover, cover;
-  background-position: center, center, center;
+    linear-gradient(135deg, 
+      #1a472a 0%,    /* Verde césped oscuro */
+      #2d5a3d 25%,   /* Verde césped medio */
+      #1e3a5f 50%,   /* Azul noche */
+      #0f1f3d 75%,   /* Azul noche profundo */
+      #1a1a2e 100%   /* Negro azulado */
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 100px,
+      rgba(255, 255, 255, 0.03) 100px,
+      rgba(255, 255, 255, 0.03) 102px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 100px,
+      rgba(255, 255, 255, 0.03) 100px,
+      rgba(255, 255, 255, 0.03) 102px
+    ),
+    radial-gradient(circle at 30% 40%, rgba(212, 175, 55, 0.15) 0%, transparent 50%);
+  background-size: cover, cover, cover, cover;
+  background-position: center, center, center, center;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,17 +45,17 @@
 }
 
 /* ========================================
-   FORMULARIO DE LOGIN CON EFECTO VIDRIO
+   FORMULARIO DE LOGIN CON EFECTO VIDRIO - MUNDIAL 2026
    ======================================== */
 .login-form {
-  background: rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 20px;
+  background: rgba(10, 25, 20, 0.55);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 32px;
   padding: 35px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 0 0 100px rgba(212, 175, 55, 0.1);
   position: relative;
   transition: transform 0.3s ease;
 }
@@ -51,14 +70,17 @@
 }
 
 /* ========================================
-   TÍTULO DE BIENVENIDA
+   TÍTULO DE BIENVENIDA - MUNDIAL 2026
    ======================================== */
 .login-title {
   text-align: center;
-  color: white;
+  color: #d4af37;
   margin-bottom: 20px;
   font-size: 24px;
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
 }
 
 /* ========================================
@@ -119,7 +141,7 @@
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.8);
+  color: #d4af37;
   pointer-events: none;
   z-index: 2;
 }
@@ -129,22 +151,22 @@
    ======================================== */
 .form-input {
   width: 100%;
-  padding: 14px 14px 14px 85px;
-  border: 1px solid var(--modulo-input-border, rgba(255, 255, 255, 0.3));
+  padding: 14px 14px 14px 52px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 15px;
   font-size: 15px;
-  background: var(--modulo-input-bg, rgba(255, 255, 255, 0.12));
-  color: var(--modulo-text-primary, #ffffff);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-  color: var(--modulo-text-primary, #ffffff);
+  border-color: #d4af37;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  color: #ffffff;
 }
 
 .form-input::placeholder {
@@ -164,27 +186,28 @@
 }
 
 /* ========================================
-   BOTÓN DE LOGIN
+   BOTÓN DE LOGIN - MUNDIAL 2026 (DORADO)
    ======================================== */
 .login-button {
-  background: linear-gradient(135deg, #a83279 0%, #d94a6e 100%);
-  color: white;
+  background: linear-gradient(135deg, #F5B042 0%, #FFD966 100%);
+  color: #1a1a2e;
   border: none;
   padding: 18px;
-  border-radius: 15px;
+  border-radius: 48px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 5px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(168, 50, 121, 0.3);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .login-button:hover {
-  background: linear-gradient(135deg, #b84289 0%, #e95a7e 100%);
+  background: linear-gradient(135deg, #FFD966 0%, #FFE566 100%);
   transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(168, 50, 121, 0.5);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
 }
 
 .login-button:active {
@@ -209,6 +232,8 @@
   margin-top: 5px;
   margin-bottom: 5px;
   padding: 0 5px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .remember-me {
@@ -220,20 +245,26 @@
 }
 
 .remember-me input[type="checkbox"] {
-  margin-right: 8px;
-  accent-color: #6a4c93;
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  accent-color: #d4af37;
+  cursor: pointer;
 }
 
 .forgot-password {
+  background: none;
+  border: none;
   color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
   font-size: 14px;
   transition: color 0.3s ease;
   font-weight: 500;
+  cursor: pointer;
+  padding: 0;
 }
 
 .forgot-password:hover {
-  color: #ffffff;
+  color: #d4af37;
   text-decoration: underline;
 }
 
@@ -250,7 +281,7 @@
 }
 
 .register-anchor {
-  color: #ffffff;
+  color: #d4af37;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s ease;
@@ -258,8 +289,9 @@
 }
 
 .register-anchor:hover {
-  color: #a83279;
+  color: #ffd700;
   text-decoration: underline;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
 }
 
 /* ========================================
@@ -406,12 +438,17 @@
 }
 
 /* ========================================
-   DISEÑO RESPONSIVO
-   ========================================/* Responsive design */
+   DISEÑO RESPONSIVO - MÓVIL
+   ======================================== */
 @media (max-width: 480px) {
   .login-form {
-    margin: 20px;
-    padding: 30px 20px;
+    margin: 16px;
+    padding: 25px 18px;
+  }
+  
+  .login-title {
+    font-size: 20px;
+    margin-bottom: 15px;
   }
   
   .logo {
@@ -419,12 +456,40 @@
     height: 60px;
   }
   
+  .form-input {
+    padding: 12px 12px 12px 45px;
+    font-size: 14px;
+  }
+  
+  .input-icon {
+    left: 14px;
+  }
+  
+  .remember-forgot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .forgot-password {
+    align-self: flex-end;
+  }
+  
+  .login-button {
+    padding: 16px;
+    font-size: 15px;
+  }
+  
+  .register-link {
+    font-size: 13px;
+    padding: 12px 0;
+  }
+  
   .back-link {
     top: 20px;
     left: 20px;
   }
-
-  }
+}
 
 /* ========================================
    RESPONSIVE PARA EL MODAL
@@ -432,7 +497,8 @@
 @media (max-width: 768px) {
   .modal-content {
     width: 95%;
-    height: 250px;
+    aspect-ratio: 16 / 9;
+    height: auto;
   }
   
   .modal-close {
@@ -441,5 +507,46 @@
     width: 30px;
     height: 30px;
     font-size: 20px;
+  }
+}
+
+/* ========================================
+   RESPONSIVE PARA TABLETS (481px - 768px)
+   ======================================== */
+@media (min-width: 481px) and (max-width: 768px) {
+  .login-form {
+    max-width: 380px;
+    padding: 30px;
+  }
+  
+  .logo {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .login-title {
+    font-size: 22px;
+  }
+}
+
+/* ========================================
+   RESPONSIVE PARA PANTALLAS MUY PEQUEÑAS (max-width: 360px)
+   ======================================== */
+@media (max-width: 360px) {
+  .login-title {
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+  
+  .register-link {
+    font-size: 12px;
+  }
+  
+  .remember-me {
+    font-size: 12px;
+  }
+  
+  .forgot-password {
+    font-size: 12px;
   }
 }
