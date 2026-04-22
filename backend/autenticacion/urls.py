@@ -4,7 +4,9 @@ from .views import (
     LoginView,
     LogoutView,
     UserProfileView,
-    CheckAuthView
+    CheckAuthView,
+    SesionesActivasView,
+    CerrarSesionView
 )
 
 urlpatterns = [
@@ -13,4 +15,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', UserProfileView.as_view(), name='profile'),
     path('check/', CheckAuthView.as_view(), name='check-auth'),
+    path('sesiones/', SesionesActivasView.as_view(), name='sesiones-activas'),
+    path('sesiones/<int:sesion_id>/cerrar/', CerrarSesionView.as_view(), name='cerrar-sesion'),
 ]

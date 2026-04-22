@@ -1548,7 +1548,8 @@ INSERT INTO public.usuario (
     email, 
     telefono, 
     contrasena,
-    fk_rol
+    fk_rol,
+    status
 ) VALUES (
     1,                      
     'Admin',                
@@ -1556,10 +1557,11 @@ INSERT INTO public.usuario (
     'Principal',             
     NULL,                   
     '1990-01-01',            
-    'admin@quiniela.com',    
+    'admin@mundial.com',    
     12345678,           
-    'pbkdf2_sha256$1000000$yduaB5yxmHJkQwvYhNLp3d$dwDooVxrFnwsAjQ7TgpahndRXZE+14+QVJXdjkkQuy4=',
-    1                        
+    'bcrypt_sha256$$2b$12$X0maiGq0O0lRxPsyuVAgEOIlhZ2FFbvSNtWHI0gpHuWUhM8vAv7UC',
+    1,
+    true                        
 ) ON CONFLICT (id_usuario) DO NOTHING;
 
 -- Restart sequence to start from 2 (skip ID 1 for admin user)

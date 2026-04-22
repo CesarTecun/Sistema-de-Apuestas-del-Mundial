@@ -56,6 +56,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "backend.autenticacion.middleware.SesionTrackingMiddleware",  # Seguimiento de sesión en tiempo real
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -160,6 +161,15 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 AUTHENTICATION_BACKENDS = [
     'backend.autenticacion.backends.EmailAuthBackend',
     'django.contrib.auth.backends.ModelBackend',  # Fallback
+]
+
+# Password hashers - Usar bcrypt como algoritmo principal
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',  # bcrypt con SHA256
+    'django.contrib.auth.hashers.BCryptPasswordHasher',          # bcrypt estándar
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',          # Fallback PBKDF2
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',        # Fallback SHA1
+    'django.contrib.auth.hashers.Argon2PasswordHasher',          # Opcional
 ]
 
 # Django REST Framework
