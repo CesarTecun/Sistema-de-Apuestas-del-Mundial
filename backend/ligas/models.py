@@ -31,3 +31,33 @@ class PartidoLiga(models.Model):
 
     def __str__(self):
         return f"Liga {self.fk_id_liga} - Partido {self.fk_id_partido}"
+
+
+class Invitacion(models.Model):
+    """
+    Modelo para la tabla invitacion.
+    Maneja invitaciones enviadas a usuarios para unirse a ligas.
+    """
+    ESTADOS = [
+        ('Pendiente', 'Pendiente'),
+        ('Aceptada', 'Aceptada'),
+        ('Rechazada', 'Rechazada'),
+        ('Expirada', 'Expirada'),
+    ]
+
+    id_invitacion = models.AutoField(primary_key=True)
+    fk_id_liga = models.IntegerField()
+    fk_id_usuario_invitado = models.IntegerField()
+    fk_id_usuario_administrador = models.IntegerField()
+    fecha_invitacion = models.DateTimeField(auto_now_add=True)
+    estado_invitacion = models.CharField(max_length=50, choices=ESTADOS, default='Pendiente')
+    mensaje_invitacion = models.TextField(blank=True, null=True)
+    email_invitado = models.EmailField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        db_table = 'invitacion'
+        managed = False
+        app_label = 'ligas'
+
+    def __str__(self):
+        return f"Invitación {self.id_invitacion} - Liga {self.fk_id_liga}"

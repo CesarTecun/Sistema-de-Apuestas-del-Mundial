@@ -225,3 +225,21 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+# =============================================================================
+# CONFIGURACIÓN DE CORREO SMTP (Gmail)
+# =============================================================================
+# Usar contraseña de aplicación de Gmail (no la contraseña normal)
+# Generada en: https://myaccount.google.com/apppasswords
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'quinielachechas@gmail.com'
+EMAIL_HOST_PASSWORD = 'xmwo rmnf zvsr giew'  # Contraseña de aplicación
+DEFAULT_FROM_EMAIL = 'Copa Mundial FIFA 2026 <quinielachechas@gmail.com>'
+SERVER_EMAIL = 'quinielachechas@gmail.com'
+
+# Para pruebas en consola (descomentar si quieres ver emails en consola)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
