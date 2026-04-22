@@ -1,12 +1,14 @@
-from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import permissions, status
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Liga, Invitacion
+from backend.utils.viewsets import SoftDeleteModelViewSet
+from .models import Liga, Invitacion, ParticipanteLiga
 from .serializers import LigaSerializer, InvitacionSerializer
+from backend.ligas.serializers import ParticipanteLigaSerializer
 
-class LigaViewSet(viewsets.ModelViewSet):
+class LigaViewSet(SoftDeleteModelViewSet):
     """
     API endpoint para gestionar ligas
     Permite operaciones CRUD completas
@@ -64,13 +66,26 @@ def ligas_por_usuario(request):
     return Response(serializer.data)
 
 
-class InvitacionViewSet(viewsets.ModelViewSet):
+class ParticipanteLigaViewSet(SoftDeleteModelViewSet):
     """
-    API endpoint para gestionar invitaciones a ligas
+    API endpoint para gestionar participantes de ligas.
+    Implementa soft delete - al "eliminar" solo cambia status a False.
+    """
+    queryset = ParticipanteLiga.objects.all()
+    serializer_class = ParticipanteLigaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id_participante'
+
+
+class InvitacionViewSet(SoftDeleteModelViewSet):
+    """
+    API endpoint para gestionar invitaciones a ligas.
+    Implementa soft delete - al "eliminar" solo cambia status a False.
     """
     queryset = Invitacion.objects.all()
     serializer_class = InvitacionSerializer
     permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id_invitacion'
     
     def create(self, request, *args, **kwargs):
         """Crear una nueva invitación (envía correo automáticamente si tiene email)"""

@@ -1,11 +1,12 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.db.models import Q
+from backend.utils.viewsets import SoftDeleteModelViewSet
 from .models import Pronostico
 from .serializers import PronosticoSerializer
 
-class PronosticoViewSet(viewsets.ModelViewSet):
+class PronosticoViewSet(SoftDeleteModelViewSet):
     """
     API endpoint para gestionar pronósticos
     Permite operaciones CRUD completas

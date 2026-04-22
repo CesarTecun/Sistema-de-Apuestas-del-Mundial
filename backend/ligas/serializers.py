@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Liga, Invitacion
+from .models import Liga, Invitacion, ParticipanteLiga
+
 
 class LigaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,9 +8,25 @@ class LigaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ParticipanteLigaSerializer(serializers.ModelSerializer):
+    """Serializer para gestionar participantes de ligas"""
+
+    class Meta:
+        model = ParticipanteLiga
+        fields = [
+            'id_participante',
+            'fk_id_liga',
+            'fk_id_usuario',
+            'fecha_union',
+            'estado_participacion',
+            'status'
+        ]
+        read_only_fields = ['id_participante', 'fecha_union']
+
+
 class InvitacionSerializer(serializers.ModelSerializer):
     """Serializer para crear y gestionar invitaciones"""
-    
+
     class Meta:
         model = Invitacion
         fields = [

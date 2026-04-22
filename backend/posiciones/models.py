@@ -1,7 +1,8 @@
 from django.db import models
+from backend.utils.models import SoftDeleteModel
 
 
-class Ranking(models.Model):
+class Ranking(SoftDeleteModel):
     """
     Modelo para la tabla ranking que almacena las posiciones
     de los usuarios en cada liga.

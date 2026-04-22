@@ -153,7 +153,8 @@ CREATE TABLE public.historial_ganador (
     fk_id_usuario integer,
     fk_id_liga integer,
     monto_pagado numeric(10,2),
-    fecha_premio timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    fecha_premio timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    status boolean DEFAULT true
 );
 
 
@@ -194,7 +195,8 @@ CREATE TABLE public.jugador (
     fecha_nacimiento date,
     dorsal integer,
     posicion character varying(50),
-    fk_id_seleccion integer
+    fk_id_seleccion integer,
+    status boolean DEFAULT true
 );
 
 
@@ -232,7 +234,8 @@ CREATE TABLE public.liga (
     fk_administrador integer,
     monto_total_recaudado numeric(10,2) DEFAULT 0,
     estado character varying(50),
-    tipo_liga character varying(50) DEFAULT 'Diversion'::character varying
+    tipo_liga character varying(50) DEFAULT 'Diversion'::character varying,
+    status boolean DEFAULT true
 );
 
 
@@ -308,7 +311,8 @@ CREATE TABLE public.participante_liga (
     fk_id_liga integer NOT NULL,
     fk_id_usuario integer NOT NULL,
     fecha_union timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    estado_participacion character varying(50) DEFAULT 'Activo'::character varying
+    estado_participacion character varying(50) DEFAULT 'Activo'::character varying,
+    status boolean DEFAULT true
 );
 
 
@@ -484,7 +488,8 @@ CREATE TABLE public.pronostico (
     gol_local integer,
     gol_visitante integer,
     CONSTRAINT pronostico_gol_local_check CHECK ((gol_local >= 0)),
-    CONSTRAINT pronostico_gol_visitante_check CHECK ((gol_visitante >= 0))
+    CONSTRAINT pronostico_gol_visitante_check CHECK ((gol_visitante >= 0)),
+    status boolean DEFAULT true
 );
 
 
@@ -522,7 +527,8 @@ CREATE TABLE public.ranking (
     fk_id_usuario integer,
     fk_id_liga integer,
     pj integer DEFAULT 0,
-    fecha_actualizacion timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    fecha_actualizacion timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    status boolean DEFAULT true
 );
 
 
@@ -627,7 +633,8 @@ CREATE TABLE public.seleccion (
     id_seleccion integer NOT NULL,
     pais character varying(100) NOT NULL,
     bandera character varying(255),
-    fk_id_fase_inicial integer
+    fk_id_fase_inicial integer,
+    status boolean DEFAULT true
 );
 
 
@@ -669,7 +676,8 @@ CREATE TABLE public.usuario (
     email character varying(100) NOT NULL,
     telefono integer,
     contrasena character varying(255) NOT NULL,
-    fk_rol integer
+    fk_rol integer,
+    status boolean DEFAULT true
 );
 
 
@@ -1393,6 +1401,12 @@ ALTER TABLE ONLY public.invitacion
 
 
 --
+-- Agregar columna email_invitado para invitaciones por email
+--
+ALTER TABLE public.invitacion ADD COLUMN email_invitado character varying(100);
+
+
+--
 -- Name: participante_liga participante_liga_fk_id_liga_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1607,5 +1621,88 @@ SELECT setval('public.partido_id_partido_seq', 9, true);
 --
 -- PostgreSQL database dump complete
 --
+
+--
+-- Name: sesion_usuario; Type: TABLE; Schema: public; Owner: postgres
+-- Tabla para registrar inicios de sesion y estado activo en tiempo real
+--
+
+CREATE TABLE public.sesion_usuario (
+    id_sesion integer NOT NULL,
+    fk_id_usuario integer NOT NULL,
+    token_sesion character varying(255) NOT NULL,
+    fecha_inicio timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    fecha_ultima_actividad timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    fecha_cierre timestamp without time zone,
+    estado_sesion character varying(20) DEFAULT 'Activa'::character varying NOT NULL,
+    ip_address character varying(45),
+    user_agent text,
+    dispositivo character varying(100)
+);
+
+
+ALTER TABLE public.sesion_usuario OWNER TO postgres;
+
+
+--
+-- Name: sesion_usuario_id_sesion_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.sesion_usuario_id_sesion_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.sesion_usuario_id_sesion_seq OWNER TO postgres;
+
+
+--
+-- Name: sesion_usuario_id_sesion_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.sesion_usuario_id_sesion_seq OWNED BY public.sesion_usuario.id_sesion;
+
+
+--
+-- Name: sesion_usuario_id_sesion; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sesion_usuario ALTER COLUMN id_sesion SET DEFAULT nextval('public.sesion_usuario_id_sesion_seq'::regclass);
+
+
+--
+-- Name: sesion_usuario sesion_usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sesion_usuario
+    ADD CONSTRAINT sesion_usuario_pkey PRIMARY KEY (id_sesion);
+
+
+--
+-- Name: sesion_usuario sesion_usuario_fk_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sesion_usuario
+    ADD CONSTRAINT sesion_usuario_fk_id_usuario_fkey FOREIGN KEY (fk_id_usuario) REFERENCES public.usuario(id_usuario) ON DELETE CASCADE;
+
+
+--
+-- Name: sesion_usuario sesion_usuario_token_sesion_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sesion_usuario
+    ADD CONSTRAINT sesion_usuario_token_sesion_key UNIQUE (token_sesion);
+
+
+--
+-- Name: sesion_usuario_id_sesion_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.sesion_usuario_id_sesion_seq', 1, false);
+
 
 \unrestrict 7Hpn2sIihswh4XAuPxR1fe5o2a6TWNDyPVROSlnxS9ahweTnrEyZg9kr8GUqJYz
