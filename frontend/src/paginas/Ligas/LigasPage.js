@@ -5,8 +5,9 @@ import TarjetaLiga from './componentes/TarjetaLiga';
 import FormularioLiga from './componentes/FormularioLiga';
 import useNotificaciones from '../../hooks/useNotificaciones';
 import NotificacionesContainer from '../../componentes/NotificacionesContainer';
-import AlertaConfirmacion from '../../componentes/AlertaConfirmacion';
-import '../../componentes/AlertaConfirmacion.css';
+import AlertaConfirmacion from './componentes/AlertaConfirmacion';
+import { API_ENDPOINTS, getAuthHeaders } from '../../config/apiConfig';
+import './componentes/AlertaConfirmacion.css';
 import './estilos/LigasPage.css';
 
 const LigasPage = () => {
@@ -39,12 +40,8 @@ const LigasPage = () => {
   const cargarLigas = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:8000/api/ligas/', {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await fetch(API_ENDPOINTS.LIGAS, {
+        headers: getAuthHeaders()
       });
       
       if (!response.ok) {

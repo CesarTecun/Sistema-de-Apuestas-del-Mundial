@@ -78,7 +78,8 @@ class LoginView(APIView):
 
             user = serializer.validated_data['user']
 
-            login(request, user)
+            # No usar login() de Django ya que el modelo no tiene last_login
+            # login(request, user)
 
             return Response({
 

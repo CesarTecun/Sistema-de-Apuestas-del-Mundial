@@ -1,1 +1,0 @@
-# Backend Vaticinio App

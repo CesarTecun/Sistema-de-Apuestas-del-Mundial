@@ -34,6 +34,7 @@ class Usuario(models.Model):
     class Meta:
         managed = False
         db_table = 'usuario'
+        app_label = 'usuarios'
 
     def __str__(self):
         return f"{self.primer_nombre} {self.primer_apellido} ({self.email})"
@@ -110,6 +111,7 @@ class RolUsuario(models.Model):
     class Meta:
         managed = False
         db_table = 'rol_usuario'
+        app_label = 'usuarios'
 
     def __str__(self):
         return self.descripcion

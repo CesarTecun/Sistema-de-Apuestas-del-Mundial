@@ -60,6 +60,8 @@ Thumbs.db
 # Database
 *.db
 *.sqlite3
+database/backups/
+database/migrations/*.py
 
 # Docker
 docker-compose.override.yml

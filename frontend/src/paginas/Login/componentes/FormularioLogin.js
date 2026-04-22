@@ -78,7 +78,7 @@ const FormularioLogin = ({ onSubmit, error, loading }) => {
             <input type="checkbox" />
             <span>Recordarme</span>
           </label>
-          <a href="#" className="forgot-password">¿Olvidaste tu contraseña?</a>
+          <button type="button" className="forgot-password">¿Olvidaste tu contraseña?</button>
         </div>
         
         <div className="register-link">

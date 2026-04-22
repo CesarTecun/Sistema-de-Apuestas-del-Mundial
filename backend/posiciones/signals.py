@@ -6,7 +6,7 @@ cuando cambian los resultados de partidos o los pronósticos.
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from backend.partidos.models import Partido
-from backend.vaticinio.models import Pronostico
+from backend.pronosticos.models import Pronostico
 from .services import actualizar_ranking_usuario
 
 

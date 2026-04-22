@@ -7,7 +7,7 @@ Reglas de puntuación:
 - 0 puntos: No acierta nada
 """
 
-from backend.vaticinio.models import Pronostico
+from backend.pronosticos.models import Pronostico
 from backend.partidos.models import Partido
 from backend.posiciones.models import Ranking
 

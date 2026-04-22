@@ -65,6 +65,7 @@ urlpatterns = [
     path("api/auth/", include("backend.autenticacion.urls")),
     path("api/ligas/", include("backend.ligas.urls")),
     path("api/partidos/", include("backend.partidos.urls")),
+    path("api/pronosticos/", include("backend.pronosticos.urls")),
     path("api/posiciones/", include("backend.posiciones.urls")),
     path("api/premios/", include("backend.premios.urls")),
     path("api/historial/", include("backend.historialganador.urls")),

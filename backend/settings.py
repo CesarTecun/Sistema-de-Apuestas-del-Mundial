@@ -40,10 +40,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'backend.autenticacion',  # App de autenticación
-    'usuarios',
+    'backend.usuarios',       # App de usuarios
     'backend.ligas',          # App de ligas
     'backend.partidos',       # App de partidos
-    'backend.vaticinio',      # App de pronósticos
+    'backend.pronosticos',     # App de pronósticos
     'backend.posiciones',     # App de posiciones/ranking
     'backend.premios',        # App de premios
     'backend.historialganador',  # App de historial de ganadores

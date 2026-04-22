@@ -12,7 +12,7 @@ class Pronostico(models.Model):
     class Meta:
         db_table = 'pronostico'
         managed = False  # Django no gestionará esta tabla (ya existe)
-        app_label = 'vaticinio'
+        app_label = 'pronosticos'
         # Un usuario solo puede hacer un pronóstico por partido en una liga
         unique_together = [['fk_id_usuario', 'fk_id_partido', 'fk_id_liga']]
     
