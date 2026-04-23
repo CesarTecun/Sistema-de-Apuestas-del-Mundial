@@ -1,12 +1,13 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.db.models import Sum
+from backend.utils.viewsets import ReadOnlySoftDeleteModelViewSet
 from .models import HistorialGanador
 from .serializers import HistorialGanadorSerializer, ResumenGanadorSerializer
 
 
-class HistorialGanadorViewSet(viewsets.ReadOnlyModelViewSet):
+class HistorialGanadorViewSet(ReadOnlySoftDeleteModelViewSet):
     """
     API endpoint para consultar el historial de ganadores.
     Solo lectura - los registros se crean automáticamente.

@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# Pre-commit hook para verificar migraciones de Django
+#
+
+# Verificar si se están intentando commitear migraciones
+STAGED_MIGRATIONS=$(git diff --cached --name-only --diff-filter=ACM | grep -E "backend/.*/migrations/0.*\.py$" || true)
+
+if [ -n "$STAGED_MIGRATIONS" ]; then
+    echo ""
+    echo "⚠️  ATENCIÓN: Estás intentando commitear migraciones de Django:"
+    echo "$STAGED_MIGRATIONS"
+    echo ""
+    echo "Según la política del equipo:"
+    echo "   - NO commitees migraciones durante desarrollo"
+    echo "   - Solo el responsable de migraciones debe commitearlas"
+    echo ""
+    echo "Opciones:"
+    echo "   1. Descarta los cambios: git reset HEAD backend/*/migrations/0*.py"
+    echo "   2. Fuerza el commit: git commit --no-verify (NO RECOMENDADO)"
+    echo ""
+    exit 1
+fi
+
+exit 0

@@ -1,16 +1,22 @@
 from django.db import models
 from django.contrib.auth.hashers import check_password, make_password
+from backend.utils.models import SoftDeleteModel, SoftDeleteManager, AllObjectsManager
 
 
-class UsuarioManager(models.Manager):
-    """Manager personalizado para Usuario"""
+class UsuarioManager(SoftDeleteManager):
+    """Manager personalizado para Usuario - solo retorna usuarios activos"""
 
     def get_by_natural_key(self, email):
         """Obtener usuario por email (requerido por Django auth)"""
         return self.get(email=email)
 
 
-class Usuario(models.Model):
+class AllUsuariosManager(AllObjectsManager):
+    """Manager que retorna todos los usuarios incluyendo eliminados"""
+    pass
+
+
+class Usuario(SoftDeleteModel):
     """
     Modelo de usuario que mapea directamente la tabla public.usuario.
     No hereda de AbstractBaseUser para evitar campos adicionales de Django.
@@ -58,8 +64,8 @@ class Usuario(models.Model):
 
     @property
     def is_active(self):
-        """Asumimos que todos los usuarios de la BD están activos"""
-        return True
+        """Retorna True si el usuario está activo (status=True)"""
+        return self.status
 
     @property
     def is_staff(self):

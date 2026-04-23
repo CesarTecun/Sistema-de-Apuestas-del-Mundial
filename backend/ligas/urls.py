@@ -1,11 +1,17 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import LigaViewSet, ligas_por_usuario
+from .views import (
+    LigaViewSet, InvitacionViewSet, ParticipanteLigaViewSet,
+    ligas_por_usuario, enviar_invitacion_email_api
+)
 
 router = DefaultRouter()
-router.register(r'', LigaViewSet, basename='liga')  # Cambiado de 'ligas' a ''
+router.register(r'', LigaViewSet, basename='liga')
+router.register(r'invitaciones', InvitacionViewSet, basename='invitacion')
+router.register(r'participantes', ParticipanteLigaViewSet, basename='participante')
 
 urlpatterns = [
-    path('', include(router.urls)),  # Cambiado de 'api/' a ''
+    path('', include(router.urls)),
     path('por-usuario/', ligas_por_usuario, name='ligas_por_usuario'),
+    path('invitaciones/enviar-email/', enviar_invitacion_email_api, name='enviar_invitacion_email'),
 ]

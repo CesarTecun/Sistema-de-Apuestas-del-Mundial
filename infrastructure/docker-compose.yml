@@ -10,7 +10,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ../database/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ../database/init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql
+      - ../database/init-django-tables.sql:/docker-entrypoint-initdb.d/02-init-django-tables.sql
     networks:
       - quiniela_network
 

@@ -1,7 +1,8 @@
 from django.db import models
+from backend.utils.models import SoftDeleteModel
 
 
-class HistorialGanador(models.Model):
+class HistorialGanador(SoftDeleteModel):
     """
     Modelo para la tabla historial_ganador que registra
     todos los ganadores de premios de todas las ligas.

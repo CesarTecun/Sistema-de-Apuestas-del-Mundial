@@ -1,11 +1,12 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.db.models import Q
+from backend.utils.viewsets import ReadOnlySoftDeleteModelViewSet
 from .models import Ranking
 from .serializers import (
-    RankingSerializer, 
-    RankingConPosicionSerializer, 
+    RankingSerializer,
+    RankingConPosicionSerializer,
     PosicionUsuarioSerializer
 )
 from .services import (
@@ -16,7 +17,7 @@ from .services import (
 )
 
 
-class RankingViewSet(viewsets.ReadOnlyModelViewSet):
+class RankingViewSet(ReadOnlySoftDeleteModelViewSet):
     """
     API endpoint para consultar rankings.
     Solo lectura - las actualizaciones se hacen mediante los endpoints específicos.

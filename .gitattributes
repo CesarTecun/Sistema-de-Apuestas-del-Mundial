@@ -1,2 +1,8 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Django migrations - always take ours or theirs, never merge
+backend/**/migrations/*.py merge=union
+
+# SQL files - union merge
+*.sql merge=union

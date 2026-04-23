@@ -61,7 +61,6 @@ Thumbs.db
 *.db
 *.sqlite3
 database/backups/
-database/migrations/*.py
 
 # Docker
 docker-compose.override.yml
@@ -69,6 +68,10 @@ docker-compose.override.yml
 
 # Django migrations (initial ones ok, but keep them tracked)
 # backend/*/migrations/0*.py
+
+# Ignore migration cache
+backend/**/migrations/__pycache__/
+backend/**/migrations/*.pyc
 
 # Coverage reports
 htmlcov/

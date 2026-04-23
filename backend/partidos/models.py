@@ -1,4 +1,47 @@
 from django.db import models
+from backend.utils.models import SoftDeleteModel
+
+
+class Seleccion(SoftDeleteModel):
+    """
+    Modelo para la tabla seleccion.
+    Representa las selecciones nacionales que participan en el mundial.
+    """
+    id_seleccion = models.AutoField(primary_key=True)
+    pais = models.CharField(max_length=100)
+    bandera = models.CharField(max_length=255, null=True, blank=True)
+    fk_id_fase_inicial = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'seleccion'
+        managed = False
+
+    def __str__(self):
+        return self.pais
+
+
+class Jugador(SoftDeleteModel):
+    """
+    Modelo para la tabla jugador.
+    Representa los jugadores de cada selección.
+    """
+    id_jugador = models.AutoField(primary_key=True)
+    primer_nombre = models.CharField(max_length=50, null=True, blank=True)
+    segundo_nombre = models.CharField(max_length=50, null=True, blank=True)
+    primer_apellido = models.CharField(max_length=50, null=True, blank=True)
+    segundo_apellido = models.CharField(max_length=50, null=True, blank=True)
+    fecha_nacimiento = models.DateField(null=True, blank=True)
+    dorsal = models.IntegerField(null=True, blank=True)
+    posicion = models.CharField(max_length=50, null=True, blank=True)
+    fk_id_seleccion = models.IntegerField()
+
+    class Meta:
+        db_table = 'jugador'
+        managed = False
+
+    def __str__(self):
+        return f"{self.primer_nombre} {self.primer_apellido} ({self.posicion})"
+
 
 class Partido(models.Model):
     id_partido = models.AutoField(primary_key=True)

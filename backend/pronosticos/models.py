@@ -1,21 +1,22 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from backend.utils.models import SoftDeleteModel
 
-class Pronostico(models.Model):
+class Pronostico(SoftDeleteModel):
     id_pronostico = models.AutoField(primary_key=True)
     fk_id_usuario = models.IntegerField()
     fk_id_partido = models.IntegerField()
     fk_id_liga = models.IntegerField()
     gol_local = models.IntegerField()
     gol_visitante = models.IntegerField()
-    
+
     class Meta:
         db_table = 'pronostico'
         managed = False  # Django no gestionará esta tabla (ya existe)
         app_label = 'pronosticos'
         # Un usuario solo puede hacer un pronóstico por partido en una liga
         unique_together = [['fk_id_usuario', 'fk_id_partido', 'fk_id_liga']]
-    
+
     def __str__(self):
         return f"Pronóstico {self.id_pronostico}: Usuario {self.fk_id_usuario} - Partido {self.fk_id_partido} ({self.gol_local}-{self.gol_visitante})"
     

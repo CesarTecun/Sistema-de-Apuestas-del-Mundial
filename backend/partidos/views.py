@@ -1,11 +1,35 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import Partido
-from .serializers import PartidoSerializer
+from backend.utils.viewsets import SoftDeleteModelViewSet
+from .models import Partido, Jugador, Seleccion
+from .serializers import PartidoSerializer, JugadorSerializer, SeleccionSerializer
 
-class PartidoViewSet(viewsets.ModelViewSet):
+
+class JugadorViewSet(SoftDeleteModelViewSet):
+    """
+    API endpoint para gestionar jugadores.
+    Implementa soft delete - al "eliminar" solo cambia status a False.
+    """
+    queryset = Jugador.objects.all()
+    serializer_class = JugadorSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id_jugador'
+
+
+class SeleccionViewSet(SoftDeleteModelViewSet):
+    """
+    API endpoint para gestionar selecciones.
+    Implementa soft delete - al "eliminar" solo cambia status a False.
+    """
+    queryset = Seleccion.objects.all()
+    serializer_class = SeleccionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id_seleccion'
+
+
+class PartidoViewSet(SoftDeleteModelViewSet):
     """
     API endpoint para gestionar partidos
     Permite operaciones CRUD completas
