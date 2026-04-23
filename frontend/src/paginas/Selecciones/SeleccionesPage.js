@@ -58,7 +58,6 @@ const SeleccionesPage = () => {
   } = useNotificaciones();
 
   const {
-    selecciones,
     loading,
     error,
     searchTerm,
