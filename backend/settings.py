@@ -89,14 +89,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# SQLite para desarrollo local temporal
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
 # PostgreSQL para producción con Docker
 DATABASES = {
     "default": {

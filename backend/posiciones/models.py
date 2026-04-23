@@ -15,7 +15,7 @@ class Ranking(SoftDeleteModel):
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'ranking'
         app_label = 'posiciones'
 

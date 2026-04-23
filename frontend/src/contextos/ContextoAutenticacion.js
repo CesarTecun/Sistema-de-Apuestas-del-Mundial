@@ -43,6 +43,11 @@ export const ProveedorAutenticacion = ({ children }) => {
           if (response.data.is_authenticated) {
             setUser(response.data.user);
             setIsAuthenticated(true);
+            
+            // Limpiar sessionStorage de animaciones cuando se carga la app y el usuario ya está autenticado
+            sessionStorage.removeItem('ligas_visited');
+            sessionStorage.removeItem('partidos_visited');
+            sessionStorage.removeItem('selecciones_visited');
           } else {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
@@ -79,6 +84,11 @@ export const ProveedorAutenticacion = ({ children }) => {
       });
 
       const { access, refresh } = tokenResponse.data;
+      
+      // Limpiar sessionStorage de animaciones al iniciar sesión
+      sessionStorage.removeItem('ligas_visited');
+      sessionStorage.removeItem('partidos_visited');
+      sessionStorage.removeItem('selecciones_visited');
       
       // Guardar tokens con nombres consistentes
       localStorage.setItem('access_token', access);
@@ -130,6 +140,11 @@ export const ProveedorAutenticacion = ({ children }) => {
 
       const { access, refresh } = tokenResponse.data;
       
+      // Limpiar sessionStorage de animaciones al registrarse
+      sessionStorage.removeItem('ligas_visited');
+      sessionStorage.removeItem('partidos_visited');
+      sessionStorage.removeItem('selecciones_visited');
+      
       // Guardar tokens con nombres consistentes
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
@@ -163,6 +178,11 @@ export const ProveedorAutenticacion = ({ children }) => {
     } catch (error) {
       console.error('Error de logout:', error);
     } finally {
+      // Limpiar sessionStorage de animaciones al cerrar sesión
+      sessionStorage.removeItem('ligas_visited');
+      sessionStorage.removeItem('partidos_visited');
+      sessionStorage.removeItem('selecciones_visited');
+      
       // Limpiar tokens y estado con nombres consistentes
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');

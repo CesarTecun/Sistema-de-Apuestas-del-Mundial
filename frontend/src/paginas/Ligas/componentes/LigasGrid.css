@@ -1,0 +1,309 @@
+@import '../../../estilos/variables.css';
+
+/* ========================================
+   LIGAS GRID
+   ======================================== */
+.ligas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+  padding: 0 var(--spacing-lg);
+  animation: var(--animation-fade-in);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ========================================
+   TARJETA DE LIGA MODERNA
+   ======================================== */
+.liga-card-modern {
+  background: rgba(10, 25, 20, 0.55);
+  backdrop-filter: var(--backdrop-blur-xl);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+  border-radius: var(--border-radius-2xl);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+}
+
+.liga-card-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-accent);
+  transform: scaleX(0);
+  transition: transform var(--transition-base);
+}
+
+.liga-card-modern:hover::before {
+  transform: scaleX(1);
+}
+
+.liga-card-modern:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-2xl);
+  border-color: rgba(212, 175, 55, 0.6);
+}
+
+.liga-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.liga-card-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(212, 175, 55, 0.15);
+  border-radius: var(--border-radius-lg);
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.liga-card-modern:hover .liga-card-icon {
+  transform: scale(1.1);
+  background: rgba(212, 175, 55, 0.25);
+}
+
+.liga-card-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.liga-card-title {
+  color: var(--color-white);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: var(--line-height-tight);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.liga-card-badges {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.liga-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 4px var(--spacing-md);
+  border-radius: var(--border-radius-lg);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+}
+
+.liga-badge-apuesta {
+  background: var(--color-success);
+  color: var(--color-white);
+  border: var(--border-width-thin) solid var(--color-success);
+}
+
+.liga-badge-diversion {
+  background: var(--color-gray-500);
+  color: var(--color-white);
+  border: var(--border-width-thin) solid var(--color-gray-500);
+}
+
+.liga-card-body {
+  margin-bottom: var(--spacing-md);
+}
+
+.liga-card-description {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.liga-card-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius-lg);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+}
+
+.liga-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--spacing-md);
+  border-top: var(--border-width-thin) solid var(--border-color-accent);
+}
+
+.liga-card-position {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.liga-card-ver-tabla {
+  background: var(--gradient-accent);
+  color: var(--color-gray-900);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-xl);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-accent);
+}
+
+.liga-card-ver-tabla:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-accent-hover);
+}
+
+.liga-card-actions {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-xs);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  z-index: 10;
+}
+
+.liga-card-modern:hover .liga-card-actions {
+  opacity: 1;
+}
+
+.action-button {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border: var(--border-width-thin) solid var(--border-color-medium);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+}
+
+.action-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.view-button:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.edit-button:hover {
+  background: rgba(245, 158, 11, 0.3);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.delete-button:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* ========================================
+   RESPONSIVE - LIGAS GRID
+   ======================================== */
+@media (max-width: 1024px) {
+  .ligas-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .ligas-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    padding: 0 var(--spacing-md);
+  }
+
+  .liga-card-modern {
+    padding: var(--spacing-md);
+  }
+
+  .liga-card-header {
+    gap: var(--spacing-sm);
+  }
+
+  .liga-card-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .liga-card-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .liga-card-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .liga-card-info {
+    font-size: var(--font-size-sm);
+  }
+
+  .liga-card-position {
+    font-size: var(--font-size-xs);
+  }
+
+  .liga-card-ver-tabla {
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-xs);
+  }
+
+  .liga-card-actions {
+    position: static;
+    opacity: 1;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: var(--border-width-thin) solid var(--border-color-accent);
+  }
+}
+
+@media (max-width: 480px) {
+  .ligas-grid {
+    gap: var(--spacing-sm);
+  }
+
+  .liga-card-modern {
+    padding: var(--spacing-sm);
+  }
+
+  .liga-card-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .liga-card-title {
+    font-size: var(--font-size-md);
+  }
+
+  .liga-card-ver-tabla {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}

@@ -14,7 +14,7 @@ class Seleccion(SoftDeleteModel):
 
     class Meta:
         db_table = 'seleccion'
-        managed = False
+        managed = True
 
     def __str__(self):
         return self.pais
@@ -37,7 +37,7 @@ class Jugador(SoftDeleteModel):
 
     class Meta:
         db_table = 'jugador'
-        managed = False
+        managed = True
 
     def __str__(self):
         return f"{self.primer_nombre} {self.primer_apellido} ({self.posicion})"
@@ -58,7 +58,7 @@ class Partido(models.Model):
     
     class Meta:
         db_table = 'partido'
-        managed = False  # Django no gestionará esta tabla (ya existe)
+        managed = True
     
     def __str__(self):
         return f"Partido {self.id_partido}: {self.equipo_local} vs {self.equipo_visitante}"

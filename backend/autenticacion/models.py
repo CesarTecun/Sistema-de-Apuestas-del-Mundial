@@ -24,7 +24,7 @@ class SesionUsuario(models.Model):
     dispositivo = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sesion_usuario'
         app_label = 'autenticacion'
 

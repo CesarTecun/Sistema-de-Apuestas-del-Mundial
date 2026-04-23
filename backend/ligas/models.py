@@ -11,7 +11,7 @@ class Liga(SoftDeleteModel):
 
     class Meta:
         db_table = 'liga'
-        managed = False  # Django no gestionará esta tabla (ya existe)
+        managed = True
 
     def __str__(self):
         return self.nombre_liga
@@ -77,7 +77,7 @@ class Invitacion(models.Model):
 
     class Meta:
         db_table = 'invitacion'
-        managed = False
+        managed = True
         app_label = 'ligas'
 
     def __str__(self):

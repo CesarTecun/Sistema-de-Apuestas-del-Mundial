@@ -1,6 +1,7 @@
 import React from 'react';
+import './LigasGrid.css';
 
-const TarjetaLiga = ({ liga, onEdit, onDelete, onView }) => {
+const TarjetaLiga = ({ liga, onEdit, onDelete, onView, onVerTabla }) => {
   const formatearMonto = (monto) => {
     return new Intl.NumberFormat('es-GT', {
       style: 'currency',
@@ -8,76 +9,79 @@ const TarjetaLiga = ({ liga, onEdit, onDelete, onView }) => {
     }).format(monto);
   };
 
-  const getEstadoColor = (estado) => {
-    switch (estado?.toLowerCase()) {
-      case 'activa':
-        return '#4CAF50';
-      case 'inactiva':
-        return '#f44336';
-      case 'pendiente':
-        return '#FF9800';
-      default:
-        return '#9E9E9E';
-    }
-  };
-
-  const getTipoLigaIcon = (tipo) => {
-    switch (tipo?.toLowerCase()) {
-      case 'diversion':
-        return '🎮';
-      case 'competitiva':
-        return '🏆';
-      case 'dinero':
-        return '💰';
-      default:
-        return '⚽';
-    }
-  };
+  const isApuesta = liga.tipo_liga?.toLowerCase() === 'apuesta' || liga.tipo_liga?.toLowerCase() === 'dinero' || liga.tipo_liga?.toLowerCase() === 'competitiva';
+  const participantes = liga.numero_participantes || liga.participantes || 0;
+  const posicion = liga.posicion_usuario || 1;
 
   return (
-    <div className="liga-card">
-      <div className="liga-header">
-        <div className="liga-icon">
-          {getTipoLigaIcon(liga.tipo_liga)}
+    <div className="liga-card-modern">
+      <div className="liga-card-header">
+        <div className="liga-card-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+          </svg>
         </div>
-        <div className="liga-tipo">
-          {liga.tipo_liga || 'Diversion'}
-        </div>
-        <div 
-          className="liga-estado"
-          style={{ backgroundColor: getEstadoColor(liga.estado) }}
-        >
-          {liga.estado || 'Activa'}
+        <div className="liga-card-title-group">
+          <h3 className="liga-card-title">{liga.nombre_liga}</h3>
+          <div className="liga-card-badges">
+            {isApuesta ? (
+              <span className="liga-badge liga-badge-apuesta">Apuesta</span>
+            ) : (
+              <span className="liga-badge liga-badge-diversion">Diversión</span>
+            )}
+          </div>
         </div>
       </div>
       
-      <div className="liga-content">
-        <h3 className="liga-nombre">{liga.nombre_liga}</h3>
-        
-        <div className="liga-info">
-          <div className="info-item">
-            <div className="info-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </div>
-            <span>ID Admin: {liga.fk_administrador || 'Sin asignar'}</span>
-          </div>
-          
-          <div className="info-item">
-            <div className="info-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <div className="liga-card-body">
+        <div className="liga-card-description">
+          {isApuesta ? (
+            <div className="liga-card-info">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
                 <line x1="12" y1="1" x2="12" y2="23"></line>
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
               </svg>
+              <span>{formatearMonto(liga.monto_total_recaudado)} - {participantes} participantes</span>
             </div>
-            <span>{formatearMonto(liga.monto_total_recaudado)}</span>
-          </div>
+          ) : (
+            <div className="liga-card-info">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <span>Diversión - {participantes} personas</span>
+            </div>
+          )}
         </div>
       </div>
       
-      <div className="liga-actions">
+      <div className="liga-card-footer">
+        <div className="liga-card-position">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd700" strokeWidth="2">
+            <circle cx="12" cy="8" r="7"></circle>
+            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+          </svg>
+          <span>Posición: {posicion}° lugar</span>
+        </div>
+        <button 
+          className="liga-card-ver-tabla"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onVerTabla) onVerTabla(liga);
+          }}
+        >
+          Ver Tabla
+        </button>
+      </div>
+      
+      <div className="liga-card-actions">
         <button 
           className="action-button view-button"
           onClick={() => onView(liga)}

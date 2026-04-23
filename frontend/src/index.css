@@ -1,8 +1,12 @@
+/* Importar variables CSS del sistema de diseño */
+@import './estilos/variables.css';
+
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
+  height: auto;
+  overflow-y: auto;
 }
 
 body {
@@ -21,7 +25,7 @@ body {
 
 #root {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   background: linear-gradient(135deg, 
     rgba(33, 33, 33, 0.95) 0%, 
     rgba(66, 66, 66, 0.95) 100%

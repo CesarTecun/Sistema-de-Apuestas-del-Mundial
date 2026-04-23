@@ -12,7 +12,7 @@ class Premio(models.Model):
     porcentaje_premio = models.DecimalField(max_digits=5, decimal_places=2)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'premio'
         app_label = 'premios'
 

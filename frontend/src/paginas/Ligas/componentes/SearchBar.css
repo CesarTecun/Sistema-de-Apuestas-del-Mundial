@@ -1,0 +1,89 @@
+@import '../../../estilos/variables.css';
+
+/* ========================================
+   SEARCH BAR
+   ======================================== */
+.search-container {
+  margin-bottom: var(--spacing-2xl);
+  position: relative;
+}
+
+.search-input-group {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-icon {
+  position: absolute;
+  left: var(--spacing-lg);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  pointer-events: none;
+  z-index: 2;
+  transition: all var(--transition-base);
+}
+
+.search-input {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 55px;
+  border: var(--border-width-medium) solid var(--border-color-medium);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-md);
+  background: var(--bg-glass);
+  color: var(--color-white);
+  transition: all var(--transition-bounce);
+  box-sizing: border-box;
+  backdrop-filter: var(--backdrop-blur-md);
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+  font-weight: var(--font-weight-normal);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: rgba(236, 72, 153, 0.6);
+  background: var(--bg-glass-hover);
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1), 
+              0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.search-input:focus + .search-icon {
+  color: var(--color-primary);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* ========================================
+   RESPONSIVE - SEARCH BAR
+   ======================================== */
+@media (max-width: 768px) {
+  .search-input-group {
+    max-width: 100%;
+  }
+
+  .search-input {
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 50px;
+    font-size: var(--font-size-sm);
+  }
+
+  .search-icon {
+    left: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .search-input {
+    padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) 45px;
+    font-size: var(--font-size-sm);
+    border-radius: var(--border-radius-md);
+  }
+
+  .search-icon {
+    left: var(--spacing-sm);
+  }
+}

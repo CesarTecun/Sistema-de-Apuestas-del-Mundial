@@ -5,7 +5,6 @@ import FormularioLogin from './componentes/FormularioLogin';
 import LogoCopaMundial from './componentes/LogoCopaMundial';
 import ModalVideo from './componentes/ModalVideo';
 import './estilos/PaginaLogin.css';
-import './estilos/LoginModerno.css';
 
 const PaginaLogin = () => {
   const [error, setError] = useState('');
@@ -19,10 +18,10 @@ const PaginaLogin = () => {
     setError('');
     setLoading(true);
 
-    const result = await login(formData.email, formData.password, formData.rememberMe);
+    const result = await login(formData.email, formData.password);
     
     if (result.success) {
-      navigate('/panel');
+      navigate('/home');
     } else {
       setError(result.error);
     }
@@ -43,8 +42,8 @@ const PaginaLogin = () => {
       <div className="login-background">
         <div className="login-form">
           <div className="logo-container">
-            <div className="logo">
-              <LogoCopaMundial size={300} onClick={handleLogoClick} />
+            <div className="logo logo-clickable">
+              <LogoCopaMundial size={150} onClick={handleLogoClick} />
             </div>
           </div>
           
