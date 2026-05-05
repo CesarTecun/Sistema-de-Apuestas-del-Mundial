@@ -16,7 +16,7 @@ class HistorialGanador(SoftDeleteModel):
     fecha_premio = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'historial_ganador'
         app_label = 'historialganador'
 

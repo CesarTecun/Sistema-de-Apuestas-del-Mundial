@@ -1,0 +1,260 @@
+/* Importar variables CSS del sistema de diseño */
+@import '../../../estilos/variables.css';
+
+/* ========================================
+   PARTIDOS PAGE - LAYOUT PRINCIPAL
+   ======================================== */
+
+/* ========================================
+   CONTENEDOR PRINCIPAL DE PARTIDOS
+   ======================================== */
+.partidos-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* ========================================
+   FONDO CON IMAGEN DE ESTADIO
+   ======================================== */
+.partidos-background {
+  min-height: 100vh;
+  width: 100%;
+  background: 
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.8) 100%),
+    url('https://images.unsplash.com/photo-1522778034537-20a2486be803?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+.partidos-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.partidos-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+  pointer-events: none;
+}
+
+/* ========================================
+   CONTENEDOR PRINCIPAL STICKY
+   ======================================== */
+.main-sticky-container {
+  position: sticky;
+  top: var(--spacing-md);
+  z-index: var(--z-sticky);
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+}
+
+/* ========================================
+   CONTROLES STICKY
+   ======================================== */
+.sticky-controls {
+  background: none;
+  backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.sticky-controls:hover {
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ========================================
+   CONTENIDO DE PARTIDOS CON SCROLL
+   ======================================== */
+.partidos-content {
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.partidos-content.no-animation {
+  animation: none;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   ESTADOS DE CARGA Y ERROR
+   ======================================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-secondary);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  color: var(--color-error);
+  text-align: center;
+  margin: var(--spacing-lg) 0;
+}
+
+/* ========================================
+   ESTADO VACÍO
+   ======================================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  text-align: center;
+  color: var(--text-secondary);
+  min-height: 80vh;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 769px) {
+  .empty-state {
+    max-width: 600px;
+  }
+}
+
+.empty-icon {
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  color: var(--color-white);
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-xl);
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+}
+
+/* ========================================
+   CONTENEDOR DEL FORMULARIO
+   ======================================== */
+.partidos-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing-2xl);
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.logo {
+  display: inline-block;
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE FIRST
+   ======================================== */
+@media (max-width: 768px) {
+  .partidos-background {
+    background-attachment: scroll;
+    padding: var(--spacing-md);
+  }
+
+  .partidos-wrapper {
+    width: 100%;
+  }
+
+  .main-sticky-container {
+    position: static;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .partidos-content {
+    padding: 0 var(--spacing-md);
+  }
+
+  .partidos-form-container {
+    padding: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .partidos-background {
+    padding: var(--spacing-sm);
+  }
+
+  .partidos-content {
+    padding: 0 var(--spacing-sm);
+  }
+
+  .partidos-form-container {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ========================================
+   NO ANIMATION CLASS
+   ======================================== */
+.no-animation .partidos-content,
+.no-animation .tarjeta-partido,
+.no-animation .partidos-header,
+.no-animation .partidos-top-bar {
+  animation: none !important;
+}
+
+.no-animation .tarjeta-partido {
+  transform: none !important;
+}

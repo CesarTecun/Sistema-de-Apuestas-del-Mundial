@@ -1,0 +1,330 @@
+/* ========================================
+   INPUTS - COMPONENTES REUTILIZABLES
+   ======================================== */
+
+/* ========================================
+   INPUT BASE
+   ======================================== */
+.input {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: var(--border-width-medium) solid var(--border-color-medium);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-md);
+  font-family: var(--font-family-base);
+  background: var(--bg-glass);
+  color: var(--color-white);
+  transition: all var(--transition-bounce);
+  box-sizing: border-box;
+  backdrop-filter: var(--backdrop-blur-md);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+  font-weight: var(--font-weight-normal);
+}
+
+.input:focus {
+  outline: none;
+  border-color: rgba(236, 72, 153, 0.6);
+  background: var(--bg-glass-hover);
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1), 
+              0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.input:read-only {
+  background: rgba(255, 255, 255, 0.05);
+  cursor: default;
+}
+
+/* ========================================
+   INPUT CON ICONO
+   ======================================== */
+.input-group {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.input-group-icon {
+  position: absolute;
+  left: var(--spacing-lg);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  pointer-events: none;
+  z-index: 2;
+  transition: all var(--transition-base);
+}
+
+.input-with-icon {
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 55px;
+}
+
+.input:focus + .input-group-icon {
+  color: var(--color-primary);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* ========================================
+   INPUT DE BÚSQUEDA
+   ======================================== */
+.input-search {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 55px;
+  border: var(--border-width-medium) solid var(--border-color-medium);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-md);
+  background: var(--bg-glass);
+  color: var(--color-white);
+  transition: all var(--transition-bounce);
+  box-sizing: border-box;
+  backdrop-filter: var(--backdrop-blur-md);
+}
+
+.input-search:focus {
+  outline: none;
+  border-color: rgba(236, 72, 153, 0.6);
+  background: var(--bg-glass-hover);
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1), 
+              0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.input-search::placeholder {
+  color: var(--text-muted);
+  font-weight: var(--font-weight-normal);
+}
+
+/* ========================================
+   INPUT DE TEXTO (TEXTAREA)
+   ======================================== */
+.input-textarea {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: var(--border-width-medium) solid var(--border-color-medium);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-md);
+  font-family: var(--font-family-base);
+  background: var(--bg-glass);
+  color: var(--color-white);
+  transition: all var(--transition-bounce);
+  box-sizing: border-box;
+  backdrop-filter: var(--backdrop-blur-md);
+  outline: none;
+  min-height: 120px;
+  resize: vertical;
+}
+
+.input-textarea:focus {
+  outline: none;
+  border-color: rgba(236, 72, 153, 0.6);
+  background: var(--bg-glass-hover);
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1), 
+              0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   SELECT
+   ======================================== */
+.input-select {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: var(--border-width-medium) solid var(--border-color-medium);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-md);
+  font-family: var(--font-family-base);
+  background: var(--bg-glass);
+  color: var(--color-white);
+  transition: all var(--transition-bounce);
+  box-sizing: border-box;
+  backdrop-filter: var(--backdrop-blur-md);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-md) center;
+  padding-right: var(--spacing-3xl);
+}
+
+.input-select:focus {
+  outline: none;
+  border-color: rgba(236, 72, 153, 0.6);
+  background: var(--bg-glass-hover);
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1), 
+              0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.input-select option {
+  background: var(--color-gray-900);
+  color: var(--color-white);
+}
+
+/* ========================================
+   INPUT CON ERROR
+   ======================================== */
+.input-error {
+  border-color: var(--color-danger);
+}
+
+.input-error:focus {
+  border-color: var(--color-danger-dark);
+  box-shadow: 0 0 0 4px rgba(244, 67, 54, 0.1), 
+              0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.input-error-message {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+}
+
+/* ========================================
+   INPUT CON ÉXITO
+   ======================================== */
+.input-success {
+  border-color: var(--color-success);
+}
+
+.input-success:focus {
+  border-color: var(--color-success-dark);
+  box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1), 
+              0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   LABEL
+   ======================================== */
+.input-label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-sm);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.input-label-required::after {
+  content: ' *';
+  color: var(--color-danger);
+}
+
+/* ========================================
+   INPUT GROUP (ADJACENT)
+   ======================================== */
+.input-adjacent {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.input-adjacent .input {
+  flex: 1;
+}
+
+/* ========================================
+   INPUT DE RANGO
+   ======================================== */
+.input-range {
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.input-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+}
+
+.input-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  border: none;
+  box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   INPUT DE CHECKBOX
+   ======================================== */
+.input-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* ========================================
+   INPUT DE RADIO
+   ======================================== */
+.input-radio {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* ========================================
+   INPUT DE ARCHIVO
+   ======================================== */
+.input-file {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: var(--border-width-medium) solid var(--border-color-medium);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-md);
+  background: var(--bg-glass);
+  color: var(--color-white);
+  transition: all var(--transition-bounce);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.input-file:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-color-heavy);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .input,
+  .input-search,
+  .input-textarea {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+  
+  .input-with-icon {
+    padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) 45px;
+  }
+  
+  .input-group {
+    max-width: 100%;
+  }
+  
+  .input-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    padding-right: var(--spacing-2xl);
+  }
+}

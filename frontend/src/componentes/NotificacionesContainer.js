@@ -1,6 +1,6 @@
 import React from 'react';
 import Notificacion from '../paginas/Ligas/componentes/Notificacion';
-import '../paginas/Ligas/componentes/Notificacion.css';
+import '../estilos/componentes/modals.css';
 
 const NotificacionesContainer = ({ notificaciones, onClose }) => {
   if (notificaciones.length === 0) {

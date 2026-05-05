@@ -30,7 +30,7 @@ const ModalVideo = ({ isOpen, onClose, videoId }) => {
             src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&modestbranding=1&rel=0`}
             title="Video del Mundial"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media;贪 picture-in-picture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
             allowFullScreen
           />
         </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import logoImage from '../assets/logo.png';
 
-const LogoCopaMundial = ({ size = 80, onClick }) => {
+const LogoCopaMundial = ({ size = 150, onClick }) => {
   return (
     <img 
       src={logoImage} 

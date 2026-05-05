@@ -115,7 +115,7 @@ class RolUsuario(models.Model):
     descripcion = models.CharField(max_length=50)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'rol_usuario'
         app_label = 'usuarios'
 

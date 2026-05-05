@@ -1,0 +1,55 @@
+/* ========================================
+   PAGE TRANSITION
+   ======================================== */
+.page-transition-container {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ========================================
+   TRANSITION ANIMATIONS
+   ======================================== */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.fade-out {
+  animation: fadeOut 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* ========================================
+   ROUTE-SPECIFIC STYLES
+   ======================================== */
+.route-login,
+.route-registro {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.route-default {
+  min-height: 100vh;
+}

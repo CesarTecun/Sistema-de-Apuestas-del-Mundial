@@ -1,0 +1,397 @@
+/* ========================================
+   LANDING PAGE - MUNDIAL 2026
+   ======================================== */
+.landing-page {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #0a0f1a 0%, #1a1a2e 50%, #0d1b2a 100%);
+}
+
+/* ========================================
+   HERO SECTION CON FONDO DE ESTADIO
+   ======================================== */
+.landing-hero {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  background: 
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%),
+    url('https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1920&q=80') center/cover no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+/* ========================================
+   NAVBAR
+   ======================================== */
+.landing-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
+  backdrop-filter: blur(10px);
+}
+
+.landing-nav-button {
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  color: #d4af37;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+.landing-nav-button:hover {
+  background: rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+}
+
+.landing-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.landing-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.landing-social-icons {
+  display: flex;
+  gap: 15px;
+}
+
+.social-icon {
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  color: #d4af37;
+  transform: scale(1.2);
+}
+
+.landing-menu-button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: color 0.3s ease;
+}
+
+.landing-menu-button:hover {
+  color: #d4af37;
+}
+
+.landing-language {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.landing-language:hover {
+  color: #d4af37;
+}
+
+/* ========================================
+   HERO CONTENT
+   ======================================== */
+.landing-hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 0 20px;
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-title {
+  font-size: 80px;
+  font-weight: 200;
+  color: #ffffff;
+  margin: 0 0 20px 0;
+  letter-spacing: 8px;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  line-height: 1.1;
+}
+
+.landing-subtitle {
+  font-size: 24px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  letter-spacing: 3px;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* ========================================
+   FLOATING CARDS
+   ======================================== */
+.landing-cards {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 24px;
+  z-index: 20;
+  padding: 0 40px;
+  width: 100%;
+  max-width: 1200px;
+  justify-content: center;
+}
+
+.landing-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 32px;
+  width: 280px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInUp 1s ease-out 0.3s backwards;
+}
+
+.landing-card:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.landing-card:nth-child(3) {
+  animation-delay: 0.7s;
+}
+
+.landing-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+.landing-card-image {
+  width: 60px;
+  height: 60px;
+  background: rgba(212, 175, 55, 0.15);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.landing-card:hover .landing-card-image {
+  background: rgba(212, 175, 55, 0.25);
+  transform: scale(1.1);
+}
+
+.landing-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 12px 0;
+  letter-spacing: 1px;
+}
+
+.landing-card-text {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 20px 0;
+  line-height: 1.6;
+}
+
+.landing-card-link {
+  color: #d4af37;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.landing-card-link:hover {
+  color: #ffd700;
+  transform: translateX(5px);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 1024px) {
+  .landing-title {
+    font-size: 60px;
+    letter-spacing: 6px;
+  }
+
+  .landing-subtitle {
+    font-size: 20px;
+  }
+
+  .landing-cards {
+    bottom: 60px;
+    padding: 0 20px;
+  }
+
+  .landing-card {
+    width: 240px;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-navbar {
+    padding: 16px 20px;
+  }
+
+  .landing-nav-button {
+    padding: 10px 18px;
+    font-size: 12px;
+  }
+
+  .landing-social-icons {
+    display: none;
+  }
+
+  .landing-menu-button {
+    display: none;
+  }
+
+  .landing-title {
+    font-size: 40px;
+    letter-spacing: 4px;
+  }
+
+  .landing-subtitle {
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
+
+  .landing-cards {
+    flex-direction: column;
+    bottom: 40px;
+    gap: 16px;
+  }
+
+  .landing-card {
+    width: 100%;
+    max-width: 300px;
+    padding: 20px;
+  }
+
+  .landing-card-image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .landing-card-title {
+    font-size: 16px;
+  }
+
+  .landing-card-text {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-navbar {
+    padding: 12px 16px;
+  }
+
+  .landing-nav-button {
+    padding: 8px 14px;
+    font-size: 11px;
+  }
+
+  .landing-logo svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .landing-title {
+    font-size: 32px;
+    letter-spacing: 3px;
+  }
+
+  .landing-subtitle {
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+
+  .landing-card {
+    padding: 18px;
+  }
+
+  .landing-card-image {
+    width: 45px;
+    height: 45px;
+  }
+
+  .landing-card-image svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ========================================
+   SCROLL SUAVE
+   ======================================== */
+html {
+  scroll-behavior: smooth;
+}

@@ -42,8 +42,8 @@ const PaginaRegistro = () => {
       <div className="registro-background">
         <div className="registro-form">
           <div className="logo-container">
-            <div className="logo">
-              <LogoCopaMundial size={300} onClick={handleLogoClick} />
+            <div className="logo logo-clickable">
+              <LogoCopaMundial size={150} onClick={handleLogoClick} />
             </div>
           </div>
           

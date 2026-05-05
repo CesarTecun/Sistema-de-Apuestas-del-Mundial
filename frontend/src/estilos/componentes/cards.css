@@ -1,0 +1,390 @@
+/* ========================================
+   CARDS - COMPONENTES REUTILIZABLES
+   ======================================== */
+
+/* ========================================
+   CARD BASE
+   ======================================== */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: var(--backdrop-blur-lg);
+  border: var(--border-width-thin) solid var(--border-color-medium);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-bounce);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-xl);
+  background: var(--bg-card-hover);
+  border-color: var(--border-color-heavy);
+}
+
+/* ========================================
+   CARD CON BARRA SUPERIOR
+   ======================================== */
+.card-with-bar {
+  position: relative;
+}
+
+.card-with-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  transform: scaleX(0);
+  transition: transform var(--transition-base);
+}
+
+.card-with-bar:hover::before {
+  transform: scaleX(1);
+}
+
+/* ========================================
+   CARD MUNDIAL (ORO)
+   ======================================== */
+.card-mundial {
+  background: rgba(10, 25, 20, 0.55);
+  backdrop-filter: var(--backdrop-blur-xl);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+  border-radius: var(--border-radius-2xl);
+  padding: var(--spacing-xl);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-mundial::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-accent);
+  transform: scaleX(0);
+  transition: transform var(--transition-base);
+}
+
+.card-mundial:hover::before {
+  transform: scaleX(1);
+}
+
+.card-mundial:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 50px rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.6);
+}
+
+/* ========================================
+   CARD HEADER
+   ======================================== */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  gap: var(--spacing-md);
+}
+
+.card-header-centered {
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+/* ========================================
+   CARD ICON
+   ======================================== */
+.card-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(212, 175, 55, 0.15);
+  border-radius: var(--border-radius-lg);
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.card-icon-primary {
+  background: var(--gradient-primary);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-primary);
+}
+
+.card:hover .card-icon {
+  transform: scale(1.1);
+  background: rgba(212, 175, 55, 0.25);
+}
+
+.card:hover .card-icon-primary {
+  transform: rotate(10deg) scale(1.1);
+  box-shadow: var(--shadow-primary-hover);
+}
+
+/* ========================================
+   CARD TITLE GROUP
+   ======================================== */
+.card-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  color: var(--color-white);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: var(--line-height-tight);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin: 0;
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+/* ========================================
+   CARD BADGES
+   ======================================== */
+.card-badges {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.card-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 4px var(--spacing-md);
+  border-radius: var(--border-radius-lg);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+}
+
+.card-badge-apuesta {
+  background: rgba(76, 175, 80, 0.8);
+  color: var(--color-white);
+  border: var(--border-width-thin) solid rgba(76, 175, 80, 1);
+}
+
+.card-badge-diversion {
+  background: rgba(158, 158, 158, 0.8);
+  color: var(--color-white);
+  border: var(--border-width-thin) solid rgba(158, 158, 158, 1);
+}
+
+.card-badge-success {
+  background: var(--color-success);
+  color: var(--color-white);
+}
+
+.card-badge-warning {
+  background: var(--color-warning);
+  color: var(--color-white);
+}
+
+.card-badge-danger {
+  background: var(--color-danger);
+  color: var(--color-white);
+}
+
+/* ========================================
+   CARD BODY
+   ======================================== */
+.card-body {
+  margin-bottom: var(--spacing-md);
+}
+
+.card-description {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+/* ========================================
+   CARD INFO
+   ======================================== */
+.card-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius-lg);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+}
+
+.card-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.card-info-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius-md);
+  border: var(--border-width-thin) solid var(--border-color-light);
+  transition: all var(--transition-base);
+}
+
+.card-info-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(3px);
+}
+
+.card-info-icon {
+  color: var(--color-primary);
+  font-size: var(--font-size-md);
+}
+
+/* ========================================
+   CARD FOOTER
+   ======================================== */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--spacing-md);
+  border-top: var(--border-width-thin) solid var(--border-color-accent);
+  gap: var(--spacing-md);
+}
+
+.card-footer-column {
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: stretch;
+}
+
+/* ========================================
+   CARD ACTIONS
+   ======================================== */
+.card-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  padding-top: var(--spacing-md);
+  border-top: var(--border-width-thin) solid var(--border-color-light);
+}
+
+.card-actions-absolute {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  padding-top: 0;
+  border-top: none;
+  gap: var(--spacing-xs);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.card:hover .card-actions-absolute {
+  opacity: 1;
+}
+
+/* ========================================
+   CARD POSITION
+   ======================================== */
+.card-position {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ========================================
+   CARD GLASSMORPHISM
+   ======================================== */
+.card-glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: var(--border-width-thin) solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-2xl);
+  padding: var(--spacing-2xl);
+  width: 100%;
+  max-width: 300px;
+  transition: all var(--transition-bounce);
+}
+
+.card-glass:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ========================================
+   CARD IMAGE
+   ======================================== */
+.card-image {
+  width: 45px;
+  height: 45px;
+  margin-bottom: var(--spacing-md);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .card {
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-xl);
+  }
+  
+  .card:hover {
+    transform: translateY(-5px) scale(1.01);
+  }
+  
+  .card-mundial {
+    padding: var(--spacing-md);
+  }
+  
+  .card-header {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .card-title {
+    font-size: var(--font-size-lg);
+  }
+  
+  .card-icon {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .card-footer {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: stretch;
+  }
+  
+  .card-glass {
+    padding: var(--spacing-md);
+    max-width: 100%;
+  }
+}

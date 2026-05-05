@@ -5,6 +5,9 @@ import { ModulosColorProvider, useModulosColor } from './contextos/ContextoModul
 import PaginaLogin from './paginas/Login';
 import PaginaRegistro from './paginas/Registro';
 import { LigasPage } from './paginas/Ligas';
+import { PartidosPage } from './paginas/Partidos';
+import SeleccionesPage from './paginas/Selecciones';
+import HomePage from './paginas/Home/HomePage';
 import RutaProtegida from './componentes/RutaProtegida';
 import PageTransition from './componentes/PageTransition';
 import './App.css';
@@ -53,9 +56,10 @@ function ContenidoApp() {
 
   return (
     <Routes>
+      <Route path="/home" element={<HomePage />} />
       <Route path="/login" element={<PaginaLogin />} />
       <Route path="/registro" element={<PaginaRegistro />} />
-      <Route path="/panel" element={
+      <Route path="/GestionLigas" element={
         <RutaProtegida>
           <LigasPage />
         </RutaProtegida>
@@ -65,7 +69,17 @@ function ContenidoApp() {
           <LigasPage />
         </RutaProtegida>
       } />
-      <Route path="/" element={<Navigate to="/panel" replace />} />
+      <Route path="/partidos" element={
+        <RutaProtegida>
+          <PartidosPage />
+        </RutaProtegida>
+      } />
+      <Route path="/selecciones" element={
+        <RutaProtegida>
+          <SeleccionesPage />
+        </RutaProtegida>
+      } />
+      <Route path="/" element={<Navigate to="/home" replace />} />
     </Routes>
   );
 }

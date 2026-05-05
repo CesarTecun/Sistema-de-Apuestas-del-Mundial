@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import './Notificacion.css';
+import '../../../estilos/componentes/modals.css';
 
 const Notificacion = ({ mensaje, tipo, onClose, autoClose = true }) => {
   useEffect(() => {
