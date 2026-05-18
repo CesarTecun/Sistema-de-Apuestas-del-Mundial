@@ -1,11 +1,15 @@
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from django.db.models import Q
 from backend.utils.viewsets import SoftDeleteModelViewSet
 from .models import Partido, Jugador, Seleccion
 from .serializers import PartidoSerializer, JugadorSerializer, SeleccionSerializer
-
+from backend.ligas.utils import (
+    obtener_ligas_usuario_ids,
+    obtener_ligas_administradas_ids,
+)
 
 class JugadorViewSet(SoftDeleteModelViewSet):
     """
@@ -39,19 +43,32 @@ class PartidoViewSet(SoftDeleteModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        """Filtrar partidos por liga si se especifica"""
-        queryset = super().get_queryset()
+        """Filtrar partidos a las ligas permitidas y opcionalmente por liga específica."""
+        ligas_usuario = obtener_ligas_usuario_ids(self.request.user.id_usuario)
+        if not ligas_usuario:
+            return Partido.objects.none()
+
+        queryset = Partido.objects.filter(fk_id_liga__in=ligas_usuario)
+
         liga_id = self.request.query_params.get('liga_id')
         if liga_id:
-            # Por ahora filtramos directamente, luego podemos agregar la relación con fases
-            queryset = queryset.filter(fk_id_fase__isnull=False)
+            try:
+                liga_id_int = int(liga_id)
+            except ValueError:
+                raise ValidationError({'liga_id': 'El identificador de liga debe ser numérico.'})
+
+            if liga_id_int not in ligas_usuario:
+                raise PermissionDenied('No tienes permisos para consultar esta liga.')
+
+            queryset = queryset.filter(fk_id_liga=liga_id_int)
+
         return queryset
     
     def create(self, request, *args, **kwargs):
         """Crear un nuevo partido"""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     def retrieve(self, request, pk=None):
@@ -62,6 +79,23 @@ class PartidoViewSet(SoftDeleteModelViewSet):
             return Response(serializer.data)
         except Partido.DoesNotExist:
             return Response({'error': 'Partido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+    def perform_create(self, serializer):
+        liga_id = serializer.validated_data.get('fk_id_liga')
+        self._validar_liga_administrada(liga_id)
+        serializer.save()
+
+    def perform_update(self, serializer):
+        liga_id = serializer.validated_data.get('fk_id_liga', serializer.instance.fk_id_liga)
+        self._validar_liga_administrada(liga_id)
+        serializer.save()
+
+    def _validar_liga_administrada(self, liga_id):
+        if not liga_id:
+            raise ValidationError({'fk_id_liga': 'Debes seleccionar la liga a la que pertenece el partido.'})
+        ligas_admin = obtener_ligas_administradas_ids(self.request.user.id_usuario)
+        if liga_id not in ligas_admin:
+            raise PermissionDenied('Solo el administrador de la liga puede gestionar partidos.')
     
     def update(self, request, pk=None):
         """Actualizar un partido existente"""
@@ -69,7 +103,7 @@ class PartidoViewSet(SoftDeleteModelViewSet):
             partido = self.get_object()
             serializer = self.get_serializer(partido, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+            self.perform_update(serializer)
             return Response(serializer.data)
         except Partido.DoesNotExist:
             return Response({'error': 'Partido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
@@ -78,6 +112,7 @@ class PartidoViewSet(SoftDeleteModelViewSet):
         """Eliminar un partido"""
         try:
             partido = self.get_object()
+            self._validar_liga_administrada(partido.fk_id_liga)
             partido.delete()
             return Response({'message': 'Partido eliminado correctamente'}, status=status.HTTP_200_OK)
         except Partido.DoesNotExist:
@@ -91,21 +126,39 @@ def partidos_por_liga(request):
     if not liga_id:
         return Response({'error': 'Se requiere el ID de la liga'}, status=status.HTTP_400_BAD_REQUEST)
     
-    partidos = Partido.objects.filter(fk_id_fase__isnull=False)
+    try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response({'error': 'liga_id debe ser numérico'}, status=status.HTTP_400_BAD_REQUEST)
+
+    ligas_usuario = obtener_ligas_usuario_ids(request.user.id_usuario)
+    if liga_id_int not in ligas_usuario:
+        raise PermissionDenied('No tienes permisos para consultar esta liga.')
+
+    partidos = Partido.objects.filter(fk_id_liga=liga_id_int)
     serializer = PartidoSerializer(partidos, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def partidos_por_equipo(request):
-    """Obtener partidos de un equipo específico"""
+    """Obtener partidos de un equipo específico dentro de las ligas permitidas"""
     equipo_id = request.query_params.get('equipo_id')
     if not equipo_id:
         return Response({'error': 'Se requiere el ID del equipo'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+    try:
+        equipo_id_int = int(equipo_id)
+    except ValueError:
+        return Response({'error': 'equipo_id debe ser numérico'}, status=status.HTTP_400_BAD_REQUEST)
+
+    ligas_usuario = obtener_ligas_usuario_ids(request.user.id_usuario)
+    if not ligas_usuario:
+        return Response([], status=status.HTTP_200_OK)
+
     partidos = Partido.objects.filter(
-        Q(equipo_local=equipo_id) | Q(equipo_visitante=equipo_id)
-    ).order_by('horario')
+        Q(equipo_local=equipo_id_int) | Q(equipo_visitante=equipo_id_int)
+    ).filter(fk_id_liga__in=ligas_usuario).order_by('horario')
     serializer = PartidoSerializer(partidos, many=True)
     return Response(serializer.data)
 
@@ -115,14 +168,18 @@ def actualizar_resultado(request, pk):
     """Actualizar resultado de un partido"""
     try:
         partido = Partido.objects.get(pk=pk)
+        ligas_admin = obtener_ligas_administradas_ids(request.user.id_usuario)
+        if partido.fk_id_liga not in ligas_admin:
+            raise PermissionDenied('Solo el administrador de la liga puede actualizar este partido.')
+
         gol_local = request.data.get('gol_local')
         gol_visitante = request.data.get('gol_visitante')
         resultado = request.data.get('resultado')
-        
+
         if gol_local is not None:
-            partido.gol_local = gol_local
+            partido.gol_local = int(gol_local)
         if gol_visitante is not None:
-            partido.gol_visitante = gol_visitante
+            partido.gol_visitante = int(gol_visitante)
         if resultado is not None:
             partido.resultado = resultado
             

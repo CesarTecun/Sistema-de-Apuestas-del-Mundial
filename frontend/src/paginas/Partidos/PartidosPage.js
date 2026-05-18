@@ -59,6 +59,12 @@ const PartidosPage = () => {
 
   const {
     selecciones,
+    ligas,
+    ligasAdministradas,
+    puedeGestionarLiga,
+    puedeGestionarLigaSeleccionada,
+    ligaSeleccionada,
+    setLigaSeleccionada,
     loading,
     error,
     searchTerm,
@@ -92,6 +98,10 @@ const PartidosPage = () => {
     navigate('/home');
   };
 
+  const handleLigaChange = (value) => {
+    setLigaSeleccionada(value);
+  };
+
   const handleFormSubmit = async (formData) => {
     const result = editingPartido
       ? await updatePartido(editingPartido.id_partido, formData)
@@ -116,11 +126,26 @@ const PartidosPage = () => {
   };
 
   const handleEditClick = (partido) => {
+    if (!puedeGestionarLiga(partido.fk_id_liga)) {
+      mostrarError('Solo el administrador de la liga puede editar partidos.');
+      return;
+    }
+
     setEditingPartido(partido);
     setShowForm(true);
   };
 
   const handleCreateClick = () => {
+    if (!ligaSeleccionada) {
+      mostrarError('Selecciona primero una liga para crear partidos.');
+      return;
+    }
+
+    if (!puedeGestionarLiga(ligaSeleccionada)) {
+      mostrarError('Solo el administrador de la liga puede crear partidos.');
+      return;
+    }
+
     setEditingPartido(null);
     setShowForm(true);
   };
@@ -181,6 +206,8 @@ const PartidosPage = () => {
               initialData={editingPartido}
               isEditing={!!editingPartido}
               selecciones={selecciones}
+              ligas={ligasAdministradas}
+              defaultLigaId={editingPartido?.fk_id_liga || ligaSeleccionada}
             />
           </div>
         </div>
@@ -196,8 +223,19 @@ const PartidosPage = () => {
             <TopBar user={user} onLogout={handleLogout} />
 
             <div className="sticky-controls">
-              <PartidosHeader onCreateClick={handleCreateClick} />
-              <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+              <PartidosHeader
+                onCreateClick={handleCreateClick}
+                ligas={ligas}
+                selectedLigaId={ligaSeleccionada}
+                onLigaChange={handleLigaChange}
+                canManageSelectedLiga={puedeGestionarLigaSeleccionada}
+                requireAdminSelection={ligasAdministradas.length > 0}
+              />
+              <SearchBar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                placeholder="Buscar por selección o resultado..."
+              />
             </div>
           </div>
 
@@ -227,9 +265,11 @@ const PartidosPage = () => {
                   </div>
                   <h3>No se encontraron partidos</h3>
                   <p>
-                    {searchTerm
+                    {ligas.length === 0
+                      ? 'Aún no tienes ligas disponibles. Crea una liga primero para poder añadir partidos.'
+                      : searchTerm
                       ? 'No hay partidos que coincidan con tu búsqueda.'
-                      : 'Usa el botón "+ Nuevo Partido" para comenzar.'
+                      : 'Selecciona una liga o usa el botón "+ Nuevo Partido" para comenzar.'
                     }
                   </p>
                 </div>
@@ -242,6 +282,7 @@ const PartidosPage = () => {
                       selecciones={selecciones}
                       onEdit={handleEditClick}
                       onDelete={handleDeletePartido}
+                      canManage={puedeGestionarLiga(partido.fk_id_liga)}
                     />
                   ))}
                 </div>

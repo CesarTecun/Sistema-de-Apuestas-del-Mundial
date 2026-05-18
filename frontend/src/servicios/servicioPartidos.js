@@ -2,9 +2,11 @@ import servicioApi from './servicioApi';
 
 export const servicioPartidos = {
   // Obtener todos los partidos
-  getPartidos: async () => {
+  getPartidos: async (ligaId) => {
     try {
-      const response = await servicioApi.get('/partidos/partidos/');
+      const response = await servicioApi.get('/partidos/partidos/', {
+        params: ligaId ? { liga_id: ligaId } : undefined,
+      });
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al obtener partidos:', error);

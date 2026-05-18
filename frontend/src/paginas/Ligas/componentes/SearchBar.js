@@ -1,7 +1,7 @@
 import React from 'react';
 import './SearchBar.css';
 
-const SearchBar = ({ searchTerm, onSearchChange }) => {
+const SearchBar = ({ searchTerm, onSearchChange, placeholder = 'Buscar ligas...' }) => {
   return (
     <div className="search-container">
       <div className="search-input-group">
@@ -13,7 +13,7 @@ const SearchBar = ({ searchTerm, onSearchChange }) => {
         </div>
         <input
           type="text"
-          placeholder="Buscar ligas..."
+          placeholder={placeholder}
           className="search-input"
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}

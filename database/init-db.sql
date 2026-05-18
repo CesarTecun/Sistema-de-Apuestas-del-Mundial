@@ -351,6 +351,7 @@ CREATE TABLE public.partido (
     equipo_visitante integer,
     fk_sede integer,
     fk_id_fase integer,
+    fk_id_liga integer,
     gol_local integer DEFAULT 0,
     gol_visitante integer DEFAULT 0,
     ganador_penales integer,
@@ -905,7 +906,7 @@ COPY public.participante_liga (id_participante, fk_id_liga, fk_id_usuario, fecha
 -- Data for Name: partido; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.partido (id_partido, horario, equipo_local, equipo_visitante, fk_sede, fk_id_fase, gol_local, gol_visitante, ganador_penales, tipo_partido, resultado) FROM stdin;
+COPY public.partido (id_partido, horario, equipo_local, equipo_visitante, fk_sede, fk_id_fase, fk_id_liga, gol_local, gol_visitante, ganador_penales, tipo_partido, resultado) FROM stdin;
 \.
 
 
@@ -1447,6 +1448,14 @@ ALTER TABLE ONLY public.partido
 
 
 --
+-- Name: partido partido_fk_id_liga_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.partido
+    ADD CONSTRAINT partido_fk_id_liga_fkey FOREIGN KEY (fk_id_liga) REFERENCES public.liga(id_liga);
+
+
+--
 -- Name: partido partido_fk_sede_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1567,6 +1576,14 @@ INSERT INTO public.usuario (
 -- Restart sequence to start from 2 (skip ID 1 for admin user)
 SELECT setval('public.usuario_id_usuario_seq', 2, true);
 
+-- Ligas base
+INSERT INTO liga (id_liga, nombre_liga, fk_administrador, monto_total_recaudado, estado, tipo_liga)
+VALUES
+    (1, 'Liga Dorada', 1, 0, 'Activa', 'Competitiva'),
+    (2, 'Liga Amistosa', 1, 0, 'Activa', 'Diversion')
+ON CONFLICT (id_liga) DO NOTHING;
+SELECT setval('public.liga_id_liga_seq', 3, true);
+
 -- ============ DATOS DE EJEMPLO PARA PRUEBAS ============
 
 -- Fases del torneo
@@ -1608,15 +1625,15 @@ SELECT setval('public.seleccion_id_seleccion_seq', 13, true);
 
 -- Partidos de ejemplo (con fechas futuras para poder pronosticar)
 -- Partidos de Fase de Grupos
-INSERT INTO partido (id_partido, horario, equipo_local, equipo_visitante, fk_sede, fk_id_fase, gol_local, gol_visitante, tipo_partido, resultado) VALUES 
-(1, '2026-06-15 15:00:00', 1, 2, 1, 1, 0, 0, 'Regular', 'Pendiente'),
-(2, '2026-06-15 18:00:00', 3, 4, 1, 1, 0, 0, 'Regular', 'Pendiente'),
-(3, '2026-06-16 15:00:00', 5, 6, 2, 1, 0, 0, 'Regular', 'Pendiente'),
-(4, '2026-06-16 18:00:00', 7, 8, 2, 1, 0, 0, 'Regular', 'Pendiente'),
-(5, '2026-06-17 15:00:00', 9, 10, 3, 1, 0, 0, 'Regular', 'Pendiente'),
-(6, '2026-06-17 18:00:00', 11, 12, 3, 1, 0, 0, 'Regular', 'Pendiente'),
-(7, '2026-06-18 15:00:00', 1, 3, 4, 1, 0, 0, 'Regular', 'Pendiente'),
-(8, '2026-06-18 18:00:00', 2, 4, 4, 1, 0, 0, 'Regular', 'Pendiente')
+INSERT INTO partido (id_partido, horario, equipo_local, equipo_visitante, fk_sede, fk_id_fase, fk_id_liga, gol_local, gol_visitante, tipo_partido, resultado) VALUES 
+(1, '2026-06-15 15:00:00', 1, 2, 1, 1, 1, 0, 0, 'Regular', 'Pendiente'),
+(2, '2026-06-15 18:00:00', 3, 4, 1, 1, 1, 0, 0, 'Regular', 'Pendiente'),
+(3, '2026-06-16 15:00:00', 5, 6, 2, 1, 1, 0, 0, 'Regular', 'Pendiente'),
+(4, '2026-06-16 18:00:00', 7, 8, 2, 1, 1, 0, 0, 'Regular', 'Pendiente'),
+(5, '2026-06-17 15:00:00', 9, 10, 3, 1, 2, 0, 0, 'Regular', 'Pendiente'),
+(6, '2026-06-17 18:00:00', 11, 12, 3, 1, 2, 0, 0, 'Regular', 'Pendiente'),
+(7, '2026-06-18 15:00:00', 1, 3, 4, 1, 2, 0, 0, 'Regular', 'Pendiente'),
+(8, '2026-06-18 18:00:00', 2, 4, 4, 1, 2, 0, 0, 'Regular', 'Pendiente')
 ON CONFLICT (id_partido) DO NOTHING;
 SELECT setval('public.partido_id_partido_seq', 9, true);
 

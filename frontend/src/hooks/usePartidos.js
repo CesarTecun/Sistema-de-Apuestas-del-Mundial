@@ -1,9 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import servicioPartidos from '../servicios/servicioPartidos';
+import servicioLigas from '../servicios/servicioLigas';
+import { useAuth } from '../contextos/ContextoAutenticacion';
 
 export const usePartidos = () => {
+  const { user } = useAuth();
   const [partidos, setPartidos] = useState([]);
   const [selecciones, setSelecciones] = useState([]);
+  const [ligas, setLigas] = useState([]);
+  const [ligaSeleccionada, setLigaSeleccionada] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,7 +16,7 @@ export const usePartidos = () => {
   const cargarPartidos = useCallback(async () => {
     try {
       setLoading(true);
-      const result = await servicioPartidos.getPartidos();
+      const result = await servicioPartidos.getPartidos(ligaSeleccionada);
 
       if (result.success) {
         setPartidos(result.data);
@@ -25,7 +30,7 @@ export const usePartidos = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [ligaSeleccionada]);
 
   const cargarSelecciones = useCallback(async () => {
     try {
@@ -39,10 +44,22 @@ export const usePartidos = () => {
     }
   }, []);
 
+  const cargarLigas = useCallback(async () => {
+    try {
+      const result = await servicioLigas.getLigas();
+      if (result.success) {
+        setLigas(result.data);
+      }
+    } catch (error) {
+      console.error('Error al cargar ligas:', error);
+    }
+  }, []);
+
   useEffect(() => {
     cargarPartidos();
     cargarSelecciones();
-  }, [cargarPartidos, cargarSelecciones]);
+    cargarLigas();
+  }, [cargarPartidos, cargarSelecciones, cargarLigas]);
 
   const createPartido = async (partidoData) => {
     try {
@@ -112,6 +129,26 @@ export const usePartidos = () => {
     }
   };
 
+  const ligasAdministradas = useMemo(() => {
+    if (!user) return [];
+    return ligas.filter(liga => liga.fk_administrador === user.id_usuario);
+  }, [ligas, user]);
+
+  const ligasAdministradasIds = useMemo(() => new Set(ligasAdministradas.map(l => l.id_liga)), [ligasAdministradas]);
+
+  const puedeGestionarLiga = useCallback(
+    (ligaId) => {
+      if (!ligaId) return false;
+      return ligasAdministradasIds.has(Number(ligaId));
+    },
+    [ligasAdministradasIds]
+  );
+
+  const puedeGestionarLigaSeleccionada = useMemo(() => {
+    if (!ligaSeleccionada) return false;
+    return puedeGestionarLiga(ligaSeleccionada);
+  }, [ligaSeleccionada, puedeGestionarLiga]);
+
   const filteredPartidos = partidos.filter(partido => {
     const searchLower = searchTerm.toLowerCase();
     // Buscar por IDs de equipos (que corresponden a selecciones)
@@ -130,6 +167,12 @@ export const usePartidos = () => {
   return {
     partidos,
     selecciones,
+    ligas,
+    ligasAdministradas,
+    puedeGestionarLiga,
+    puedeGestionarLigaSeleccionada,
+    ligaSeleccionada,
+    setLigaSeleccionada,
     loading,
     error,
     searchTerm,
@@ -137,6 +180,7 @@ export const usePartidos = () => {
     filteredPartidos,
     cargarPartidos,
     cargarSelecciones,
+    cargarLigas,
     createPartido,
     updatePartido,
     deletePartido,

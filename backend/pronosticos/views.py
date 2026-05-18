@@ -1,8 +1,10 @@
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.db.models import Q
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from backend.utils.viewsets import SoftDeleteModelViewSet
+from backend.ligas.utils import obtener_ligas_usuario_ids
+from backend.partidos.models import Partido
 from .models import Pronostico
 from .serializers import PronosticoSerializer
 
@@ -16,40 +18,61 @@ class PronosticoViewSet(SoftDeleteModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        """Filtrar pronósticos por usuario o liga"""
-        queryset = super().get_queryset()
-        usuario_id = self.request.query_params.get('usuario_id')
+        """Filtrar pronósticos al usuario autenticado y ligas permitidas (opcionalmente por liga/partido)."""
+        usuario = self.request.user
+        ligas_usuario = obtener_ligas_usuario_ids(usuario.id_usuario)
+        queryset = Pronostico.objects.filter(
+            fk_id_usuario=usuario.id_usuario,
+            fk_id_liga__in=ligas_usuario
+        )
+
         liga_id = self.request.query_params.get('liga_id')
-        
-        if usuario_id:
-            queryset = queryset.filter(fk_id_usuario=usuario_id)
+        partido_id = self.request.query_params.get('partido_id')
+
         if liga_id:
             queryset = queryset.filter(fk_id_liga=liga_id)
-            
+        if partido_id:
+            queryset = queryset.filter(fk_id_partido=partido_id)
+
         return queryset
-    
-    def create(self, request, *args, **kwargs):
-        """Crear un nuevo pronóstico"""
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        # Verificar que el usuario no tenga ya un pronóstico para este partido en esta liga
-        usuario_id = request.data.get('fk_id_usuario')
-        partido_id = request.data.get('fk_id_partido')
-        liga_id = request.data.get('fk_id_liga')
-        
+
+    def perform_create(self, serializer):
+        usuario_id = self.request.user.id_usuario
+        liga_id = serializer.validated_data.get('fk_id_liga')
+        partido_id = serializer.validated_data.get('fk_id_partido')
+
+        if not liga_id or liga_id not in obtener_ligas_usuario_ids(usuario_id):
+            raise PermissionDenied('No tienes permisos para pronosticar en esta liga.')
+
+        if not Partido.objects.filter(id_partido=partido_id, fk_id_liga=liga_id).exists():
+            raise ValidationError({'fk_id_partido': 'El partido no pertenece a la liga seleccionada.'})
+
         if Pronostico.objects.filter(
             fk_id_usuario=usuario_id,
             fk_id_partido=partido_id,
             fk_id_liga=liga_id
         ).exists():
-            return Response(
-                {'error': 'Ya existe un pronóstico para este usuario en este partido y liga'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            raise ValidationError({'detail': 'Ya registraste un pronóstico para este partido en esta liga.'})
+
+        serializer.save(fk_id_usuario=usuario_id)
+
+    def perform_update(self, serializer):
+        pronostico = serializer.instance
+        if pronostico.fk_id_usuario != self.request.user.id_usuario:
+            raise PermissionDenied('Solo puedes editar tus propios pronósticos.')
+
+        liga_id = pronostico.fk_id_liga
+        if liga_id not in obtener_ligas_usuario_ids(self.request.user.id_usuario):
+            raise PermissionDenied('No puedes modificar pronósticos de esta liga.')
+
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def perform_destroy(self, instance):
+        if instance.fk_id_usuario != self.request.user.id_usuario:
+            raise PermissionDenied('Solo puedes eliminar tus propios pronósticos.')
+        if instance.fk_id_liga not in obtener_ligas_usuario_ids(self.request.user.id_usuario):
+            raise PermissionDenied('No puedes eliminar pronósticos de esta liga.')
+        instance.delete()
     
     def retrieve(self, request, pk=None):
         """Obtener un pronóstico específico"""

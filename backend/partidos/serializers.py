@@ -10,6 +10,9 @@ class PartidoSerializer(serializers.ModelSerializer):
         model = Partido
         fields = '__all__'
         read_only_fields = ('id_partido',)
+        extra_kwargs = {
+            'fk_id_liga': {'required': True},
+        }
 
     def validate(self, data):
         """Validación personalizada para los goles"""
@@ -17,6 +20,10 @@ class PartidoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Los goles del equipo local no pueden ser negativos")
         if data.get('gol_visitante', 0) < 0:
             raise serializers.ValidationError("Los goles del equipo visitante no pueden ser negativos")
+        if not data.get('fk_id_liga'):
+            raise serializers.ValidationError({
+                'fk_id_liga': 'Debes seleccionar la liga a la que pertenece el partido.'
+            })
         return data
 
 

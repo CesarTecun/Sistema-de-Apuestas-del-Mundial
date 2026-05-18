@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import '../estilos/FormularioPartido.css';
 
-const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecciones }) => {
+const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecciones, ligas = [], defaultLigaId }) => {
   const [formData, setFormData] = useState({
     horario: '',
     equipo_local: '',
     equipo_visitante: '',
     fk_sede: '',
     fk_id_fase: '',
+    fk_id_liga: '',
     tipo_partido: 'Regular',
     gol_local: 0,
     gol_visitante: 0,
@@ -24,13 +25,19 @@ const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecci
         equipo_visitante: initialData.equipo_visitante || '',
         fk_sede: initialData.fk_sede || '',
         fk_id_fase: initialData.fk_id_fase || '',
+        fk_id_liga: initialData.fk_id_liga || defaultLigaId || '',
         tipo_partido: initialData.tipo_partido || 'Regular',
         gol_local: initialData.gol_local || 0,
         gol_visitante: initialData.gol_visitante || 0,
         resultado: initialData.resultado || ''
       });
+    } else if (defaultLigaId) {
+      setFormData((prev) => ({
+        ...prev,
+        fk_id_liga: defaultLigaId,
+      }));
     }
-  }, [initialData]);
+  }, [initialData, defaultLigaId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,7 +60,11 @@ const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecci
     if (!formData.horario) {
       newErrors.horario = 'La fecha y hora son requeridas';
     }
-    
+
+    if (!formData.fk_id_liga) {
+      newErrors.fk_id_liga = 'Debes seleccionar la liga a la que pertenece el partido';
+    }
+
     if (!formData.equipo_local) {
       newErrors.equipo_local = 'El equipo local es requerido';
     }
@@ -79,6 +90,7 @@ const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecci
         horario: new Date(formData.horario).toISOString(),
         gol_local: parseInt(formData.gol_local) || 0,
         gol_visitante: parseInt(formData.gol_visitante) || 0,
+        fk_id_liga: parseInt(formData.fk_id_liga),
         fk_sede: formData.fk_sede ? parseInt(formData.fk_sede) : null,
         fk_id_fase: formData.fk_id_fase ? parseInt(formData.fk_id_fase) : null
       };
@@ -100,6 +112,30 @@ const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecci
 
       <form onSubmit={handleSubmit} className="partido-form">
         <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="fk_id_liga">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              </svg>
+              Liga *
+            </label>
+            <select
+              id="fk_id_liga"
+              name="fk_id_liga"
+              value={formData.fk_id_liga}
+              onChange={handleChange}
+              className={errors.fk_id_liga ? 'error' : ''}
+            >
+              <option value="">Seleccionar liga</option>
+              {ligas.map((liga) => (
+                <option key={liga.id_liga} value={liga.id_liga}>
+                  {liga.nombre_liga}
+                </option>
+              ))}
+            </select>
+            {errors.fk_id_liga && <span className="error-message">{errors.fk_id_liga}</span>}
+          </div>
+
           <div className="form-group">
             <label htmlFor="horario">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
