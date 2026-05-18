@@ -7,15 +7,42 @@ from backend.utils.viewsets import SoftDeleteModelViewSet
 from .models import Liga, Invitacion, ParticipanteLiga
 from .serializers import LigaSerializer, InvitacionSerializer
 from backend.ligas.serializers import ParticipanteLigaSerializer
+from backend.usuarios.models import Usuario
 
 class LigaViewSet(SoftDeleteModelViewSet):
     """
     API endpoint para gestionar ligas
     Permite operaciones CRUD completas
     """
-    queryset = Liga.objects.all()
     serializer_class = LigaSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        """Solo mostrar ligas donde el usuario es admin, participante o tiene invitación"""
+        user = self.request.user
+        usuario_id = user.id_usuario
+        
+        # Ligas donde el usuario es administrador
+        ligas_admin = Liga.objects.filter(fk_administrador=usuario_id)
+        
+        # Ligas donde el usuario es participante
+        ligas_participante_ids = ParticipanteLiga.objects.filter(
+            fk_id_usuario=usuario_id,
+            estado_participacion='Activo'
+        ).values_list('fk_id_liga', flat=True)
+        ligas_participante = Liga.objects.filter(id_liga__in=ligas_participante_ids)
+        
+        # Ligas donde el usuario tiene invitación pendiente o aceptada
+        ligas_invitacion_ids = Invitacion.objects.filter(
+            fk_id_usuario_invitado=usuario_id,
+            estado_invitacion__in=['Pendiente', 'Aceptada']
+        ).values_list('fk_id_liga', flat=True)
+        ligas_invitacion = Liga.objects.filter(id_liga__in=ligas_invitacion_ids)
+        
+        # Combinar todos los querysets y eliminar duplicados
+        from django.db.models import Q
+        queryset = ligas_admin | ligas_participante | ligas_invitacion
+        return queryset.distinct()
     
     def create(self, request, *args, **kwargs):
         """Crear una nueva liga"""
@@ -23,6 +50,51 @@ class LigaViewSet(SoftDeleteModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'], url_path='enviar-invitacion')
+    def enviar_invitacion(self, request, pk=None):
+        """Enviar invitación a un usuario para unirse a la liga"""
+        try:
+            liga = self.get_object()
+        except Liga.DoesNotExist:
+            return Response({'error': 'Liga no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Verificar que el usuario es administrador de la liga
+        if liga.fk_administrador != request.user.id_usuario:
+            return Response({'error': 'Solo el administrador puede enviar invitaciones'}, status=status.HTTP_403_FORBIDDEN)
+        
+        usuario_invitado_id = request.data.get('fk_id_usuario_invitado')
+        if not usuario_invitado_id:
+            return Response({'error': 'Se requiere el ID del usuario invitado'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verificar que el usuario invitado existe
+        try:
+            usuario_invitado = Usuario.objects.get(id_usuario=usuario_invitado_id)
+        except Usuario.DoesNotExist:
+            return Response({'error': 'Usuario invitado no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Verificar que no exista una invitación previa
+        if Invitacion.objects.filter(
+            fk_id_liga=liga.id_liga,
+            fk_id_usuario_invitado=usuario_invitado_id,
+            estado_invitacion__in=['Pendiente', 'Aceptada']
+        ).exists():
+            return Response({'error': 'Ya existe una invitación pendiente o aceptada para este usuario'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Crear la invitación
+        invitacion = Invitacion.objects.create(
+            fk_id_liga=liga.id_liga,
+            fk_id_usuario_invitado=usuario_invitado_id,
+            fk_id_usuario_administrador=request.user.id_usuario,
+            email_invitado=request.data.get('email_invitado', usuario_invitado.email),
+            mensaje_invitacion=request.data.get('mensaje_invitacion', '')
+        )
+        
+        serializer = InvitacionSerializer(invitacion)
+        return Response({
+            'message': 'Invitación enviada exitosamente',
+            'invitacion': serializer.data
+        }, status=status.HTTP_201_CREATED)
     
     def retrieve(self, request, pk=None):
         """Obtener una liga específica"""
@@ -82,10 +154,60 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
     API endpoint para gestionar invitaciones a ligas.
     Implementa soft delete - al "eliminar" solo cambia status a False.
     """
-    queryset = Invitacion.objects.all()
     serializer_class = InvitacionSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id_invitacion'
+    
+    def get_queryset(self):
+        """Solo mostrar invitaciones del usuario actual"""
+        user = self.request.user
+        return Invitacion.objects.filter(fk_id_usuario_invitado=user.id_usuario)
+    
+    @action(detail=True, methods=['post'], url_path='aceptar')
+    def aceptar(self, request, pk=None):
+        """Aceptar una invitación y unirse a la liga"""
+        try:
+            invitacion = self.get_object()
+        except Invitacion.DoesNotExist:
+            return Response({'error': 'Invitación no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if invitacion.estado_invitacion != 'Pendiente':
+            return Response({'error': 'Esta invitación ya no está pendiente'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Actualizar estado de la invitación
+        invitacion.estado_invitacion = 'Aceptada'
+        invitacion.save()
+        
+        # Crear registro de participante en la liga
+        ParticipanteLiga.objects.create(
+            fk_id_liga=invitacion.fk_id_liga,
+            fk_id_usuario=request.user.id_usuario,
+            estado_participacion='Activo'
+        )
+        
+        return Response({
+            'message': 'Invitación aceptada exitosamente',
+            'invitacion': InvitacionSerializer(invitacion).data
+        }, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'], url_path='rechazar')
+    def rechazar(self, request, pk=None):
+        """Rechazar una invitación"""
+        try:
+            invitacion = self.get_object()
+        except Invitacion.DoesNotExist:
+            return Response({'error': 'Invitación no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if invitacion.estado_invitacion != 'Pendiente':
+            return Response({'error': 'Esta invitación ya no está pendiente'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        invitacion.estado_invitacion = 'Rechazada'
+        invitacion.save()
+        
+        return Response({
+            'message': 'Invitación rechazada',
+            'invitacion': InvitacionSerializer(invitacion).data
+        }, status=status.HTTP_200_OK)
     
     def create(self, request, *args, **kwargs):
         """Crear una nueva invitación (envía correo automáticamente si tiene email)"""

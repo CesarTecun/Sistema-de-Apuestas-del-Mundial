@@ -47,6 +47,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         # Asignar rol por defecto (rol 2 = usuario normal)
         if 'fk_rol' not in validated_data:
             validated_data['fk_rol'] = 2
+        # Incluir contrasena en validated_data antes de crear
+        validated_data['contrasena'] = password
         user = Usuario.objects.create(**validated_data)
         user.set_password(password)
         user.save()
