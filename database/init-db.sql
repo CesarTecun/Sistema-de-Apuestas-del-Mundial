@@ -60,6 +60,33 @@ ALTER SEQUENCE public.bitacora_log_seq OWNED BY public.bitacora.log;
 
 
 --
+-- Name: audit_log; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.audit_log (
+    id_audit_log bigserial NOT NULL,
+    table_name character varying(100) NOT NULL,
+    operation character varying(10) NOT NULL,
+    record_pk text,
+    old_data jsonb,
+    new_data jsonb,
+    changed_by text DEFAULT CURRENT_USER,
+    changed_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT audit_log_operation_check CHECK (((operation)::text = ANY ((ARRAY['INSERT'::character varying, 'UPDATE'::character varying, 'DELETE'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.audit_log OWNER TO postgres;
+
+
+--
+-- Name: audit_log_id_audit_log_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.audit_log_id_audit_log_seq OWNER TO postgres;
+
+
+--
 -- Name: equipoliga; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -154,7 +181,8 @@ CREATE TABLE public.historial_ganador (
     fk_id_liga integer,
     monto_pagado numeric(10,2),
     fecha_premio timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    status boolean DEFAULT true
+    status boolean DEFAULT true,
+    deleted_at timestamp with time zone
 );
 
 
@@ -196,7 +224,8 @@ CREATE TABLE public.jugador (
     dorsal integer,
     posicion character varying(50),
     fk_id_seleccion integer,
-    status boolean DEFAULT true
+    status boolean DEFAULT true,
+    deleted_at timestamp with time zone
 );
 
 
@@ -235,7 +264,8 @@ CREATE TABLE public.liga (
     monto_total_recaudado numeric(10,2) DEFAULT 0,
     estado character varying(50),
     tipo_liga character varying(50) DEFAULT 'Diversion'::character varying,
-    status boolean DEFAULT true
+    status boolean DEFAULT true,
+    deleted_at timestamp with time zone
 );
 
 
@@ -312,7 +342,8 @@ CREATE TABLE public.participante_liga (
     fk_id_usuario integer NOT NULL,
     fecha_union timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     estado_participacion character varying(50) DEFAULT 'Activo'::character varying,
-    status boolean DEFAULT true
+    status boolean DEFAULT true,
+    deleted_at timestamp with time zone
 );
 
 
@@ -490,7 +521,8 @@ CREATE TABLE public.pronostico (
     gol_visitante integer,
     CONSTRAINT pronostico_gol_local_check CHECK ((gol_local >= 0)),
     CONSTRAINT pronostico_gol_visitante_check CHECK ((gol_visitante >= 0)),
-    status boolean DEFAULT true
+    status boolean DEFAULT true,
+    deleted_at timestamp with time zone
 );
 
 
@@ -529,7 +561,8 @@ CREATE TABLE public.ranking (
     fk_id_liga integer,
     pj integer DEFAULT 0,
     fecha_actualizacion timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    status boolean DEFAULT true
+    status boolean DEFAULT true,
+    deleted_at timestamp with time zone
 );
 
 
@@ -635,7 +668,8 @@ CREATE TABLE public.seleccion (
     pais character varying(100) NOT NULL,
     bandera character varying(255),
     fk_id_fase_inicial integer,
-    status boolean DEFAULT true
+    status boolean DEFAULT true,
+    deleted_at timestamp with time zone
 );
 
 
@@ -678,7 +712,8 @@ CREATE TABLE public.usuario (
     telefono integer,
     contrasena character varying(255) NOT NULL,
     fk_rol integer,
-    status boolean DEFAULT true
+    status boolean DEFAULT true,
+    deleted_at timestamp with time zone
 );
 
 
@@ -1104,6 +1139,14 @@ ALTER TABLE ONLY public.bitacora
 
 
 --
+-- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.audit_log
+    ADD CONSTRAINT audit_log_pkey PRIMARY KEY (id_audit_log);
+
+
+--
 -- Name: equipoliga equipoliga_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1287,6 +1330,81 @@ ALTER TABLE ONLY public.usuario
 
 ALTER TABLE ONLY public.usuario
     ADD CONSTRAINT usuario_pkey PRIMARY KEY (id_usuario);
+
+
+ALTER TABLE ONLY public.liga
+    ADD CONSTRAINT liga_monto_total_recaudado_check CHECK ((monto_total_recaudado >= (0)::numeric));
+
+
+ALTER TABLE ONLY public.liga
+    ADD CONSTRAINT liga_tipo_liga_check CHECK (((tipo_liga)::text = ANY ((ARRAY['Diversion'::character varying, 'Competitiva'::character varying, 'Premio'::character varying])::text[])));
+
+
+ALTER TABLE ONLY public.invitacion
+    ADD CONSTRAINT invitacion_estado_invitacion_check CHECK (((estado_invitacion)::text = ANY ((ARRAY['Pendiente'::character varying, 'Aceptada'::character varying, 'Rechazada'::character varying, 'Expirada'::character varying])::text[])));
+
+
+ALTER TABLE ONLY public.participante_liga
+    ADD CONSTRAINT participante_liga_estado_participacion_check CHECK (((estado_participacion)::text = ANY ((ARRAY['Activo'::character varying, 'Inactivo'::character varying, 'Expulsado'::character varying])::text[])));
+
+
+ALTER TABLE ONLY public.partido
+    ADD CONSTRAINT partido_tipo_partido_check CHECK (((tipo_partido)::text = ANY ((ARRAY['Regular'::character varying, 'Eliminatoria'::character varying, 'Final'::character varying])::text[])));
+
+
+ALTER TABLE ONLY public.premio
+    ADD CONSTRAINT premio_porcentaje_premio_check CHECK (((porcentaje_premio >= (0)::numeric) AND (porcentaje_premio <= (100)::numeric)));
+
+
+ALTER TABLE ONLY public.premio
+    ADD CONSTRAINT premio_posicion_check CHECK ((posicion > 0));
+
+
+ALTER TABLE ONLY public.ranking
+    ADD CONSTRAINT ranking_pj_check CHECK ((pj >= 0));
+
+
+ALTER TABLE ONLY public.ranking
+    ADD CONSTRAINT ranking_puntos_check CHECK ((puntos >= 0));
+
+
+CREATE INDEX idx_usuario_email ON public.usuario USING btree (email);
+
+
+CREATE INDEX idx_liga_fk_administrador ON public.liga USING btree (fk_administrador);
+
+
+CREATE INDEX idx_historial_ganador_fk_id_liga ON public.historial_ganador USING btree (fk_id_liga);
+
+
+CREATE INDEX idx_invitacion_fk_id_liga ON public.invitacion USING btree (fk_id_liga);
+
+
+CREATE INDEX idx_participante_liga_fk_id_liga ON public.participante_liga USING btree (fk_id_liga);
+
+
+CREATE INDEX idx_partido_fk_id_liga ON public.partido USING btree (fk_id_liga);
+
+
+CREATE INDEX idx_partido_liga_fk_id_liga ON public.partido_liga USING btree (fk_id_liga);
+
+
+CREATE INDEX idx_partido_liga_fk_id_partido ON public.partido_liga USING btree (fk_id_partido);
+
+
+CREATE INDEX idx_premio_fk_id_liga ON public.premio USING btree (fk_id_liga);
+
+
+CREATE INDEX idx_pronostico_fk_id_liga ON public.pronostico USING btree (fk_id_liga);
+
+
+CREATE INDEX idx_pronostico_fk_id_partido ON public.pronostico USING btree (fk_id_partido);
+
+
+CREATE INDEX idx_pronostico_usuario_partido_liga ON public.pronostico USING btree (fk_id_usuario, fk_id_partido, fk_id_liga);
+
+
+CREATE INDEX idx_ranking_fk_id_liga ON public.ranking USING btree (fk_id_liga);
 
 
 --
@@ -1599,29 +1717,77 @@ SELECT setval('public.fase_grupo_id_fase_seq', 7, true);
 
 -- Sedes (estadios)
 INSERT INTO sede (id_sede, ciudad, estadio) VALUES 
-(1, 'Ciudad de Guatemala', 'Estadio Doroteo Guamuch Flores'),
-(2, 'Quetzaltenango', 'Estadio Mario Camposeco'),
-(3, 'Antigua Guatemala', 'Estadio Pensativo'),
-(4, 'Escuintla', 'Estadio Ricardo Saprissa')
+(1, 'Ciudad de México', 'Estadio Azteca'),
+(2, 'Monterrey', 'Estadio BBVA'),
+(3, 'Guadalajara / Zapopan', 'Estadio Akron'),
+(4, 'Vancouver', 'BC Place'),
+(5, 'Toronto', 'BMO Field'),
+(6, 'Nueva York / Nueva Jersey', 'MetLife Stadium'),
+(7, 'Dallas / Arlington', 'AT&T Stadium'),
+(8, 'Atlanta', 'Mercedes-Benz Stadium'),
+(9, 'Los Ángeles / Inglewood', 'SoFi Stadium'),
+(10, 'Miami', 'Hard Rock Stadium'),
+(11, 'Boston / Foxborough', 'Gillette Stadium'),
+(12, 'Houston', 'NRG Stadium'),
+(13, 'Kansas City', 'GEHA Field at Arrowhead Stadium'),
+(14, 'Filadelfia', 'Lincoln Financial Field'),
+(15, 'San Francisco Bay Area / Santa Clara', 'Levi’s Stadium'),
+(16, 'Seattle', 'Lumen Field')
 ON CONFLICT (id_sede) DO NOTHING;
-SELECT setval('public.sede_id_sede_seq', 5, true);
+SELECT setval('public.sede_id_sede_seq', 17, true);
 
 -- Selecciones participantes
 INSERT INTO seleccion (id_seleccion, pais, bandera, fk_id_fase_inicial) VALUES 
-(1, 'Guatemala', 'https://flagcdn.com/gt.svg', 1),
+(1, 'Canadá', 'https://flagcdn.com/ca.svg', 1),
 (2, 'México', 'https://flagcdn.com/mx.svg', 1),
 (3, 'Estados Unidos', 'https://flagcdn.com/us.svg', 1),
-(4, 'Costa Rica', 'https://flagcdn.com/cr.svg', 1),
-(5, 'Honduras', 'https://flagcdn.com/hn.svg', 1),
-(6, 'El Salvador', 'https://flagcdn.com/sv.svg', 1),
-(7, 'Panamá', 'https://flagcdn.com/pa.svg', 1),
-(8, 'Canadá', 'https://flagcdn.com/ca.svg', 1),
-(9, 'Argentina', 'https://flagcdn.com/ar.svg', 1),
-(10, 'Brasil', 'https://flagcdn.com/br.svg', 1),
-(11, 'Colombia', 'https://flagcdn.com/co.svg', 1),
-(12, 'Uruguay', 'https://flagcdn.com/uy.svg', 1)
+(4, 'Curazao', 'https://flagcdn.com/cw.svg', 1),
+(5, 'Haití', 'https://flagcdn.com/ht.svg', 1),
+(6, 'Panamá', 'https://flagcdn.com/pa.svg', 1),
+(7, 'Argentina', 'https://flagcdn.com/ar.svg', 1),
+(8, 'Brasil', 'https://flagcdn.com/br.svg', 1),
+(9, 'Colombia', 'https://flagcdn.com/co.svg', 1),
+(10, 'Ecuador', 'https://flagcdn.com/ec.svg', 1),
+(11, 'Paraguay', 'https://flagcdn.com/py.svg', 1),
+(12, 'Uruguay', 'https://flagcdn.com/uy.svg', 1),
+(13, 'Austria', 'https://flagcdn.com/at.svg', 1),
+(14, 'Bélgica', 'https://flagcdn.com/be.svg', 1),
+(15, 'Bosnia y Herzegovina', 'https://flagcdn.com/ba.svg', 1),
+(16, 'Croacia', 'https://flagcdn.com/hr.svg', 1),
+(17, 'Chequia', 'https://flagcdn.com/cz.svg', 1),
+(18, 'Inglaterra', 'https://flagcdn.com/gb-eng.svg', 1),
+(19, 'Francia', 'https://flagcdn.com/fr.svg', 1),
+(20, 'Alemania', 'https://flagcdn.com/de.svg', 1),
+(21, 'Países Bajos', 'https://flagcdn.com/nl.svg', 1),
+(22, 'Noruega', 'https://flagcdn.com/no.svg', 1),
+(23, 'Portugal', 'https://flagcdn.com/pt.svg', 1),
+(24, 'Escocia', 'https://flagcdn.com/gb-sct.svg', 1),
+(25, 'España', 'https://flagcdn.com/es.svg', 1),
+(26, 'Suecia', 'https://flagcdn.com/se.svg', 1),
+(27, 'Suiza', 'https://flagcdn.com/ch.svg', 1),
+(28, 'Turquía', 'https://flagcdn.com/tr.svg', 1),
+(29, 'Australia', 'https://flagcdn.com/au.svg', 1),
+(30, 'Irak', 'https://flagcdn.com/iq.svg', 1),
+(31, 'Irán', 'https://flagcdn.com/ir.svg', 1),
+(32, 'Japón', 'https://flagcdn.com/jp.svg', 1),
+(33, 'Jordania', 'https://flagcdn.com/jo.svg', 1),
+(34, 'Corea del Sur', 'https://flagcdn.com/kr.svg', 1),
+(35, 'Catar', 'https://flagcdn.com/qa.svg', 1),
+(36, 'Arabia Saudita', 'https://flagcdn.com/sa.svg', 1),
+(37, 'Uzbekistán', 'https://flagcdn.com/uz.svg', 1),
+(38, 'Argelia', 'https://flagcdn.com/dz.svg', 1),
+(39, 'Cabo Verde', 'https://flagcdn.com/cv.svg', 1),
+(40, 'República Democrática del Congo', 'https://flagcdn.com/cd.svg', 1),
+(41, 'Costa de Marfil', 'https://flagcdn.com/ci.svg', 1),
+(42, 'Egipto', 'https://flagcdn.com/eg.svg', 1),
+(43, 'Ghana', 'https://flagcdn.com/gh.svg', 1),
+(44, 'Marruecos', 'https://flagcdn.com/ma.svg', 1),
+(45, 'Senegal', 'https://flagcdn.com/sn.svg', 1),
+(46, 'Sudáfrica', 'https://flagcdn.com/za.svg', 1),
+(47, 'Túnez', 'https://flagcdn.com/tn.svg', 1),
+(48, 'Nueva Zelanda', 'https://flagcdn.com/nz.svg', 1)
 ON CONFLICT (id_seleccion) DO NOTHING;
-SELECT setval('public.seleccion_id_seleccion_seq', 13, true);
+SELECT setval('public.seleccion_id_seleccion_seq', 49, true);
 
 -- Partidos de ejemplo (con fechas futuras para poder pronosticar)
 -- Partidos de Fase de Grupos
@@ -1723,5 +1889,131 @@ ALTER TABLE ONLY public.sesion_usuario
 
 SELECT pg_catalog.setval('public.sesion_usuario_id_sesion_seq', 1, false);
 
+
+--
+-- Name: fn_audit_log(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE OR REPLACE FUNCTION public.fn_audit_log()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    pk_value text;
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        IF TG_TABLE_NAME = 'usuario' THEN
+            pk_value := OLD.id_usuario::text;
+        ELSIF TG_TABLE_NAME = 'liga' THEN
+            pk_value := OLD.id_liga::text;
+        ELSIF TG_TABLE_NAME = 'pronostico' THEN
+            pk_value := OLD.id_pronostico::text;
+        ELSIF TG_TABLE_NAME = 'partido' THEN
+            pk_value := OLD.id_partido::text;
+        ELSE
+            pk_value := NULL;
+        END IF;
+    ELSE
+        IF TG_TABLE_NAME = 'usuario' THEN
+            pk_value := NEW.id_usuario::text;
+        ELSIF TG_TABLE_NAME = 'liga' THEN
+            pk_value := NEW.id_liga::text;
+        ELSIF TG_TABLE_NAME = 'pronostico' THEN
+            pk_value := NEW.id_pronostico::text;
+        ELSIF TG_TABLE_NAME = 'partido' THEN
+            pk_value := NEW.id_partido::text;
+        ELSE
+            pk_value := NULL;
+        END IF;
+    END IF;
+
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO public.audit_log (table_name, operation, record_pk, new_data)
+        VALUES (TG_TABLE_NAME, TG_OP, pk_value, to_jsonb(NEW));
+        RETURN NEW;
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT INTO public.audit_log (table_name, operation, record_pk, old_data, new_data)
+        VALUES (TG_TABLE_NAME, TG_OP, pk_value, to_jsonb(OLD), to_jsonb(NEW));
+        RETURN NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT INTO public.audit_log (table_name, operation, record_pk, old_data)
+        VALUES (TG_TABLE_NAME, TG_OP, pk_value, to_jsonb(OLD));
+        RETURN OLD;
+    END IF;
+
+    RETURN NULL;
+END;
+$$;
+
+ALTER FUNCTION public.fn_audit_log() OWNER TO postgres;
+
+--
+-- Name: usuario trg_audit_usuario; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER trg_audit_usuario
+AFTER INSERT OR UPDATE OR DELETE ON public.usuario
+FOR EACH ROW EXECUTE FUNCTION public.fn_audit_log();
+
+--
+-- Name: liga trg_audit_liga; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER trg_audit_liga
+AFTER INSERT OR UPDATE OR DELETE ON public.liga
+FOR EACH ROW EXECUTE FUNCTION public.fn_audit_log();
+
+--
+-- Name: pronostico trg_audit_pronostico; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER trg_audit_pronostico
+AFTER INSERT OR UPDATE OR DELETE ON public.pronostico
+FOR EACH ROW EXECUTE FUNCTION public.fn_audit_log();
+
+--
+-- Name: partido trg_audit_resultado_partido; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER trg_audit_resultado_partido
+AFTER UPDATE OF gol_local, gol_visitante, ganador_penales, resultado ON public.partido
+FOR EACH ROW EXECUTE FUNCTION public.fn_audit_log();
+
+--
+-- Roles de base de datos para la aplicación
+--
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'quiniela_admin') THEN
+        CREATE ROLE quiniela_admin LOGIN PASSWORD 'CAMBIAR_PASSWORD_ADMIN';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'quiniela_readonly') THEN
+        CREATE ROLE quiniela_readonly LOGIN PASSWORD 'CAMBIAR_PASSWORD_READONLY';
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    EXECUTE format('GRANT CONNECT ON DATABASE %I TO quiniela_admin', current_database());
+    EXECUTE format('GRANT CONNECT ON DATABASE %I TO quiniela_readonly', current_database());
+END
+$$;
+
+GRANT USAGE ON SCHEMA public TO quiniela_admin;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO quiniela_admin;
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO quiniela_admin;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO quiniela_admin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO quiniela_admin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO quiniela_admin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO quiniela_admin;
+
+GRANT USAGE ON SCHEMA public TO quiniela_readonly;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO quiniela_readonly;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO quiniela_readonly;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO quiniela_readonly;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON SEQUENCES TO quiniela_readonly;
 
 \unrestrict 7Hpn2sIihswh4XAuPxR1fe5o2a6TWNDyPVROSlnxS9ahweTnrEyZg9kr8GUqJYz

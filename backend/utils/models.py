@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class SoftDeleteManager(models.Manager):
@@ -23,6 +24,7 @@ class SoftDeleteModel(models.Model):
     Al llamar delete(), cambia status a False en lugar de eliminar físicamente.
     """
     status = models.BooleanField(default=True, db_column='status')
+    deleted_at = models.DateTimeField(null=True, blank=True, db_column='deleted_at')
 
     # Manager por defecto: solo objetos activos
     objects = SoftDeleteManager()
@@ -38,7 +40,8 @@ class SoftDeleteModel(models.Model):
         En lugar de eliminar el registro, cambia status a False.
         """
         self.status = False
-        self.save(using=using, update_fields=['status'])
+        self.deleted_at = timezone.now()
+        self.save(using=using, update_fields=['status', 'deleted_at'])
 
     def hard_delete(self, using=None, keep_parents=False):
         """
@@ -52,9 +55,10 @@ class SoftDeleteModel(models.Model):
         Restaura un registro eliminado lógicamente cambiando status a True.
         """
         self.status = True
-        self.save(update_fields=['status'])
+        self.deleted_at = None
+        self.save(update_fields=['status', 'deleted_at'])
 
     @property
     def is_deleted(self):
         """Retorna True si el registro fue eliminado lógicamente."""
-        return not self.status
+        return self.deleted_at is not None
