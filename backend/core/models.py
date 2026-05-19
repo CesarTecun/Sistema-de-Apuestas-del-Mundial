@@ -15,7 +15,7 @@ class AuditLog(models.Model):
 
     class Meta:
         db_table = 'audit_log'
-        managed = False
+        managed = True
 
 
 class Bitacora(models.Model):
@@ -28,7 +28,7 @@ class Bitacora(models.Model):
 
     class Meta:
         db_table = 'bitacora'
-        managed = False
+        managed = True
 
 
 class EquipoLiga(models.Model):
@@ -38,7 +38,7 @@ class EquipoLiga(models.Model):
 
     class Meta:
         db_table = 'equipoliga'
-        managed = False
+        managed = True
         unique_together = ('fk_id_liga', 'fk_id_seleccion')
 
 
@@ -49,7 +49,7 @@ class FaseGrupo(models.Model):
 
     class Meta:
         db_table = 'fase_grupo'
-        managed = False
+        managed = True
 
 
 class Gol(models.Model):
@@ -61,18 +61,7 @@ class Gol(models.Model):
 
     class Meta:
         db_table = 'gol'
-        managed = False
-
-
-class PartidoLiga(models.Model):
-    """Modelo para la tabla partido_liga"""
-    fk_id_liga = models.IntegerField()
-    fk_id_partido = models.IntegerField()
-
-    class Meta:
-        db_table = 'partido_liga'
-        managed = False
-        unique_together = ('fk_id_liga', 'fk_id_partido')
+        managed = True
 
 
 class PosicionesTorneo(models.Model):
@@ -90,43 +79,7 @@ class PosicionesTorneo(models.Model):
 
     class Meta:
         db_table = 'posiciones_torneo'
-        managed = False
-
-
-class Premio(models.Model):
-    """Modelo para la tabla premio"""
-    id_premio = models.AutoField(primary_key=True)
-    fk_id_liga = models.IntegerField(null=True, blank=True)
-    posicion = models.IntegerField()
-    porcentaje_premio = models.DecimalField(max_digits=5, decimal_places=2)
-
-    class Meta:
-        db_table = 'premio'
-        managed = False
-
-
-class Ranking(models.Model):
-    """Modelo para la tabla ranking"""
-    id_registro = models.AutoField(primary_key=True)
-    puntos = models.IntegerField(default=0)
-    fk_id_usuario = models.IntegerField(null=True, blank=True)
-    fk_id_liga = models.IntegerField(null=True, blank=True)
-    pj = models.IntegerField(default=0)
-    fecha_actualizacion = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'ranking'
-        managed = False
-
-
-class RolUsuario(models.Model):
-    """Modelo para la tabla rol_usuario"""
-    id_rol = models.AutoField(primary_key=True)
-    descripcion = models.CharField(max_length=50)
-
-    class Meta:
-        db_table = 'rol_usuario'
-        managed = False
+        managed = True
 
 
 class Sede(models.Model):
@@ -137,22 +90,6 @@ class Sede(models.Model):
 
     class Meta:
         db_table = 'sede'
-        managed = False
+        managed = True
 
 
-class SesionUsuario(models.Model):
-    """Modelo para la tabla sesion_usuario"""
-    id_sesion = models.AutoField(primary_key=True)
-    fk_id_usuario = models.IntegerField()
-    token_sesion = models.CharField(max_length=255, unique=True)
-    fecha_inicio = models.DateTimeField(auto_now_add=True)
-    fecha_ultima_actividad = models.DateTimeField(auto_now=True)
-    fecha_cierre = models.DateTimeField(null=True, blank=True)
-    estado_sesion = models.CharField(max_length=20, default='Activa')
-    ip_address = models.CharField(max_length=45, null=True, blank=True)
-    user_agent = models.TextField(null=True, blank=True)
-    dispositivo = models.CharField(max_length=100, null=True, blank=True)
-
-    class Meta:
-        db_table = 'sesion_usuario'
-        managed = False

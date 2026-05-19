@@ -38,7 +38,7 @@ class Usuario(SoftDeleteModel):
     REQUIRED_FIELDS = ['primer_nombre', 'primer_apellido']
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'usuario'
         app_label = 'usuarios'
 

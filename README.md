@@ -32,10 +32,9 @@ cd frontend && npm start
 
 ### ¿Qué hacen los scripts?
 1. ✅ Inician PostgreSQL en Docker
-2. ✅ Cargan el esquema completo (`init-db.sql`)
-3. ✅ Aplican todas las migraciones Django
-4. ✅ Crean superusuario (`admin/admin123`)
-5. ✅ Verifican integridad de datos
+2. ✅ Aplican todas las migraciones Django
+3. ✅ Crean superusuario (`admin/admin123`)
+4. ✅ Verifican conexión a la base de datos
 
 ## Estructura del Proyecto
 ```
@@ -65,9 +64,8 @@ Sistema de Apuestas del Mundial/
 |   |-- public/
 |   `-- package.json
 |-- database/             # Scripts y archivos de base de datos
-|   |-- init-db.sql       # Script de inicialización de BD
-|   |-- migrations/       # Migraciones manuales
-|   `-- backups/          # Respaldos de BD
+|   |-- init-db.sql.backup # Backup del esquema original (referencia)
+|   |-- backups/          # Respaldos de BD
 |-- infrastructure/       # Configuración de infraestructura
 |   |-- docker-compose.yml # Configuración Docker
 |   |-- Dockerfile        # Imagen Docker

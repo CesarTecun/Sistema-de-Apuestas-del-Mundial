@@ -62,51 +62,16 @@ def setup_django_environment():
     print("✅ Entorno Django configurado")
 
 def verify_database_schema():
-    """Verificar que el esquema de la base de datos esté completo"""
-    print("🔍 Verificando esquema de base de datos...")
+    """Verificar conexión a la base de datos"""
+    print("🔍 Verificando conexión a base de datos...")
     
     try:
         with connection.cursor() as cursor:
-            # Verificar tablas críticas
-            cursor.execute("""
-                SELECT table_name 
-                FROM information_schema.tables 
-                WHERE table_schema = 'public' 
-                AND table_type = 'BASE TABLE'
-                ORDER BY table_name
-            """)
-            tables = [row[0] for row in cursor.fetchall()]
-            
-            required_tables = [
-                'usuario', 'liga', 'partido', 'seleccion', 'jugador',
-                'fase_grupo', 'sede', 'rol_usuario', 'sesion_usuario',
-                'equipoliga', 'partido_liga', 'posiciones_torneo',
-                'gol', 'historial_ganador', 'ranking', 'premio',
-                'pronostico', 'bitacora', 'audit_log'
-            ]
-            
-            missing_tables = [t for t in required_tables if t not in tables]
-            
-            if missing_tables:
-                print(f"❌ Faltan tablas: {missing_tables}")
-                print("📝 El init-db.sql debería haberlas creado automáticamente")
-                return False
-            else:
-                print(f"✅ Todas las {len(tables)} tablas encontradas")
-                
-                # Verificar datos de ejemplo
-                cursor.execute("SELECT COUNT(*) FROM seleccion")
-                selecciones_count = cursor.fetchone()[0]
-                cursor.execute("SELECT COUNT(*) FROM liga")
-                ligas_count = cursor.fetchone()[0]
-                cursor.execute("SELECT COUNT(*) FROM partido")
-                partidos_count = cursor.fetchone()[0]
-                
-                print(f"   📊 Datos: {selecciones_count} selecciones, {ligas_count} ligas, {partidos_count} partidos")
-                return True
-    
+            cursor.execute("SELECT 1")
+            print("✅ Conexión a base de datos exitosa")
+            return True
     except Exception as e:
-        print(f"❌ Error verificando esquema: {e}")
+        print(f"❌ Error conectando a la base de datos: {e}")
         return False
 
 def apply_migrations():
@@ -114,22 +79,8 @@ def apply_migrations():
     print("🔄 Aplicando migraciones de Django...")
     
     try:
-        # Verificar columna name en django_content_type
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT column_name 
-                FROM information_schema.columns 
-                WHERE table_name = 'django_content_type' AND column_name = 'name'
-            """)
-            if not cursor.fetchone():
-                print("➕ Agregando columna 'name' a django_content_type...")
-                cursor.execute("ALTER TABLE django_content_type ADD COLUMN name VARCHAR(100)")
-                cursor.execute("UPDATE django_content_type SET name = model")
-                print("✅ Columna 'name' agregada")
-        
         # Aplicar migraciones
-        execute_from_command_line(['manage.py', 'migrate', '--fake-initial'])
-        execute_from_command_line(['manage.py', 'migrate', '--fake'])
+        execute_from_command_line(['manage.py', 'migrate'])
         
         print("✅ Migraciones aplicadas correctamente")
         return True
@@ -175,10 +126,9 @@ def main():
     # 2. Configurar Django
     setup_django_environment()
     
-    # 3. Verificar esquema
+    # 3. Verificar conexión a BD
     if not verify_database_schema():
-        print("❌ El esquema de la base de datos está incompleto")
-        print("📝 Asegúrate que el init-db.sql se ejecutó correctamente en Docker")
+        print("❌ No se pudo conectar a la base de datos")
         return False
     
     # 4. Aplicar migraciones
@@ -193,7 +143,7 @@ def main():
     print("🎉 ¡Configuración Docker completada!")
     print("\n📝 Resumen:")
     print("   ✅ PostgreSQL listo")
-    print("   ✅ Esquema de base de datos completo")
+    print("   ✅ Base de datos lista")
     print("   ✅ Migraciones aplicadas")
     print("   ✅ Superusuario creado")
     print("\n🚀 Ahora puedes ejecutar:")
