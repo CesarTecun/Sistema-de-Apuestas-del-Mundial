@@ -22,6 +22,9 @@ export const API_ENDPOINTS = {
   PREMIOS: `${API_BASE_URL}/api/premios/`,
   // Historial
   HISTORIAL: `${API_BASE_URL}/api/historial/`,
+  // Core (sedes, fases)
+  CORE: `${API_BASE_URL}/api/core/`,
+  SEDES: `${API_BASE_URL}/api/core/sedes/`,
 };
 
 export const getAuthHeaders = () => {

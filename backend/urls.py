@@ -39,6 +39,7 @@ def api_root(request):
             'posiciones': '/api/posiciones/',
             'premios': '/api/premios/',
             'historial': '/api/historial/',
+            'core': '/api/core/',
             'docs': '/api/docs/',
         }
     })
@@ -69,6 +70,7 @@ urlpatterns = [
     path("api/posiciones/", include("backend.posiciones.urls")),
     path("api/premios/", include("backend.premios.urls")),
     path("api/historial/", include("backend.historialganador.urls")),
+    path("api/core/", include("backend.core.urls")),
     # JWT endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import '../estilos/FormularioPartido.css';
 
-const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecciones, ligas = [], defaultLigaId }) => {
+const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecciones, ligas = [], sedes = [], defaultLigaId }) => {
   const [formData, setFormData] = useState({
     horario: '',
     equipo_local: '',
     equipo_visitante: '',
-    fk_sede: '',
+    ciudad_sede: '',
     fk_id_fase: '',
     fk_id_liga: '',
     tipo_partido: 'Regular',
@@ -19,11 +19,13 @@ const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecci
 
   useEffect(() => {
     if (initialData) {
+      // Si estamos editando, necesitamos encontrar la ciudad correspondiente al fk_sede
+      const sede = sedes.find(s => s.id_sede === initialData.fk_sede);
       setFormData({
         horario: initialData.horario || '',
         equipo_local: initialData.equipo_local || '',
         equipo_visitante: initialData.equipo_visitante || '',
-        fk_sede: initialData.fk_sede || '',
+        ciudad_sede: sede ? sede.ciudad : '',
         fk_id_fase: initialData.fk_id_fase || '',
         fk_id_liga: initialData.fk_id_liga || defaultLigaId || '',
         tipo_partido: initialData.tipo_partido || 'Regular',
@@ -37,7 +39,7 @@ const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecci
         fk_id_liga: defaultLigaId,
       }));
     }
-  }, [initialData, defaultLigaId]);
+  }, [initialData, defaultLigaId, sedes]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -91,9 +93,11 @@ const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecci
         gol_local: parseInt(formData.gol_local) || 0,
         gol_visitante: parseInt(formData.gol_visitante) || 0,
         fk_id_liga: parseInt(formData.fk_id_liga),
-        fk_sede: formData.fk_sede ? parseInt(formData.fk_sede) : null,
+        ciudad_sede: formData.ciudad_sede || null,
         fk_id_fase: formData.fk_id_fase ? parseInt(formData.fk_id_fase) : null
       };
+      // Eliminar fk_sede ya que ahora enviamos ciudad_sede
+      delete dataToSubmit.fk_sede;
       onSubmit(dataToSubmit);
     }
   };
@@ -211,7 +215,7 @@ const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecci
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="2" y1="12" x2="22" y2="12"></line>
               </svg>
-              Tipo de Partido
+              Fases de Partido
             </label>
             <select
               id="tipo_partido"
@@ -228,82 +232,28 @@ const FormularioPartido = ({ onSubmit, onCancel, initialData, isEditing, selecci
           </div>
 
           <div className="form-group">
-            <label htmlFor="fk_sede">
+            <label htmlFor="ciudad_sede">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                 <circle cx="12" cy="10" r="3"></circle>
               </svg>
-              Sede (ID)
+              Sede (Ciudad)
             </label>
-            <input
-              type="number"
-              id="fk_sede"
-              name="fk_sede"
-              value={formData.fk_sede}
+            <select
+              id="ciudad_sede"
+              name="ciudad_sede"
+              value={formData.ciudad_sede}
               onChange={handleChange}
-              placeholder="Opcional"
-            />
+            >
+              <option value="">Seleccionar sede</option>
+              {sedes.map((sede) => (
+                <option key={sede.id_sede} value={sede.ciudad}>
+                  {sede.ciudad} - {sede.estadio}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="fk_id_fase">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                <polyline points="2 17 12 22 22 17"></polyline>
-              </svg>
-              Fase (ID)
-            </label>
-            <input
-              type="number"
-              id="fk_id_fase"
-              name="fk_id_fase"
-              value={formData.fk_id_fase}
-              onChange={handleChange}
-              placeholder="Opcional"
-            />
-          </div>
-        </div>
-
-        <div className="form-section">
-          <h3>Resultado (opcional)</h3>
-          <div className="resultados-grid">
-            <div className="form-group">
-              <label htmlFor="gol_local">Goles Local</label>
-              <input
-                type="number"
-                id="gol_local"
-                name="gol_local"
-                value={formData.gol_local}
-                onChange={handleChange}
-                min="0"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="gol_visitante">Goles Visitante</label>
-              <input
-                type="number"
-                id="gol_visitante"
-                name="gol_visitante"
-                value={formData.gol_visitante}
-                onChange={handleChange}
-                min="0"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="resultado">Resultado</label>
-              <select
-                id="resultado"
-                name="resultado"
-                value={formData.resultado}
-                onChange={handleChange}
-              >
-                <option value="">Sin resultado</option>
-                <option value="Local">Victoria Local</option>
-                <option value="Visitante">Victoria Visitante</option>
-                <option value="Empate">Empate</option>
-              </select>
-            </div>
-          </div>
         </div>
 
         <div className="form-actions">

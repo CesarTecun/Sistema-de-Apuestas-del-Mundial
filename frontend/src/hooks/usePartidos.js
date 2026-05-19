@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import servicioPartidos from '../servicios/servicioPartidos';
 import servicioLigas from '../servicios/servicioLigas';
+import servicioCore from '../servicios/servicioCore';
 import { useAuth } from '../contextos/ContextoAutenticacion';
 
 export const usePartidos = () => {
@@ -8,6 +9,7 @@ export const usePartidos = () => {
   const [partidos, setPartidos] = useState([]);
   const [selecciones, setSelecciones] = useState([]);
   const [ligas, setLigas] = useState([]);
+  const [sedes, setSedes] = useState([]);
   const [ligaSeleccionada, setLigaSeleccionada] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -55,11 +57,23 @@ export const usePartidos = () => {
     }
   }, []);
 
+  const cargarSedes = useCallback(async () => {
+    try {
+      const result = await servicioCore.getSedes();
+      if (result.success) {
+        setSedes(result.data);
+      }
+    } catch (error) {
+      console.error('Error al cargar sedes:', error);
+    }
+  }, []);
+
   useEffect(() => {
     cargarPartidos();
     cargarSelecciones();
     cargarLigas();
-  }, [cargarPartidos, cargarSelecciones, cargarLigas]);
+    cargarSedes();
+  }, [cargarPartidos, cargarSelecciones, cargarLigas, cargarSedes]);
 
   const createPartido = async (partidoData) => {
     try {
@@ -168,6 +182,7 @@ export const usePartidos = () => {
     partidos,
     selecciones,
     ligas,
+    sedes,
     ligasAdministradas,
     puedeGestionarLiga,
     puedeGestionarLigaSeleccionada,
@@ -181,6 +196,7 @@ export const usePartidos = () => {
     cargarPartidos,
     cargarSelecciones,
     cargarLigas,
+    cargarSedes,
     createPartido,
     updatePartido,
     deletePartido,

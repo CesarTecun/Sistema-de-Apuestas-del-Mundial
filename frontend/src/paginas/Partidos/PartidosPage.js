@@ -60,6 +60,7 @@ const PartidosPage = () => {
   const {
     selecciones,
     ligas,
+    sedes,
     ligasAdministradas,
     puedeGestionarLiga,
     puedeGestionarLigaSeleccionada,
@@ -207,6 +208,7 @@ const PartidosPage = () => {
               isEditing={!!editingPartido}
               selecciones={selecciones}
               ligas={ligasAdministradas}
+              sedes={sedes}
               defaultLigaId={editingPartido?.fk_id_liga || ligaSeleccionada}
             />
           </div>
