@@ -5,6 +5,37 @@
 - **Frontend**: React + Node.js
 - **Base de Datos**: PostgreSQL (recomendado)
 
+## 🐳 Configuración con Docker (Recomendado)
+
+### Prerrequisitos
+- Docker y Docker Compose instalados
+- Python 3.11+
+
+### Inicio Rápido
+```bash
+# 1. Iniciar contenedores Docker
+docker-compose -f infrastructure/docker-compose.yml up -d
+
+# 2. Ejecutar script de configuración automatizada
+python scripts/docker_setup.py
+
+# 3. Iniciar servidor de desarrollo
+python manage.py runserver
+
+# 4. Iniciar frontend (en otra terminal)
+cd frontend && npm start
+```
+
+### Scripts Automatizados
+- **Windows**: `scripts\docker_start.bat`
+- **Linux/Mac**: `./scripts/docker_start.sh`
+
+### ¿Qué hacen los scripts?
+1. ✅ Inician PostgreSQL en Docker
+2. ✅ Aplican todas las migraciones Django
+3. ✅ Crean superusuario (`admin/admin123`)
+4. ✅ Verifican conexión a la base de datos
+
 ## Estructura del Proyecto
 ```
 Sistema de Apuestas del Mundial/
@@ -19,6 +50,7 @@ Sistema de Apuestas del Mundial/
 |   |-- posiciones/       # App de rankings
 |   |-- premios/          # App de premios
 |   |-- historialganador/ # App de historial
+|   |-- core/             # App para tablas sin modelo previo
 |   `-- correos/          # App de correos (futuro)
 |-- frontend/             # Proyecto React
 |   |-- src/
@@ -32,9 +64,8 @@ Sistema de Apuestas del Mundial/
 |   |-- public/
 |   `-- package.json
 |-- database/             # Scripts y archivos de base de datos
-|   |-- init-db.sql       # Script de inicialización de BD
-|   |-- migrations/       # Migraciones manuales
-|   `-- backups/          # Respaldos de BD
+|   |-- init-db.sql.backup # Backup del esquema original (referencia)
+|   |-- backups/          # Respaldos de BD
 |-- infrastructure/       # Configuración de infraestructura
 |   |-- docker-compose.yml # Configuración Docker
 |   |-- Dockerfile        # Imagen Docker

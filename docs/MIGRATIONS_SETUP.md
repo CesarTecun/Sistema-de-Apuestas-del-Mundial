@@ -126,8 +126,7 @@ docker-compose -f infrastructure/docker-compose.yml up -d
 python manage.py migrate
 
 # Opción B - Solo rehacer migraciones:
-python scripts/reset_migrations.py
-python manage.py migrate --fake-initial
+python manage.py migrate
 ```
 
 ### "Conflicting migrations detected"
@@ -136,7 +135,9 @@ python manage.py migrate --fake-initial
 # Dos desarrolladores crearon la misma migración
 
 # Solución:
-python scripts/reset_migrations.py
+# 1. Eliminar migraciones conflictivas manualmente
+# 2. Regenerar:
+python manage.py makemigrations
 python manage.py migrate
 ```
 
@@ -172,9 +173,6 @@ python manage.py migrate ligas zero
 
 # Deshacer última migración
 python manage.py migrate ligas 0001
-
-# Faker una migración (si la tabla ya existe)
-python manage.py migrate --fake ligas 0002
 
 # Crear migración vacía para data migrations
 python manage.py makemigrations --empty ligas

@@ -2,12 +2,17 @@ from django.db import models
 from backend.utils.models import SoftDeleteModel
 
 class Liga(SoftDeleteModel):
+    TIPOS_LIGA = [
+        ('Diversion', 'Diversión'),
+        ('Competitiva', 'Competitiva'),
+    ]
+
     id_liga = models.AutoField(primary_key=True)
     nombre_liga = models.CharField(max_length=100)
-    fk_administrador = models.IntegerField(null=True, blank=True)
+    fk_administrador = models.IntegerField(null=True, blank=True, db_index=True)
     monto_total_recaudado = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     estado = models.CharField(max_length=50, null=True, blank=True)
-    tipo_liga = models.CharField(max_length=50, default='Diversion')
+    tipo_liga = models.CharField(max_length=50, choices=TIPOS_LIGA, default='Diversion')
 
     class Meta:
         db_table = 'liga'
@@ -23,14 +28,14 @@ class ParticipanteLiga(SoftDeleteModel):
     Relaciona usuarios con ligas en las que participan.
     """
     id_participante = models.AutoField(primary_key=True)
-    fk_id_liga = models.IntegerField()
-    fk_id_usuario = models.IntegerField()
+    fk_id_liga = models.IntegerField(db_index=True)
+    fk_id_usuario = models.IntegerField(db_index=True)
     fecha_union = models.DateTimeField(auto_now_add=True)
     estado_participacion = models.CharField(max_length=50, default='Activo')
 
     class Meta:
         db_table = 'participante_liga'
-        managed = False
+        managed = True
         unique_together = ('fk_id_liga', 'fk_id_usuario')
 
     def __str__(self):
@@ -42,12 +47,12 @@ class PartidoLiga(models.Model):
     Modelo para la tabla partido_liga.
     Relaciona partidos con ligas (qué partidos están disponibles para apostar en cada liga).
     """
-    fk_id_liga = models.IntegerField()
-    fk_id_partido = models.IntegerField()
+    fk_id_liga = models.IntegerField(db_index=True)
+    fk_id_partido = models.IntegerField(db_index=True)
 
     class Meta:
         db_table = 'partido_liga'
-        managed = False
+        managed = True
         unique_together = ('fk_id_liga', 'fk_id_partido')
 
     def __str__(self):

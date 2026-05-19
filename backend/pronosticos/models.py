@@ -4,9 +4,9 @@ from backend.utils.models import SoftDeleteModel
 
 class Pronostico(SoftDeleteModel):
     id_pronostico = models.AutoField(primary_key=True)
-    fk_id_usuario = models.IntegerField()
-    fk_id_partido = models.IntegerField()
-    fk_id_liga = models.IntegerField()
+    fk_id_usuario = models.IntegerField(db_index=True)
+    fk_id_partido = models.IntegerField(db_index=True)
+    fk_id_liga = models.IntegerField(db_index=True)
     gol_local = models.IntegerField()
     gol_visitante = models.IntegerField()
 
