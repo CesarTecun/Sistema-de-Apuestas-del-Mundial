@@ -43,14 +43,14 @@ class Jugador(SoftDeleteModel):
         return f"{self.primer_nombre} {self.primer_apellido} ({self.posicion})"
 
 
-class Partido(models.Model):
+class Partido(SoftDeleteModel):
     id_partido = models.AutoField(primary_key=True)
     horario = models.DateTimeField()
     equipo_local = models.IntegerField()
     equipo_visitante = models.IntegerField()
     fk_sede = models.IntegerField(null=True, blank=True)
     fk_id_fase = models.IntegerField(null=True, blank=True)
-    fk_id_liga = models.IntegerField(null=True, blank=True)
+    fk_id_liga = models.IntegerField(null=True, blank=True, db_index=True)
     gol_local = models.IntegerField(default=0)
     gol_visitante = models.IntegerField(default=0)
     ganador_penales = models.IntegerField(null=True, blank=True)

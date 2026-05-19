@@ -13,8 +13,8 @@ class SesionUsuario(models.Model):
     ]
 
     id_sesion = models.AutoField(primary_key=True)
-    fk_id_usuario = models.IntegerField()
-    token_sesion = models.CharField(max_length=255, unique=True)
+    fk_id_usuario = models.IntegerField(db_index=True)
+    token_sesion = models.CharField(max_length=255, unique=True, db_index=True)
     fecha_inicio = models.DateTimeField(auto_now_add=True)
     fecha_ultima_actividad = models.DateTimeField(auto_now=True)
     fecha_cierre = models.DateTimeField(null=True, blank=True)

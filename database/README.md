@@ -4,30 +4,35 @@
 
 ## Roles de base de datos
 
-Si necesitas crear roles personalizados, hazlo manualmente en PostgreSQL o mediante migraciones/data migrations de Django.
+El archivo `roles.sql` define dos roles principales para cumplir con el requisito de **separación de roles** (principio de mínimo privilegio):
 
-### `quiniela_admin` (ejemplo)
+### `quiniela_app`
 
-Rol para ejecutar la aplicación backend con permisos de escritura.
-
-Uso recomendado en `.env` para el backend:
+Rol de aplicación para el backend Django. Tiene permisos DML (`SELECT`, `INSERT`, `UPDATE`, `DELETE`) pero **NO tiene permisos DDL** (`CREATE`, `DROP`, `ALTER`).
 
 ```env
-DB_USER=quiniela_admin
-DB_PASSWORD=CAMBIAR_PASSWORD_ADMIN
+DB_USER=quiniela_app
+DB_PASSWORD=CAMBIAR_PASSWORD_APP
 ```
 
-### `quiniela_readonly` (ejemplo)
+### `quiniela_readonly`
 
-Rol para consultas, reportes o revisión sin modificar datos.
-
-Uso recomendado para herramientas de consulta/reportes:
+Rol de solo lectura para reportes y dashboards. Únicamente `SELECT`.
 
 ```env
 DB_USER=quiniela_readonly
 DB_PASSWORD=CAMBIAR_PASSWORD_READONLY
 ```
 
+### Crear roles
+
+```bash
+psql -U postgres -d quiniela -f database/roles.sql
+```
+
+> **Importante:** Cambiar las contraseñas temporales antes de usar en producción.
+
 ## Seguridad
 
-El usuario `postgres` debe reservarse para administración de la base de datos, no para ejecutar la aplicación.
+- El usuario `postgres` debe reservarse para administración de la base de datos, no para ejecutar la aplicación.
+- El backend debe conectarse con `quiniela_app` (sin permisos DDL).

@@ -9,8 +9,8 @@ class Ranking(SoftDeleteModel):
     """
     id_registro = models.AutoField(primary_key=True)
     puntos = models.IntegerField(default=0)
-    fk_id_usuario = models.IntegerField()
-    fk_id_liga = models.IntegerField()
+    fk_id_usuario = models.IntegerField(db_index=True)
+    fk_id_liga = models.IntegerField(db_index=True)
     pj = models.IntegerField(default=0)  # Partidos jugados (pronosticados)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
