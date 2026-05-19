@@ -104,6 +104,10 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('core', '0003_seed_fases'),
+        ('ligas', '0003_alter_liga_fk_administrador_and_more'),
+        ('partidos', '0004_partido_deleted_at_partido_status_and_more'),
+        ('pronosticos', '0002_alter_pronostico_fk_id_liga_and_more'),
+        ('usuarios', '0003_alter_usuario_email_alter_usuario_fk_rol'),
     ]
 
     operations = [
