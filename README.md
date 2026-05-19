@@ -5,6 +5,38 @@
 - **Frontend**: React + Node.js
 - **Base de Datos**: PostgreSQL (recomendado)
 
+## 🐳 Configuración con Docker (Recomendado)
+
+### Prerrequisitos
+- Docker y Docker Compose instalados
+- Python 3.11+
+
+### Inicio Rápido
+```bash
+# 1. Iniciar contenedores Docker
+docker-compose -f infrastructure/docker-compose.yml up -d
+
+# 2. Ejecutar script de configuración automatizada
+python scripts/docker_setup.py
+
+# 3. Iniciar servidor de desarrollo
+python manage.py runserver
+
+# 4. Iniciar frontend (en otra terminal)
+cd frontend && npm start
+```
+
+### Scripts Automatizados
+- **Windows**: `scripts\docker_start.bat`
+- **Linux/Mac**: `./scripts/docker_start.sh`
+
+### ¿Qué hacen los scripts?
+1. ✅ Inician PostgreSQL en Docker
+2. ✅ Cargan el esquema completo (`init-db.sql`)
+3. ✅ Aplican todas las migraciones Django
+4. ✅ Crean superusuario (`admin/admin123`)
+5. ✅ Verifican integridad de datos
+
 ## Estructura del Proyecto
 ```
 Sistema de Apuestas del Mundial/
@@ -19,6 +51,7 @@ Sistema de Apuestas del Mundial/
 |   |-- posiciones/       # App de rankings
 |   |-- premios/          # App de premios
 |   |-- historialganador/ # App de historial
+|   |-- core/             # App para tablas sin modelo previo
 |   `-- correos/          # App de correos (futuro)
 |-- frontend/             # Proyecto React
 |   |-- src/
