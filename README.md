@@ -36,9 +36,21 @@ cd frontend && npm start
 3. ✅ Crean superusuario (`admin/admin123`)
 4. ✅ Verifican conexión a la base de datos
 
+## Microservicio Marcador (independiente)
+
+Servicio de marcador en vivo con **PostgreSQL propio** (puerto 5433) y API FastAPI (puerto 8001).
+
+```bash
+cd marcador-service
+docker compose up -d --build
+```
+
+Documentación completa: [marcador-service/README.md](marcador-service/README.md)
+
 ## Estructura del Proyecto
 ```
 Sistema de Apuestas del Mundial/
+|-- marcador-service/     # Microservicio marcador (FastAPI + Postgres)
 |-- backend/              # Proyecto Django
 |   |-- manage.py
 |   |-- backend/          # Configuración principal

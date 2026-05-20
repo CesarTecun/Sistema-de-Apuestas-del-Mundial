@@ -1,0 +1,43 @@
+services:
+  marcador-postgres:
+    image: postgres:16
+    container_name: marcador-postgres
+    environment:
+      POSTGRES_DB: marcador_db
+      POSTGRES_USER: marcador
+      POSTGRES_PASSWORD: marcador_secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - marcador_postgres_data:/var/lib/postgresql/data
+    networks:
+      - marcador_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marcador -d marcador_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  marcador-api:
+    build: .
+    container_name: marcador-api
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://marcador:marcador_secret@marcador-postgres:5432/marcador_db
+    ports:
+      - "8001:8001"
+    depends_on:
+      marcador-postgres:
+        condition: service_healthy
+    networks:
+      - marcador_network
+    command: >
+      sh -c "python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload"
+
+volumes:
+  marcador_postgres_data:
+
+networks:
+  marcador_network:
+    driver: bridge
