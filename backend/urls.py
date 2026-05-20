@@ -41,6 +41,7 @@ def api_root(request):
             'historial': '/api/historial/',
             'core': '/api/core/',
             'docs': '/api/docs/',
+            'marcador': '/api/partidos/marcador/',
         }
     })
 

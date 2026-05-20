@@ -7,13 +7,16 @@ from .models import Ranking
 from .serializers import (
     RankingSerializer,
     RankingConPosicionSerializer,
-    PosicionUsuarioSerializer
+    PosicionUsuarioSerializer,
+    TablaPosicionEquipoSerializer
 )
 from .services import (
     calcular_posicion_usuario,
     actualizar_ranking_usuario,
     calcular_todas_las_posiciones,
-    obtener_ranking_con_posicion
+    obtener_ranking_con_posicion,
+    obtener_tabla_equipos,
+    recalcular_tabla_equipos
 )
 
 
@@ -214,6 +217,43 @@ def mi_ranking(request):
             )
     except Exception as e:
         return Response(
-            {'error': f'Error al obtener ranking: {str(e)}'}, 
+            {'error': f'Error al obtener ranking: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def tabla_equipos_por_liga(request):
+    """
+    Obtiene la tabla de posiciones FIFA-style de equipos para una liga.
+    Incluye posición, variación (↑↓→), puntos, partidos, goles, etc.
+
+    Query params:
+        liga_id: ID de la liga
+    """
+    liga_id = request.query_params.get('liga_id')
+    if not liga_id:
+        return Response(
+            {'error': 'Se requiere el ID de la liga'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        tabla = obtener_tabla_equipos(int(liga_id))
+        if not tabla.exists():
+            # Si no hay datos, recalcular desde los partidos finalizados
+            recalcular_tabla_equipos(int(liga_id))
+            tabla = obtener_tabla_equipos(int(liga_id))
+
+        serializer = TablaPosicionEquipoSerializer(tabla, many=True)
+        return Response({
+            'liga_id': liga_id,
+            'total_equipos': len(serializer.data),
+            'tabla': serializer.data
+        })
+    except Exception as e:
+        return Response(
+            {'error': f'Error al obtener tabla de equipos: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

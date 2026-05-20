@@ -187,35 +187,179 @@ def calcular_todas_las_posiciones(liga_id):
 
 def obtener_ranking_con_posicion(liga_id):
     """
-    Obtiene el ranking de una liga con la posición numérica de cada usuario.
-    
+    Obtiene el ranking de una liga con la posición numérica de cada usuario,
+    incluyendo la posición anterior y la variación (tendencia ↑↓→).
+
     Args:
         liga_id: ID de la liga
-    
+
     Returns:
-        list: Lista de diccionarios con ranking y posición
+        list: Lista de diccionarios con ranking, posición y variación
     """
     rankings = calcular_todas_las_posiciones(liga_id)
-    
+
     resultado = []
     posicion = 1
     puntos_anterior = None
     posicion_real = 1
-    
+
     for ranking in rankings:
         # Si hay empate en puntos, mantener la misma posición
         if puntos_anterior is not None and ranking.puntos < puntos_anterior:
             posicion = posicion_real
-        
+
+        # Calcular variación y tendencia
+        variacion = 0
+        tendencia = 'igual'
+        if ranking.posicion_anterior is not None and posicion is not None:
+            variacion = ranking.posicion_anterior - posicion
+            if variacion > 0:
+                tendencia = 'subio'
+            elif variacion < 0:
+                tendencia = 'bajo'
+
         resultado.append({
             'posicion': posicion,
+            'posicion_anterior': ranking.posicion_anterior,
+            'variacion': variacion,
+            'tendencia': tendencia,
             'usuario_id': ranking.fk_id_usuario,
             'puntos': ranking.puntos,
             'pj': ranking.pj,
             'fecha_actualizacion': ranking.fecha_actualizacion
         })
-        
+
         puntos_anterior = ranking.puntos
         posicion_real += 1
-    
+
     return resultado
+
+
+# ---------------------------------------------------------------------------
+# Tabla de posiciones de equipos (FIFA-style) por liga
+# ---------------------------------------------------------------------------
+
+def recalcular_tabla_equipos(liga_id):
+    """
+    Recalcula la tabla de posiciones de equipos para una liga específica.
+    Usa todos los partidos finalizados de esa liga.
+    Criterio FIFA: PTS > DG > GF
+    """
+    from backend.core.models import PosicionesTorneo
+    from backend.partidos.models import Partido
+
+    partidos = Partido.objects.filter(fk_id_liga=liga_id, estado_partido='finalizado')
+
+    # Acumuladores por selección: {id_seleccion: {pg, pe, pp, gf, gc, pts}}
+    stats = {}
+
+    for p in partidos:
+        local = p.equipo_local
+        visitante = p.equipo_visitante
+
+        for sid in (local, visitante):
+            if sid not in stats:
+                stats[sid] = {'pg': 0, 'pe': 0, 'pp': 0, 'gf': 0, 'gc': 0, 'pts': 0}
+
+        gl, gv = p.gol_local or 0, p.gol_visitante or 0
+
+        # goles
+        stats[local]['gf'] += gl
+        stats[local]['gc'] += gv
+        stats[visitante]['gf'] += gv
+        stats[visitante]['gc'] += gl
+
+        # puntos
+        if gl > gv:
+            stats[local]['pg'] += 1
+            stats[local]['pts'] += 3
+            stats[visitante]['pp'] += 1
+        elif gl < gv:
+            stats[visitante]['pg'] += 1
+            stats[visitante]['pts'] += 3
+            stats[local]['pp'] += 1
+        else:
+            stats[local]['pe'] += 1
+            stats[local]['pts'] += 1
+            stats[visitante]['pe'] += 1
+            stats[visitante]['pts'] += 1
+
+    # Guardar posiciones anteriores antes de actualizar
+    prev = {
+        r.fk_id_seleccion: r.posicion
+        for r in PosicionesTorneo.objects.filter(fk_id_liga=liga_id)
+    }
+
+    # Ordenar: puntos desc, dg desc, gf desc
+    equipos = sorted(
+        stats.items(),
+        key=lambda x: (-x[1]['pts'], -(x[1]['gf'] - x[1]['gc']), -x[1]['gf'])
+    )
+
+    tabla = []
+    for idx, (sid, s) in enumerate(equipos, start=1):
+        obj, _ = PosicionesTorneo.objects.update_or_create(
+            fk_id_liga=liga_id,
+            fk_id_seleccion=sid,
+            defaults={
+                'pj': s['pg'] + s['pe'] + s['pp'],
+                'pg': s['pg'],
+                'pe': s['pe'],
+                'pp': s['pp'],
+                'gf': s['gf'],
+                'gc': s['gc'],
+                'dg': s['gf'] - s['gc'],
+                'puntos': s['pts'],
+                'posicion': idx,
+                'posicion_anterior': prev.get(sid),
+            }
+        )
+        tabla.append(obj)
+
+    # Eliminar registros de equipos que ya no están en la liga (si aplica)
+    selecciones_ids = set(stats.keys())
+    PosicionesTorneo.objects.filter(fk_id_liga=liga_id).exclude(
+        fk_id_seleccion__in=selecciones_ids
+    ).delete()
+
+    return tabla
+
+
+def obtener_tabla_equipos(liga_id):
+    """
+    Devuelve la tabla de posiciones ordenada para una liga.
+    """
+    from backend.core.models import PosicionesTorneo
+    return PosicionesTorneo.objects.filter(fk_id_liga=liga_id).order_by('posicion')
+
+
+# ---------------------------------------------------------------------------
+# Historial de rankings (snapshots por jornada)
+# ---------------------------------------------------------------------------
+
+def guardar_historial_ranking(liga_id):
+    """
+    Toma un snapshot del ranking actual de apostadores y lo guarda
+    en HistorialRanking con la jornada = cantidad de partidos finalizados + 1.
+    """
+    from backend.posiciones.models import HistorialRanking
+    from backend.partidos.models import Partido
+
+    partidos_finalizados = Partido.objects.filter(
+        fk_id_liga=liga_id, estado_partido='finalizado'
+    ).count()
+    jornada = partidos_finalizados or 1
+
+    rankings = calcular_todas_las_posiciones(liga_id)
+
+    for pos, ranking in enumerate(rankings, start=1):
+        HistorialRanking.objects.create(
+            fk_id_usuario=ranking.fk_id_usuario,
+            fk_id_liga=liga_id,
+            puntos=ranking.puntos,
+            pj=ranking.pj,
+            posicion=pos,
+            jornada=jornada,
+        )
+
+    return jornada

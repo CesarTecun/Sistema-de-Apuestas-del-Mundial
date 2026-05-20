@@ -76,6 +76,7 @@ class SeleccionSerializer(serializers.ModelSerializer):
             'pais',
             'bandera',
             'fk_id_fase_inicial',
+            'codigo_iso',
             'status'
         ]
         read_only_fields = ('id_seleccion',)

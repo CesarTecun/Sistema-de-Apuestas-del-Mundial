@@ -5,6 +5,7 @@ class SeleccionBase(BaseModel):
     pais: str = Field(..., max_length=100)
     bandera: str | None = Field(None, max_length=255)
     fk_id_fase_inicial: int | None = None
+    codigo_iso: str | None = Field(None, max_length=3)
 
 
 class SeleccionCreate(SeleccionBase):
@@ -15,6 +16,7 @@ class SeleccionUpdate(BaseModel):
     pais: str | None = Field(None, max_length=100)
     bandera: str | None = Field(None, max_length=255)
     fk_id_fase_inicial: int | None = None
+    codigo_iso: str | None = Field(None, max_length=3)
 
 
 class SeleccionResponse(SeleccionBase):

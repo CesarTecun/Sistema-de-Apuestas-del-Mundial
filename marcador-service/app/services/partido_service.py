@@ -1,8 +1,35 @@
+import os
+
+import requests
 from sqlalchemy.orm import Session
 
 from app.models.partido import Partido
 from app.models.seleccion import Seleccion
 from app.schemas.partido import MarcadorUpdate, PartidoCreate, PartidoMarcadorResponse, PartidoUpdate
+
+
+DJANGO_WEBHOOK_URL = os.getenv("DJANGO_WEBHOOK_URL", "http://localhost:8000/api/partidos/marcador/webhook/")
+
+
+def _notify_django(partido: Partido) -> None:
+    """Notifica a Django cuando cambia el marcador de un partido."""
+    if not DJANGO_WEBHOOK_URL:
+        return
+    try:
+        requests.post(
+            DJANGO_WEBHOOK_URL,
+            json={
+                "id_partido": partido.id_partido,
+                "gol_local": partido.gol_local,
+                "gol_visitante": partido.gol_visitante,
+                "estado": partido.estado,
+                "resultado": partido.resultado,
+                "ganador_penales": partido.ganador_penales,
+            },
+            timeout=3,
+        )
+    except Exception:
+        pass  # No fallar si Django no está disponible
 
 
 def _ensure_seleccion_exists(db: Session, id_seleccion: int) -> bool:
@@ -84,6 +111,7 @@ def actualizar_marcador(db: Session, partido: Partido, data: MarcadorUpdate) -> 
 
     db.commit()
     db.refresh(partido)
+    _notify_django(partido)
     return partido
 
 

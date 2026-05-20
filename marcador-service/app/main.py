@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 
 from app.config import settings
 from app.database import Base, engine
-from app.routers import partidos, selecciones
+from app.routers import partidos, selecciones, sync
 
 
 @asynccontextmanager
@@ -34,6 +34,7 @@ app.add_middleware(
 
 app.include_router(selecciones.router, prefix="/api")
 app.include_router(partidos.router, prefix="/api")
+app.include_router(sync.router, prefix="/api")
 
 # Montar archivos estáticos
 static_dir = Path(__file__).parent / "static"

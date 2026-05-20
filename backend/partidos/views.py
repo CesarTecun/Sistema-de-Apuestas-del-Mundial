@@ -189,3 +189,98 @@ def actualizar_resultado(request, pk):
         return Response(serializer.data)
     except Partido.DoesNotExist:
         return Response({'error': 'Partido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# ------------------------------------------------------------------
+# Bracket de eliminatorias
+# ------------------------------------------------------------------
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def bracket_eliminatoria(request):
+    """
+    Obtiene el bracket completo de eliminatorias para una liga.
+
+    Query params:
+        liga_id: ID de la liga
+
+    Retorna estructura jerárquica con fases, partidos, equipos,
+    resultados y conexiones entre partidos.
+    """
+    from .bracket_services import obtener_bracket
+
+    liga_id = request.query_params.get('liga_id')
+    if not liga_id:
+        return Response(
+            {'error': 'Se requiere el ID de la liga'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    ligas_usuario = obtener_ligas_usuario_ids(request.user.id_usuario)
+    if liga_id_int not in ligas_usuario:
+        raise PermissionDenied('No tienes permisos para consultar esta liga.')
+
+    resultado = obtener_bracket(liga_id_int)
+    if 'error' in resultado:
+        return Response(resultado, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(resultado)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAdminUser])
+def generar_bracket(request):
+    """
+    Genera automáticamente el bracket de eliminatorias para una liga.
+    Solo administradores.
+
+    Body params:
+        liga_id: ID de la liga
+        octavos: Lista de configuración de octavos de final
+            [
+                {
+                    'slot': 'O1',
+                    'equipo_local': id_seleccion,
+                    'equipo_visitante': id_seleccion,
+                    'horario': '2026-07-01T16:00:00Z',
+                    'fk_sede': id_sede
+                },
+                ... (8 partidos)
+            ]
+    """
+    from .bracket_services import generar_cruces_eliminatoria
+    from django.utils.dateparse import parse_datetime
+
+    liga_id = request.data.get('liga_id')
+    octavos_data = request.data.get('octavos', [])
+
+    if not liga_id:
+        return Response(
+            {'error': 'Se requiere el ID de la liga'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if not octavos_data or len(octavos_data) != 8:
+        return Response(
+            {'error': 'Se requieren exactamente 8 partidos de octavos'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Normalizar fechas
+    for item in octavos_data:
+        if 'horario' in item and isinstance(item['horario'], str):
+            item['horario'] = parse_datetime(item['horario'])
+
+    resultado = generar_cruces_eliminatoria(int(liga_id), octavos_data)
+    if 'error' in resultado:
+        return Response(resultado, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(resultado, status=status.HTTP_201_CREATED)

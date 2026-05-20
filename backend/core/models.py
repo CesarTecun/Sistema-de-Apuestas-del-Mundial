@@ -65,21 +65,27 @@ class Gol(models.Model):
 
 
 class PosicionesTorneo(models.Model):
-    """Modelo para la tabla posiciones_torneo"""
+    """Modelo para la tabla posiciones_torneo — standings FIFA por liga."""
     id_posicion = models.AutoField(primary_key=True)
     fk_id_fase = models.IntegerField(null=True, blank=True)
-    fk_id_seleccion = models.IntegerField(null=True, blank=True)
+    fk_id_seleccion = models.IntegerField(null=True, blank=True, db_index=True)
+    fk_id_liga = models.IntegerField(null=True, blank=True, db_index=True)
     pj = models.IntegerField(default=0)
     pg = models.IntegerField(default=0)
     pe = models.IntegerField(default=0)
     pp = models.IntegerField(default=0)
     gf = models.IntegerField(default=0)
     gc = models.IntegerField(default=0)
+    dg = models.IntegerField(default=0)  # diferencia de gol: gf - gc
     puntos = models.IntegerField(default=0)
+    posicion = models.IntegerField(null=True, blank=True)
+    posicion_anterior = models.IntegerField(null=True, blank=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'posiciones_torneo'
         managed = True
+        unique_together = ('fk_id_liga', 'fk_id_seleccion')
 
 
 class Sede(models.Model):

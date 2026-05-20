@@ -246,3 +246,9 @@ SERVER_EMAIL = 'quinielachechas@gmail.com'
 
 # Para pruebas en consola (descomentar si quieres ver emails en consola)
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# =============================================================================
+# CONFIGURACION DEL MICROSERVICIO MARCADOR
+# =============================================================================
+MARCADOR_SERVICE_URL = os.getenv("MARCADOR_SERVICE_URL", "http://localhost:8001")
+MARCADOR_SERVICE_TIMEOUT = int(os.getenv("MARCADOR_SERVICE_TIMEOUT", "5"))

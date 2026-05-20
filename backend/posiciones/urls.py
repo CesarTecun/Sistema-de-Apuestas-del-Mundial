@@ -17,4 +17,6 @@ urlpatterns = [
     path('recalcular/', views.recalcular_ranking_liga, name='recalcular-ranking-liga'),
     # Mi ranking (usuario autenticado)
     path('mi-ranking/', views.mi_ranking, name='mi-ranking'),
+    # Tabla de posiciones FIFA-style de equipos por liga
+    path('tabla-equipos/', views.tabla_equipos_por_liga, name='tabla-equipos-por-liga'),
 ]
