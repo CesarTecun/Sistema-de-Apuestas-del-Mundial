@@ -4,11 +4,11 @@ from .models import Premio
 
 class PremioSerializer(serializers.ModelSerializer):
     """Serializador para el modelo Premio"""
-    
+
     class Meta:
         model = Premio
-        fields = ['id_premio', 'fk_id_liga', 'posicion', 'porcentaje_premio']
-        read_only_fields = ('id_premio',)
+        fields = ['id_premio', 'fk_id_liga', 'monto_premio', 'fecha_premio']
+        read_only_fields = ('id_premio', 'fecha_premio')
 
 
 class PremioCalculadoSerializer(serializers.Serializer):

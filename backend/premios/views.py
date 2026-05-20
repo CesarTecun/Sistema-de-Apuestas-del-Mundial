@@ -14,7 +14,10 @@ from .services import (
     obtener_distribucion_premios_liga,
     actualizar_distribucion_premios,
     inicializar_premios_liga,
-    DISTRIBUCION_DEFAULT
+    DISTRIBUCION_DEFAULT,
+    cerrar_liga,
+    calcular_premios_locales_con_empates,
+    calcular_premios_globales,
 )
 
 
@@ -236,3 +239,97 @@ def premio_usuario_liga(request):
     resultado = obtener_premio_usuario(int(liga_id), int(usuario_id))
     
     return Response(resultado)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAdminUser])
+def ejecutar_cierre_liga(request):
+    """
+    Ejecuta el cierre completo de una liga con distribucion de premios.
+    Incluye premios locales (con reglas de empate), retencion de plataforma (5%)
+    y premios globales (1% del total de todas las ligas).
+
+    Body params:
+        liga_id: ID de la liga a cerrar
+    """
+    liga_id = request.data.get('liga_id')
+    if not liga_id:
+        return Response(
+            {'error': 'Se requiere el ID de la liga'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    resultado = cerrar_liga(int(liga_id))
+
+    if 'error' in resultado:
+        return Response(resultado, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(resultado, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def simular_cierre_liga(request):
+    """
+    Simula el cierre de una liga SIN persistir los premios.
+    Util para ver la distribucion antes de cerrar oficialmente.
+
+    Query params:
+        liga_id: ID de la liga
+    """
+    liga_id = request.query_params.get('liga_id')
+    if not liga_id:
+        return Response(
+            {'error': 'Se requiere el ID de la liga'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    premios_locales, resumen_local = calcular_premios_locales_con_empates(int(liga_id))
+
+    if premios_locales is None:
+        return Response(resumen_local, status=status.HTTP_400_BAD_REQUEST)
+
+    premios_individuales, premios_liga, resumen_global = calcular_premios_globales()
+
+    # Filtrar solo los premios globales que afectan a esta liga
+    premios_globales_esta_liga = [p for p in premios_individuales if p['liga_id'] == int(liga_id)]
+    premios_globales_liga_esta = [p for p in premios_liga if p['liga_id'] == int(liga_id)]
+
+    return Response({
+        'liga_id': int(liga_id),
+        'premios_locales': resumen_local,
+        'premios_globales_individuales': [
+            {k: float(v) if hasattr(v, 'quantize') else v for k, v in p.items()}
+            for p in premios_globales_esta_liga
+        ],
+        'premios_globales_liga': [
+            {k: float(v) if hasattr(v, 'quantize') else v for k, v in p.items()}
+            for p in premios_globales_liga_esta
+        ],
+        'resumen_global': resumen_global,
+        'nota': 'Esta es una simulacion. No se han guardado los premios.',
+    })
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def premios_globales(request):
+    """
+    Obtiene el calculo de premios globales sobre todas las ligas de apuesta.
+    """
+    premios_individuales, premios_liga, resumen = calcular_premios_globales()
+
+    if 'error' in resumen:
+        return Response(resumen, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({
+        'premios_individuales': [
+            {k: float(v) if hasattr(v, 'quantize') else v for k, v in p.items()}
+            for p in premios_individuales
+        ],
+        'premios_por_liga': [
+            {k: float(v) if hasattr(v, 'quantize') else v for k, v in p.items()}
+            for p in premios_liga
+        ],
+        'resumen': resumen,
+    })
