@@ -8,6 +8,7 @@ import { LigasPage } from './paginas/Ligas';
 import { PartidosPage } from './paginas/Partidos';
 import SeleccionesPage from './paginas/Selecciones';
 import HomePage from './paginas/Home/HomePage';
+import MarcadorPage from './paginas/Marcador';
 import RutaProtegida from './componentes/RutaProtegida';
 import PageTransition from './componentes/PageTransition';
 import './App.css';
@@ -77,6 +78,11 @@ function ContenidoApp() {
       <Route path="/selecciones" element={
         <RutaProtegida>
           <SeleccionesPage />
+        </RutaProtegida>
+      } />
+      <Route path="/marcador" element={
+        <RutaProtegida>
+          <MarcadorPage />
         </RutaProtegida>
       } />
       <Route path="/" element={<Navigate to="/home" replace />} />

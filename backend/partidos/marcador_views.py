@@ -129,6 +129,17 @@ def marcador_eliminar_partido(request, id_partido):
         return Response({"error": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def marcador_controlar_partido(request, id_partido):
+    """Proxy: controlar partido (iniciar, pausar, cambiar tiempo, etc.) en el microservicio marcador."""
+    try:
+        data = client.controlar_partido(id_partido, request.data)
+        return Response(data)
+    except MarcadorClientError as exc:
+        return Response({"error": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def marcador_health(request):
@@ -174,8 +185,8 @@ def marcador_webhook(request):
             partido.gol_visitante = request.data["gol_visitante"]
             update_fields.append("gol_visitante")
         if "estado" in request.data:
-            partido.estado = request.data["estado"]
-            update_fields.append("estado")
+            partido.estado_partido = request.data["estado"]
+            update_fields.append("estado_partido")
         if "resultado" in request.data:
             partido.resultado = request.data["resultado"]
             update_fields.append("resultado")

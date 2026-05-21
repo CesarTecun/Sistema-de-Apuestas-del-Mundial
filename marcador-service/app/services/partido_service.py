@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.partido import Partido
 from app.models.seleccion import Seleccion
-from app.schemas.partido import MarcadorUpdate, PartidoCreate, PartidoMarcadorResponse, PartidoUpdate
+from app.schemas.partido import MarcadorUpdate, PartidoControlUpdate, PartidoCreate, PartidoMarcadorResponse, PartidoUpdate
 
 
 DJANGO_WEBHOOK_URL = os.getenv("DJANGO_WEBHOOK_URL", "http://localhost:8000/api/partidos/marcador/webhook/")
@@ -109,6 +109,47 @@ def actualizar_marcador(db: Session, partido: Partido, data: MarcadorUpdate) -> 
     if partido.estado == "programado" and (partido.gol_local > 0 or partido.gol_visitante > 0):
         partido.estado = "en_juego"
 
+    db.commit()
+    db.refresh(partido)
+    _notify_django(partido)
+    return partido
+
+
+def controlar_partido(db: Session, partido: Partido, data: PartidoControlUpdate) -> Partido:
+    """
+    Controla el partido en vivo: iniciar, pausar, cambiar tiempo, agregar tiempo extra
+    """
+    payload = data.model_dump(exclude_unset=True)
+    
+    # Manejo especial para iniciar partido
+    if payload.get("partido_iniciado") == True and not partido.partido_iniciado:
+        partido.estado = "en_juego"
+        partido.partido_iniciado = True
+        partido.partido_pausado = False
+        partido.minuto_actual = 0
+        partido.periodo_actual = "1T"
+        partido.tiempo_extra_periodo = 0
+    
+    # Manejo especial para pausar partido
+    if payload.get("partido_pausado") is not None:
+        partido.partido_pausado = payload["partido_pausado"]
+    
+    # Actualizar otros campos
+    for field, value in payload.items():
+        if field not in ["partido_iniciado", "partido_pausado"]:
+            setattr(partido, field, value)
+    
+    # Cambio de período
+    if payload.get("periodo_actual") and payload["periodo_actual"] != partido.periodo_actual:
+        partido.periodo_actual = payload["periodo_actual"]
+        partido.minuto_actual = 0  # Reiniciar minuto al cambiar período
+        partido.tiempo_extra_periodo = 0
+    
+    # Finalizar partido
+    if payload.get("estado") == "finalizado":
+        partido.partido_pausado = True
+        partido.partido_iniciado = False
+    
     db.commit()
     db.refresh(partido)
     _notify_django(partido)

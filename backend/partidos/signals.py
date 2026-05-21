@@ -72,7 +72,7 @@ def sync_partido_to_marcador(sender, instance, created, **kwargs):
         "ganador_penales": instance.ganador_penales,
         "tipo_partido": instance.tipo_partido,
         "resultado": instance.resultado,
-        "estado": getattr(instance, "estado", "programado"),
+        "estado": instance.estado_partido,
         "status": instance.status,
     }
     try:

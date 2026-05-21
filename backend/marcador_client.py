@@ -138,6 +138,11 @@ class MarcadorClient:
         """Elimina un partido del microservicio marcador (hard delete)."""
         self._request("DELETE", f"/api/partidos/{id_partido}")
 
+    def controlar_partido(self, id_partido: int, data: dict):
+        """Controla un partido en el microservicio marcador (iniciar, pausar, etc.)."""
+        response = self._request("PATCH", f"/api/partidos/{id_partido}/control", json=data)
+        return response.json()
+
 
 # Instancia global para uso directo
 marcador_client = MarcadorClient()

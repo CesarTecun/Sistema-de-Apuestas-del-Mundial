@@ -182,13 +182,15 @@ def actualizar_resultado(request, pk):
             partido.gol_visitante = int(gol_visitante)
         if resultado is not None:
             partido.resultado = resultado
-            
+
         partido.save()
-        
+
         serializer = PartidoSerializer(partido)
         return Response(serializer.data)
     except Partido.DoesNotExist:
         return Response({'error': 'Partido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 # ------------------------------------------------------------------
