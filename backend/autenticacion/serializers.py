@@ -1,7 +1,15 @@
-from rest_framework import serializers
+import secrets
+from datetime import timedelta
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
+from django.utils import timezone
+from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 from backend.usuarios.models import Usuario
+from backend.autenticacion.models import PasswordResetToken
+from .utils import generar_tokens_y_sesion
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -78,3 +86,73 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Debe proporcionar email y password.")
 
         return data
+
+
+class SessionTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Serializer JWT que además registra la sesión en la BD."""
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        request = self.context.get('request')
+        refresh, access, sesion = generar_tokens_y_sesion(self.user, request)
+
+        data['refresh'] = refresh
+        data['access'] = access
+        data['user'] = UserSerializer(self.user).data
+        data['sesion'] = {
+            'id_sesion': sesion.id_sesion,
+            'dispositivo': sesion.dispositivo,
+            'ip_address': sesion.ip_address,
+            'fecha_inicio': sesion.fecha_inicio,
+        } if sesion else None
+        return data
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def create(self, validated_data):
+        email = validated_data['email']
+        try:
+            usuario = Usuario.objects.get(email=email)
+        except Usuario.DoesNotExist:
+            return None
+
+        token = secrets.token_hex(32)
+        expires_at = timezone.now() + timedelta(hours=24)
+        return PasswordResetToken.objects.create(
+            usuario=usuario,
+            token=token,
+            expires_at=expires_at
+        )
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({'password': 'Las contraseñas no coinciden.'})
+
+        try:
+            token_obj = PasswordResetToken.objects.get(token=attrs['token'])
+        except PasswordResetToken.DoesNotExist:
+            raise serializers.ValidationError({'token': 'Token inválido o expirado.'})
+
+        if not token_obj.is_active:
+            raise serializers.ValidationError({'token': 'Token inválido o expirado.'})
+
+        self.context['token_obj'] = token_obj
+        return attrs
+
+    def save(self, **kwargs):
+        token_obj = self.context['token_obj']
+        usuario = token_obj.usuario
+        password = self.validated_data['password']
+
+        usuario.set_password(password)
+        usuario.save(update_fields=['contrasena'])
+        token_obj.mark_used()
+        return usuario

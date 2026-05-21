@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'rest_framework',
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
     'backend.autenticacion',  # App de autenticación
     'backend.usuarios',       # App de usuarios
     'backend.ligas',          # App de ligas
@@ -101,6 +102,8 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 
 # Password validation

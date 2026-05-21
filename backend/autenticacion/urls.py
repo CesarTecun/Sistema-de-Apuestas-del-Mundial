@@ -6,7 +6,9 @@ from .views import (
     UserProfileView,
     CheckAuthView,
     SesionesActivasView,
-    CerrarSesionView
+    CerrarSesionView,
+    PasswordResetRequestView,
+    PasswordResetConfirmView,
 )
 
 urlpatterns = [
@@ -17,4 +19,6 @@ urlpatterns = [
     path('check/', CheckAuthView.as_view(), name='check-auth'),
     path('sesiones/', SesionesActivasView.as_view(), name='sesiones-activas'),
     path('sesiones/<int:sesion_id>/cerrar/', CerrarSesionView.as_view(), name='cerrar-sesion'),
+    path('password/reset/', PasswordResetRequestView.as_view(), name='password-reset-request'),
+    path('password/reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 ]

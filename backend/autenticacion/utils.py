@@ -1,12 +1,14 @@
 """
 Utilidades para el manejo de sesiones de usuario.
 """
+import hashlib
 import uuid
 from django.utils import timezone
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import SesionUsuario
 
 
-def crear_sesion_usuario(usuario, request):
+def crear_sesion_usuario(usuario, request, refresh_token: str | None = None, jwt_jti: str | None = None):
     """
     Crea un nuevo registro de sesión para un usuario.
 
@@ -24,12 +26,14 @@ def crear_sesion_usuario(usuario, request):
         dispositivo = _detectar_dispositivo(user_agent)
 
         # Generar token de sesión único
-        token_sesion = str(uuid.uuid4())
+        token_sesion = _build_token_value(refresh_token)
 
         # Crear sesión en la base de datos
         sesion = SesionUsuario.objects.create(
             fk_id_usuario=usuario.id_usuario,
             token_sesion=token_sesion,
+            refresh_token_hash=_hash_token(refresh_token) if refresh_token else None,
+            jwt_jti=jwt_jti,
             estado_sesion='Activa',
             ip_address=ip_address,
             user_agent=user_agent,
@@ -47,7 +51,7 @@ def crear_sesion_usuario(usuario, request):
         return None
 
 
-def cerrar_sesion_usuario(request):
+def cerrar_sesion_usuario(request, refresh_token: str | None = None):
     """
     Cierra la sesión activa del usuario.
 
@@ -58,7 +62,7 @@ def cerrar_sesion_usuario(request):
         bool: True si se cerró correctamente, False en caso contrario
     """
     try:
-        token_sesion = request.session.get('token_sesion')
+        token_sesion = request.session.get('token_sesion') or _hash_token(refresh_token)
 
         if token_sesion:
             # Buscar y cerrar sesión por token
@@ -174,3 +178,28 @@ def _detectar_dispositivo(user_agent):
         return 'Escritorio'
     else:
         return 'Desconocido'
+
+
+def _hash_token(token: str | None) -> str | None:
+    if not token:
+        return None
+    return hashlib.sha256(token.encode('utf-8')).hexdigest()
+
+
+def _build_token_value(refresh_token: str | None) -> str:
+    """Usa el hash del refresh token como identificador o genera uuid."""
+    return _hash_token(refresh_token) or str(uuid.uuid4())
+
+
+def generar_tokens_y_sesion(usuario, request):
+    """Genera tokens JWT y registra la sesión asociada."""
+    refresh_obj = RefreshToken.for_user(usuario)
+    refresh = str(refresh_obj)
+    access = str(refresh_obj.access_token)
+    sesion = crear_sesion_usuario(
+        usuario,
+        request,
+        refresh_token=refresh,
+        jwt_jti=str(refresh_obj.get('jti'))
+    )
+    return refresh, access, sesion

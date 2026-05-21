@@ -1,13 +1,12 @@
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
-from django.core.mail import send_mail
-from django.conf import settings
 from backend.utils.viewsets import SoftDeleteModelViewSet
 from .models import Liga, Invitacion, ParticipanteLiga
 from .serializers import LigaSerializer, InvitacionSerializer
 from backend.ligas.serializers import ParticipanteLigaSerializer
 from backend.usuarios.models import Usuario
+from .emails import enviar_correo_invitacion
 
 class LigaViewSet(SoftDeleteModelViewSet):
     """
@@ -218,7 +217,7 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
         # Enviar correo si se proporcionó email
         if invitacion.email_invitado:
             try:
-                self.enviar_email_invitacion(invitacion)
+                enviar_correo_invitacion(invitacion)
                 return Response({
                     'invitacion': serializer.data,
                     'email_enviado': True,
@@ -238,41 +237,6 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
             'message': 'Invitación creada (sin correo - no se proporcionó email)'
         }, status=status.HTTP_201_CREATED)
     
-    def enviar_email_invitacion(self, invitacion):
-        """Método auxiliar para enviar correo de invitación"""
-        asunto = '🏆 Has sido invitado a una Liga de la Copa Mundial FIFA 2026'
-        
-        mensaje = f"""
-¡Hola!
-
-Has sido invitado a unirte a una liga en nuestro sistema de pronósticos para la Copa Mundial FIFA 2026.
-
-📋 Detalles de la invitación:
-• ID de Liga: {invitacion.fk_id_liga}
-• Estado: {invitacion.estado_invitacion}
-
-💬 Mensaje del administrador:
-{invitacion.mensaje_invitacion or 'Sin mensaje personalizado'}
-
-🔗 Para aceptar la invitación, por favor inicia sesión en tu cuenta o regístrate si aún no tienes una en:
-http://localhost:3000/invitaciones/{invitacion.id_invitacion}
-
-¡Que gane el mejor!
-
----
-Copa Mundial FIFA 2026 - Sistema de Pronósticos
-Este es un correo automático, por favor no respondas a este mensaje.
-        """
-        
-        send_mail(
-            subject=asunto,
-            message=mensaje,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[invitacion.email_invitado],
-            fail_silently=False,
-        )
-
-
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def enviar_invitacion_email_api(request):
@@ -297,36 +261,7 @@ def enviar_invitacion_email_api(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        asunto = '🏆 Has sido invitado a una Liga de la Copa Mundial FIFA 2026'
-        
-        mensaje = f"""
-¡Hola!
-
-Has sido invitado a unirte a una liga en nuestro sistema de pronósticos para la Copa Mundial FIFA 2026.
-
-📋 Detalles de la invitación:
-• ID de Liga: {invitacion.fk_id_liga}
-• Estado: {invitacion.estado_invitacion}
-
-💬 Mensaje del administrador:
-{invitacion.mensaje_invitacion or 'Sin mensaje personalizado'}
-
-🔗 Para aceptar la invitación, por favor inicia sesión en tu cuenta o regístrate si aún no tienes una.
-
-¡Que gane el mejor!
-
----
-Copa Mundial FIFA 2026 - Sistema de Pronósticos
-Este es un correo automático, por favor no respondas a este mensaje.
-        """
-        
-        send_mail(
-            subject=asunto,
-            message=mensaje,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[invitacion.email_invitado],
-            fail_silently=False,
-        )
+        enviar_correo_invitacion(invitacion)
         
         return Response({
             'message': f'Correo enviado exitosamente a {invitacion.email_invitado}'

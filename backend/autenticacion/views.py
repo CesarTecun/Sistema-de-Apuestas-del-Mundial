@@ -5,22 +5,26 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
-from django.contrib.auth import login, logout, get_user_model
-
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
+from django.contrib.auth import logout, get_user_model
 from django.utils import timezone
 
 
 
 from .serializers import (
-    UserSerializer, 
-    RegisterSerializer, 
-    LoginSerializer
+    UserSerializer,
+    RegisterSerializer,
+    LoginSerializer,
+    SessionTokenObtainPairSerializer,
+    PasswordResetRequestSerializer,
+    PasswordResetConfirmSerializer,
 )
-from .utils import crear_sesion_usuario, cerrar_sesion_usuario, obtener_sesiones_activas
+from .utils import cerrar_sesion_usuario, obtener_sesiones_activas, generar_tokens_y_sesion
 from .models import SesionUsuario
+from .emails import enviar_correo_recuperacion
 
 
 
@@ -69,14 +73,16 @@ class LoginView(APIView):
         
         if serializer.is_valid():
             user = serializer.validated_data['user']
-            
-            # Crear sesión en la base de datos
-            sesion = crear_sesion_usuario(user, request)
+            refresh, access, sesion = generar_tokens_y_sesion(user, request)
             
             # Preparar respuesta con info de sesión
             response_data = {
                 'message': 'Login exitoso',
                 'user': UserSerializer(user).data,
+                'tokens': {
+                    'access': access,
+                    'refresh': refresh,
+                },
                 'sesion': {
                     'id_sesion': sesion.id_sesion if sesion else None,
                     'token_sesion': sesion.token_sesion if sesion else None,
@@ -98,8 +104,15 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        refresh_token = request.data.get('refresh')
+        if refresh_token:
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            except TokenError:
+                pass
         # Cerrar sesión en base de datos
-        cerrar_sesion_usuario(request)
+        cerrar_sesion_usuario(request, refresh_token=refresh_token)
         
         # Logout de Django
         logout(request)
@@ -233,3 +246,33 @@ class CerrarSesionView(APIView):
             return Response({
                 'error': 'Sesión no encontrada'
             }, status=status.HTTP_404_NOT_FOUND)
+
+
+class PasswordResetRequestView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        token_obj = serializer.save()
+
+        if token_obj:
+            enviar_correo_recuperacion(token_obj)
+
+        return Response({
+            'message': 'Si el correo existe, recibirás instrucciones para restablecer la contraseña.'
+        }, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'message': 'Contraseña actualizada correctamente.'})
+
+
+class SessionTokenObtainPairView(TokenObtainPairView):
+    serializer_class = SessionTokenObtainPairSerializer

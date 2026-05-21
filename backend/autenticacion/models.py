@@ -15,6 +15,8 @@ class SesionUsuario(models.Model):
     id_sesion = models.AutoField(primary_key=True)
     fk_id_usuario = models.IntegerField(db_index=True)
     token_sesion = models.CharField(max_length=255, unique=True, db_index=True)
+    refresh_token_hash = models.CharField(max_length=64, unique=True, null=True, blank=True)
+    jwt_jti = models.CharField(max_length=50, null=True, blank=True, unique=True)
     fecha_inicio = models.DateTimeField(auto_now_add=True)
     fecha_ultima_actividad = models.DateTimeField(auto_now=True)
     fecha_cierre = models.DateTimeField(null=True, blank=True)
@@ -45,3 +47,30 @@ class SesionUsuario(models.Model):
         from django.utils import timezone
         self.fecha_ultima_actividad = timezone.now()
         self.save(update_fields=['fecha_ultima_actividad'])
+
+
+class PasswordResetToken(models.Model):
+    """Tokens de recuperación de contraseña enviados por correo."""
+    usuario = models.ForeignKey(
+        'usuarios.Usuario',
+        on_delete=models.CASCADE,
+        related_name='password_reset_tokens'
+    )
+    token = models.CharField(max_length=64, unique=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'password_reset_token'
+        ordering = ['-created_at']
+
+    @property
+    def is_active(self):
+        from django.utils import timezone
+        return self.used_at is None and timezone.now() <= self.expires_at
+
+    def mark_used(self):
+        from django.utils import timezone
+        self.used_at = timezone.now()
+        self.save(update_fields=['used_at'])

@@ -1,7 +1,6 @@
 from django.contrib import admin, messages
-from django.core.mail import send_mail
-from django.conf import settings
 from .models import Liga, Invitacion
+from .emails import enviar_correo_invitacion
 
 
 @admin.register(Liga)
@@ -53,38 +52,8 @@ class InvitacionAdmin(admin.ModelAdmin):
         for invitacion in queryset.filter(estado_invitacion='Pendiente'):
             if invitacion.email_invitado:
                 try:
-                    asunto = '🏆 Has sido invitado a una Liga de la Copa Mundial FIFA 2026'
-                    
-                    mensaje = f"""
-¡Hola!
-
-Has sido invitado a unirte a una liga en nuestro sistema de pronósticos para la Copa Mundial FIFA 2026.
-
-📋 Detalles de la invitación:
-• ID de Liga: {invitacion.fk_id_liga}
-• Estado: {invitacion.estado_invitacion}
-
-💬 Mensaje del administrador:
-{invitacion.mensaje_invitacion or 'Sin mensaje personalizado'}
-
-🔗 Para aceptar la invitación, por favor inicia sesión en tu cuenta o regístrate si aún no tienes una.
-
-¡Que gane el mejor!
-
----
-Copa Mundial FIFA 2026 - Sistema de Pronósticos
-Este es un correo automático, por favor no respondas a este mensaje.
-                    """
-                    
-                    send_mail(
-                        subject=asunto,
-                        message=mensaje,
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[invitacion.email_invitado],
-                        fail_silently=False,
-                    )
+                    enviar_correo_invitacion(invitacion)
                     enviadas += 1
-                    
                 except Exception as e:
                     errores += 1
                     self.message_user(
@@ -113,3 +82,20 @@ Este es un correo automático, por favor no respondas a este mensaje.
                 'ℹ️ No se encontraron invitaciones pendientes con email para enviar.',
                 messages.INFO
             )
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if not change and obj.email_invitado and obj.estado_invitacion == 'Pendiente':
+            try:
+                enviar_correo_invitacion(obj)
+                self.message_user(
+                    request,
+                    f'Correo enviado a {obj.email_invitado}',
+                    messages.SUCCESS
+                )
+            except Exception as exc:
+                self.message_user(
+                    request,
+                    f'No se pudo enviar correo a {obj.email_invitado}: {exc}',
+                    messages.ERROR
+                )
