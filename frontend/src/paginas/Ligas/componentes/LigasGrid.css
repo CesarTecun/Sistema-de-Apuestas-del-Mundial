@@ -19,17 +19,17 @@
    TARJETA DE LIGA MODERNA
    ======================================== */
 .liga-card-modern {
-  background: rgba(10, 25, 20, 0.55);
+  background: linear-gradient(135deg, rgba(20, 30, 40, 0.85) 0%, rgba(10, 15, 25, 0.9) 100%);
   backdrop-filter: var(--backdrop-blur-xl);
-  border: var(--border-width-thin) solid var(--border-color-accent);
+  border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: var(--border-radius-2xl);
-  padding: var(--spacing-lg);
-  transition: all var(--transition-base);
+  padding: var(--spacing-xl);
+  transition: all var(--transition-bounce);
   position: relative;
   overflow: hidden;
   cursor: pointer;
   width: 100%;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(212, 175, 55, 0.1);
 }
 
 .liga-card-modern::before {
@@ -38,19 +38,37 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: var(--gradient-accent);
+  height: 4px;
+  background: linear-gradient(90deg, #d4af37 0%, #ffd700 50%, #d4af37 100%);
   transform: scaleX(0);
-  transition: transform var(--transition-base);
+  transition: transform var(--transition-bounce);
+  box-shadow: 0 2px 10px rgba(212, 175, 55, 0.5);
+}
+
+.liga-card-modern::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  pointer-events: none;
 }
 
 .liga-card-modern:hover::before {
   transform: scaleX(1);
 }
 
+.liga-card-modern:hover::after {
+  opacity: 1;
+}
+
 .liga-card-modern:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-2xl);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(212, 175, 55, 0.4);
   border-color: rgba(212, 175, 55, 0.6);
 }
 
@@ -62,20 +80,24 @@
 }
 
 .liga-card-icon {
-  width: 50px;
-  height: 50px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(212, 175, 55, 0.15);
-  border-radius: var(--border-radius-lg);
-  transition: all var(--transition-base);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  border-radius: var(--border-radius-xl);
+  transition: all var(--transition-bounce);
   flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
 }
 
 .liga-card-modern:hover .liga-card-icon {
-  transform: scale(1.1);
-  background: rgba(212, 175, 55, 0.25);
+  transform: scale(1.15) rotate(5deg);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(212, 175, 55, 0.2) 100%);
+  border-color: rgba(212, 175, 55, 0.5);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
 }
 
 .liga-card-title-group {
@@ -100,23 +122,27 @@
 
 .liga-badge {
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  padding: 4px var(--spacing-md);
-  border-radius: var(--border-radius-lg);
+  font-weight: var(--font-weight-bold);
+  padding: 6px var(--spacing-md);
+  border-radius: var(--border-radius-full);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wider);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-base);
 }
 
 .liga-badge-apuesta {
-  background: var(--color-success);
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
   color: var(--color-white);
-  border: var(--border-width-thin) solid var(--color-success);
+  border: 1px solid rgba(76, 175, 80, 0.5);
+  box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
 }
 
 .liga-badge-diversion {
-  background: var(--color-gray-500);
+  background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
   color: var(--color-white);
-  border: var(--border-width-thin) solid var(--color-gray-500);
+  border: 1px solid rgba(107, 114, 128, 0.5);
+  box-shadow: 0 2px 10px rgba(107, 114, 128, 0.3);
 }
 
 .liga-card-body {
@@ -133,9 +159,10 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: var(--border-radius-lg);
-  border: var(--border-width-thin) solid var(--border-color-accent);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: inset 0 1px 3px rgba(212, 175, 55, 0.1);
 }
 
 .liga-card-footer {
@@ -143,7 +170,7 @@
   align-items: center;
   justify-content: space-between;
   padding-top: var(--spacing-md);
-  border-top: var(--border-width-thin) solid var(--border-color-accent);
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
 }
 
 .liga-card-position {
@@ -152,25 +179,31 @@
   gap: var(--spacing-sm);
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
+  padding: 6px 12px;
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: var(--border-radius-full);
+  border: 1px solid rgba(212, 175, 55, 0.2);
 }
 
 .liga-card-ver-tabla {
-  background: var(--gradient-accent);
-  color: var(--color-gray-900);
+  background: linear-gradient(135deg, #d4af37 0%, #ffd700 50%, #d4af37 100%);
+  color: #1a1a2e;
   border: none;
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--border-radius-xl);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
-  transition: all var(--transition-base);
-  box-shadow: var(--shadow-accent);
+  transition: all var(--transition-bounce);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .liga-card-ver-tabla:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-accent-hover);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6);
 }
 
 .liga-card-actions {
@@ -189,37 +222,43 @@
 }
 
 .action-button {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   background: rgba(255, 255, 255, 0.1);
-  border: var(--border-width-thin) solid var(--border-color-medium);
-  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-lg);
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: all var(--transition-bounce);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-white);
+  backdrop-filter: blur(10px);
 }
 
 .action-button:hover {
   background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(5deg);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .view-button:hover {
-  background: rgba(59, 130, 246, 0.3);
-  border-color: rgba(59, 130, 246, 0.5);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.3) 100%);
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
 .edit-button:hover {
-  background: rgba(245, 158, 11, 0.3);
-  border-color: rgba(245, 158, 11, 0.5);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.4) 0%, rgba(245, 158, 11, 0.3) 100%);
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
 }
 
 .delete-button:hover {
-  background: rgba(239, 68, 68, 0.3);
-  border-color: rgba(239, 68, 68, 0.5);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.4) 0%, rgba(239, 68, 68, 0.3) 100%);
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
 }
 
 /* ========================================

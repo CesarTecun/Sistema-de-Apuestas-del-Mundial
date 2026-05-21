@@ -68,14 +68,14 @@ const FormularioRegistro = ({ onSubmit, error, loading }) => {
         {/* Primera fila: Primer Nombre y Primer Apellido en 2 columnas */}
         <div className="form-row form-row-compact">
           <div className="input-group">
-            <label className="input-label" htmlFor="primer_nombre">Primer Nombre</label>
+            <label className="input-label" htmlFor="primer_nombre">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Primer Nombre
+            </label>
             <div className="input-wrapper">
-              <div className="input-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </div>
               <input 
                 id="primer_nombre"
                 type="text" 
@@ -91,14 +91,14 @@ const FormularioRegistro = ({ onSubmit, error, loading }) => {
           </div>
 
           <div className="input-group">
-            <label className="input-label" htmlFor="primer_apellido">Primer Apellido</label>
+            <label className="input-label" htmlFor="primer_apellido">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Primer Apellido
+            </label>
             <div className="input-wrapper">
-              <div className="input-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </div>
               <input 
                 id="primer_apellido"
                 type="text" 
@@ -117,14 +117,14 @@ const FormularioRegistro = ({ onSubmit, error, loading }) => {
         {/* Segunda fila: Segundo Nombre y Segundo Apellido en 2 columnas */}
         <div className="form-row form-row-compact">
           <div className="input-group">
-            <label className="input-label" htmlFor="segundo_nombre">Segundo Nombre</label>
+            <label className="input-label" htmlFor="segundo_nombre">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Segundo Nombre
+            </label>
             <div className="input-wrapper">
-              <div className="input-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </div>
               <input 
                 id="segundo_nombre"
                 type="text" 
@@ -139,14 +139,14 @@ const FormularioRegistro = ({ onSubmit, error, loading }) => {
           </div>
 
           <div className="input-group">
-            <label className="input-label" htmlFor="segundo_apellido">Segundo Apellido</label>
+            <label className="input-label" htmlFor="segundo_apellido">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Segundo Apellido
+            </label>
             <div className="input-wrapper">
-              <div className="input-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </div>
               <input 
                 id="segundo_apellido"
                 type="text" 
@@ -164,14 +164,14 @@ const FormularioRegistro = ({ onSubmit, error, loading }) => {
         {/* Teléfono y Fecha en 2 columnas */}
         <div className="form-row form-row-compact">
           <div className="input-group">
-            <label className="input-label" htmlFor="telefono">Teléfono</label>
+            <label className="input-label" htmlFor="telefono">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+              Teléfono
+            </label>
             <div className="input-wrapper">
-              <div className="input-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                </svg>
-              </div>
               <input 
                 id="telefono"
                 type="tel" 
@@ -186,16 +186,16 @@ const FormularioRegistro = ({ onSubmit, error, loading }) => {
           </div>
 
           <div className="input-group">
-            <label className="input-label" htmlFor="fecha_nacimiento">Fecha de Nacimiento</label>
+            <label className="input-label" htmlFor="fecha_nacimiento">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              Fecha de Nacimiento
+            </label>
             <div className="input-wrapper">
-              <div className="input-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-              </div>
               <input 
                 id="fecha_nacimiento"
                 type="date" 
@@ -211,14 +211,14 @@ const FormularioRegistro = ({ onSubmit, error, loading }) => {
         
         {/* Cuarta fila: Correo (ancho completo) */}
         <div className="input-group full-width">
-          <label className="input-label" htmlFor="email">Correo Electrónico</label>
+          <label className="input-label" htmlFor="email">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="m22 7-10 5L2 7"></path>
+            </svg>
+            Correo Electrónico
+          </label>
           <div className="input-wrapper">
-            <div className="input-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                <path d="m22 7-10 5L2 7"></path>
-              </svg>
-            </div>
             <input 
               id="email"
               type="email" 
@@ -236,14 +236,14 @@ const FormularioRegistro = ({ onSubmit, error, loading }) => {
         {/* Quinta fila: Contraseñas en 2 columnas */}
         <div className="form-row form-row-compact">
           <div className="input-group">
-            <label className="input-label" htmlFor="password">Contraseña</label>
+            <label className="input-label" htmlFor="password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Contraseña
+            </label>
             <div className="input-wrapper">
-              <div className="input-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-              </div>
               <input 
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -277,14 +277,14 @@ const FormularioRegistro = ({ onSubmit, error, loading }) => {
           </div>
 
           <div className="input-group">
-            <label className="input-label" htmlFor="password2">Confirmar Contraseña</label>
+            <label className="input-label" htmlFor="password2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Confirmar Contraseña
+            </label>
             <div className="input-wrapper">
-              <div className="input-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-              </div>
               <input 
                 id="password2"
                 type={showPassword2 ? 'text' : 'password'}

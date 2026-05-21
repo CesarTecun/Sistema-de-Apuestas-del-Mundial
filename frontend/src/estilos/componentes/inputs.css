@@ -166,8 +166,8 @@
 }
 
 .input-select option {
-  background: var(--color-gray-900);
-  color: var(--color-white);
+  background: #1a1a2e !important;
+  color: white !important;
 }
 
 /* ========================================

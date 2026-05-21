@@ -120,22 +120,21 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
       
       {/* Campo Nombre de Liga */}
       <div className="form-group">
-        <div className="input-group">
-          <div className="input-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-            </svg>
-          </div>
-          <input
-            type="text"
-            name="nombre_liga"
-            placeholder="Nombre de la Liga"
-            className={`form-input ${errors.nombre_liga ? 'error' : ''}`}
-            value={formData.nombre_liga}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <label className="form-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+          </svg>
+          Nombre de la Liga
+        </label>
+        <input
+          type="text"
+          name="nombre_liga"
+          placeholder="Nombre de la Liga"
+          className={`form-input ${errors.nombre_liga ? 'error' : ''}`}
+          value={formData.nombre_liga}
+          onChange={handleChange}
+          required
+        />
         {errors.nombre_liga && (
           <div className="field-error">{errors.nombre_liga}</div>
         )}
@@ -143,28 +142,27 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
 
       {/* Campo Tipo de Liga */}
       <div className="form-group">
-        <div className="input-group">
-          <div className="input-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 6v6l4 2"/>
-            </svg>
-          </div>
-          <select
-            name="tipo_liga"
-            className={`form-input ${errors.tipo_liga ? 'error' : ''}`}
-            value={formData.tipo_liga}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccionar tipo de liga</option>
-            {tiposLiga.map(tipo => (
-              <option key={tipo.value} value={tipo.value}>
-                {tipo.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <label className="form-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+          Tipo de Liga
+        </label>
+        <select
+          name="tipo_liga"
+          className={`form-input ${errors.tipo_liga ? 'error' : ''}`}
+          value={formData.tipo_liga}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Seleccionar tipo de liga</option>
+          {tiposLiga.map(tipo => (
+            <option key={tipo.value} value={tipo.value}>
+              {tipo.label}
+            </option>
+          ))}
+        </select>
         {errors.tipo_liga && (
           <div className="field-error">{errors.tipo_liga}</div>
         )}
@@ -172,28 +170,27 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
 
       {/* Campo Estado */}
       <div className="form-group">
-        <div className="input-group">
-          <div className="input-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-          </div>
-          <select
-            name="estado"
-            className={`form-input ${errors.estado ? 'error' : ''}`}
-            value={formData.estado}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccionar estado</option>
-            {estados.map(estado => (
-              <option key={estado.value} value={estado.value}>
-                {estado.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <label className="form-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          Estado
+        </label>
+        <select
+          name="estado"
+          className={`form-input ${errors.estado ? 'error' : ''}`}
+          value={formData.estado}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Seleccionar estado</option>
+          {estados.map(estado => (
+            <option key={estado.value} value={estado.value}>
+              {estado.label}
+            </option>
+          ))}
+        </select>
         {errors.estado && (
           <div className="field-error">{errors.estado}</div>
         )}
@@ -209,24 +206,23 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
 
       {/* Campo Monto Total Recaudado */}
       <div className="form-group">
-        <div className="input-group">
-          <div className="input-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-          </div>
-          <input
-            type="number"
-            name="monto_total_recaudado"
-            placeholder="Monto Total Recaudado"
-            step="0.01"
-            min="0"
-            className={`form-input ${errors.monto_total_recaudado ? 'error' : ''}`}
-            value={formData.monto_total_recaudado}
-            onChange={handleChange}
-          />
-        </div>
+        <label className="form-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          Monto Total Recaudado
+        </label>
+        <input
+          type="number"
+          name="monto_total_recaudado"
+          placeholder="Monto Total Recaudado"
+          step="0.01"
+          min="0"
+          className={`form-input ${errors.monto_total_recaudado ? 'error' : ''}`}
+          value={formData.monto_total_recaudado}
+          onChange={handleChange}
+        />
         {errors.monto_total_recaudado && (
           <div className="field-error">{errors.monto_total_recaudado}</div>
         )}

@@ -4,8 +4,7 @@ import '../estilos/FormularioSeleccion.css';
 const FormularioSeleccion = ({ onSubmit, onCancel, initialData, isEditing }) => {
   const [formData, setFormData] = useState({
     pais: '',
-    bandera: '',
-    fk_id_fase_inicial: ''
+    bandera: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -14,8 +13,7 @@ const FormularioSeleccion = ({ onSubmit, onCancel, initialData, isEditing }) => 
     if (initialData) {
       setFormData({
         pais: initialData.pais || '',
-        bandera: initialData.bandera || '',
-        fk_id_fase_inicial: initialData.fk_id_fase_inicial || ''
+        bandera: initialData.bandera || ''
       });
     }
   }, [initialData]);
@@ -52,13 +50,9 @@ const FormularioSeleccion = ({ onSubmit, onCancel, initialData, isEditing }) => 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
-      const dataToSubmit = {
-        ...formData,
-        fk_id_fase_inicial: formData.fk_id_fase_inicial ? parseInt(formData.fk_id_fase_inicial) : null
-      };
-      onSubmit(dataToSubmit);
+      onSubmit(formData);
     }
   };
 
@@ -114,24 +108,6 @@ const FormularioSeleccion = ({ onSubmit, onCancel, initialData, isEditing }) => 
               className={errors.bandera ? 'error' : ''}
             />
             {errors.bandera && <span className="error-message">{errors.bandera}</span>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="fk_id_fase_inicial">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                <polyline points="2 17 12 22 22 17"></polyline>
-              </svg>
-              Fase Inicial (ID)
-            </label>
-            <input
-              type="number"
-              id="fk_id_fase_inicial"
-              name="fk_id_fase_inicial"
-              value={formData.fk_id_fase_inicial}
-              onChange={handleChange}
-              placeholder="Opcional"
-            />
           </div>
         </div>
 

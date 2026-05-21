@@ -288,6 +288,13 @@
   font-size: 14px;
   font-weight: 500;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-label svg {
+  color: rgba(212, 175, 55, 0.8);
 }
 
 .input-wrapper {
@@ -309,7 +316,7 @@
    ======================================== */
 .form-input {
   width: 100%;
-  padding: 16px 16px 16px 52px;
+  padding: 16px;
   border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 12px;
   font-size: 15px;
@@ -317,6 +324,11 @@
   color: #ffffff;
   transition: all 0.3s ease;
   box-sizing: border-box;
+}
+
+/* Input con botón de toggle de contraseña */
+.input-wrapper:has(.password-toggle) .form-input {
+  padding-right: 50px;
 }
 
 .form-input:focus {
@@ -366,7 +378,7 @@
 .form-input:-webkit-autofill:focus,
 .form-input:-webkit-autofill:active {
   -webkit-text-fill-color: #ffffff !important;
-  -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.1) inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px #000000 inset !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 

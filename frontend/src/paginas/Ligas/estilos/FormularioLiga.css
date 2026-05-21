@@ -53,7 +53,9 @@
    ======================================== */
 .input-icon {
   position: absolute;
-  left: 15px;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 2;
   color: rgba(255, 255, 255, 0.7);
   pointer-events: none;
@@ -62,17 +64,7 @@
 
 .input-group:focus-within .input-icon {
   color: #EC4899;
-  transform: scale(1.1);
-}
-
-.input-icon {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.8);
-  pointer-events: none;
-  z-index: 2;
+  transform: translateY(-50%) scale(1.1);
 }
 
 /* ========================================
@@ -80,7 +72,7 @@
    ======================================== */
 .form-input {
   width: 100%;
-  padding: 14px 14px 14px 50px; /* Espacio para el icono */
+  padding: 14px 14px 14px 14px; /* Sin espacio para icono (icono está en label) */
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 15px;
   font-size: 15px;
@@ -88,6 +80,20 @@
   color: #ffffff;
   transition: all 0.3s ease;
   box-sizing: border-box;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.form-label svg {
+  color: rgba(212, 175, 55, 0.8);
 }
 
 .form-input:focus {

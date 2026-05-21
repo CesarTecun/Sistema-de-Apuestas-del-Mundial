@@ -1,0 +1,612 @@
+/* Importar variables CSS del sistema de diseño */
+@import '../../../estilos/variables.css';
+
+/* ========================================
+   MARCADOR PAGE - LAYOUT PRINCIPAL
+   ======================================== */
+.marcador-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.marcador-background {
+  min-height: 100vh;
+  width: 100%;
+  background: 
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.85) 100%),
+    url('https://images.unsplash.com/photo-1522778034537-20a2486be803?q=80&w=1170&auto=format&fit=crop') center/cover no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+.marcador-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
+  pointer-events: none;
+}
+
+.marcador-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.marcador-content {
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ========================================
+   TABS DE ESTADO
+   ======================================== */
+.marcador-tabs {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px;
+  border-radius: var(--border-radius-xl);
+  backdrop-filter: var(--backdrop-blur-md);
+  border: 1px solid var(--border-color-light);
+  width: 100%;
+  max-width: 600px;
+  justify-content: space-around;
+}
+
+.marcador-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  border-radius: var(--border-radius-lg);
+  transition: var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.marcador-tab:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.marcador-tab.active {
+  background: var(--gradient-primary);
+  color: var(--color-white);
+  box-shadow: var(--shadow-primary);
+}
+
+/* ========================================
+   HEADER Y ACCIONES DE ADMINISTRADOR
+   ======================================== */
+.marcador-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  padding: 0 var(--spacing-md);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.marcador-title {
+  color: var(--color-white);
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.marcador-btn-nuevo {
+  background: var(--gradient-success);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: var(--border-radius-lg);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  transition: var(--transition-bounce);
+}
+
+.marcador-btn-nuevo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+  background: linear-gradient(135deg, #66bb6a 0%, #81c784 100%);
+}
+
+/* ========================================
+   GRID DE PARTIDOS
+   ======================================== */
+.marcador-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--spacing-xl);
+  width: 100%;
+  margin-top: var(--spacing-md);
+}
+
+/* ========================================
+   TARJETA DE PARTIDO
+   ======================================== */
+.tarjeta-marcador {
+  background: var(--bg-glass);
+  backdrop-filter: var(--backdrop-blur-md);
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  transition: var(--transition-bounce);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.tarjeta-marcador:hover {
+  background: var(--bg-glass-hover);
+  transform: translateY(-5px);
+  border-color: var(--border-color-medium);
+  box-shadow: var(--shadow-xl);
+}
+
+.tarjeta-marcador::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: transparent;
+}
+
+.tarjeta-marcador.live::before {
+  background: var(--color-primary);
+  box-shadow: 0 2px 10px var(--color-primary);
+}
+
+.tarjeta-marcador.scheduled::before {
+  background: var(--color-accent);
+}
+
+.tarjeta-marcador.finished::before {
+  background: var(--color-success);
+}
+
+.partido-marcador-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.partido-marcador-estado {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.partido-marcador-estado.live {
+  background: rgba(236, 72, 153, 0.15);
+  color: var(--color-primary);
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+  animation: pulse-live 1.5s infinite;
+}
+
+@keyframes pulse-live {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(236, 72, 153, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(236, 72, 153, 0);
+  }
+}
+
+.partido-marcador-estado.scheduled {
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--color-accent);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.partido-marcador-estado.finished {
+  background: rgba(76, 175, 80, 0.15);
+  color: var(--color-success);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.partido-marcador-tipo {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ========================================
+   SECCIÓN DE EQUIPOS EN LA TARJETA
+   ======================================== */
+.partido-marcador-equipos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--spacing-lg) 0;
+  gap: var(--spacing-sm);
+}
+
+.equipo-marcador {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+}
+
+.equipo-marcador-bandera {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-sm);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+.equipo-marcador-bandera-img {
+  width: 50px;
+  height: 35px;
+  object-fit: contain;
+  margin-bottom: var(--spacing-sm);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+  border-radius: 4px;
+}
+
+.equipo-marcador-nombre {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+  margin-top: 4px;
+}
+
+.goles-visualizador {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.goles-numeros {
+  font-size: 2.2rem;
+  font-family: var(--font-family-heading);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.goles-numeros .goles-local {
+  color: var(--color-primary-light);
+}
+
+.goles-numeros .goles-visitante {
+  color: var(--color-accent);
+}
+
+.goles-separador {
+  opacity: 0.5;
+}
+
+.vs-texto {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+/* ========================================
+   BOTONES DE ACCIÓN PARA ADMINISTRADORES
+   ======================================== */
+.partido-marcador-acciones {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-color-light);
+  padding-top: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.btn-marcador {
+  flex: 1;
+  min-width: 80px;
+  padding: 10px 14px;
+  border-radius: var(--border-radius-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: var(--font-size-sm);
+  transition: var(--transition-base);
+  border: none;
+}
+
+.btn-marcador-iniciar {
+  background: var(--gradient-primary);
+  color: white;
+}
+.btn-marcador-iniciar:hover {
+  background: var(--gradient-primary-hover);
+  box-shadow: var(--shadow-primary);
+}
+
+.btn-marcador-actualizar {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color-light);
+}
+.btn-marcador-actualizar:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: var(--border-color-medium);
+}
+
+.btn-marcador-finalizar {
+  background: var(--gradient-warning);
+  color: white;
+}
+.btn-marcador-finalizar:hover {
+  background: linear-gradient(135deg, #ffa726 0%, #ffb74d 100%);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.btn-marcador-eliminar {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--color-danger-light);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+.btn-marcador-eliminar:hover {
+  background: var(--color-danger);
+  color: white;
+}
+
+/* ========================================
+   MODALES Y FORMULARIOS
+   ======================================= */
+.marcador-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: var(--backdrop-blur-md);
+  z-index: var(--z-modal-backdrop);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-md);
+}
+
+.marcador-modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color-heavy);
+  border-radius: var(--border-radius-xl);
+  width: 100%;
+  max-width: 500px;
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-2xl);
+  color: var(--text-primary);
+  animation: var(--animation-modal-slide-in);
+  position: relative;
+}
+
+.marcador-modal-close {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.marcador-modal-close:hover {
+  color: var(--text-primary);
+}
+
+.marcador-modal h2 {
+  font-family: var(--font-family-heading);
+  margin-top: 0;
+  margin-bottom: var(--spacing-xl);
+  font-size: var(--font-size-2xl);
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: var(--spacing-sm);
+}
+
+.control-goles-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  margin: var(--spacing-xl) 0;
+}
+
+.control-goles-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.btn-goles-cambiar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid var(--border-color-light);
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+.btn-goles-cambiar:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--border-color-medium);
+  transform: scale(1.05);
+}
+
+.goles-input-numero {
+  width: 60px;
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: white;
+  font-family: var(--font-family-heading);
+}
+
+.goles-input-numero::-webkit-inner-spin-button,
+.goles-input-numero::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.marcador-select {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--border-radius-sm);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color-medium);
+  color: white;
+  font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-lg);
+  outline: none;
+}
+
+.marcador-select option {
+  background: #1a1a2e !important;
+  color: white !important;
+}
+
+.marcador-input-fecha {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--border-radius-sm);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color-medium);
+  color: white;
+  font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.marcador-form-acciones {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.marcador-form-acciones button {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--border-radius-lg);
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  font-size: var(--font-size-md);
+  transition: var(--transition-base);
+}
+
+.marcador-btn-cancelar {
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border: 1px solid var(--border-color-light);
+}
+.marcador-btn-cancelar:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.marcador-btn-guardar {
+  background: var(--gradient-primary);
+  color: white;
+}
+.marcador-btn-guardar:hover {
+  background: var(--gradient-primary-hover);
+  box-shadow: var(--shadow-primary);
+}
+
+/* ========================================
+   RESPONSIVE LAYOUTS
+   ======================================== */
+@media (max-width: 768px) {
+  .marcador-background {
+    padding: var(--spacing-md);
+  }
+
+  .marcador-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .marcador-tabs {
+    width: 100%;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .marcador-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+}

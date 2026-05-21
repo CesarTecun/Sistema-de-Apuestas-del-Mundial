@@ -51,19 +51,19 @@ const FormularioLogin = ({ onSubmit, error, loading }) => {
       
       <div className="form-fields">
         <div className="input-group">
-          <label className="input-label" htmlFor="email">Correo Electrónico</label>
+          <label className="input-label" htmlFor="email">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="m22 7-10 5L2 7"></path>
+            </svg>
+            Correo Electrónico
+          </label>
           <div className="input-wrapper">
-            <div className="input-icon" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                <path d="m22 7-10 5L2 7"></path>
-              </svg>
-            </div>
-            <input 
+            <input
               id="email"
-              type="email" 
+              type="email"
               name="email"
-              placeholder="tu@email.com" 
+              placeholder="tu@email.com"
               className="form-input"
               value={formData.email}
               onChange={handleChange}
@@ -73,21 +73,21 @@ const FormularioLogin = ({ onSubmit, error, loading }) => {
             />
           </div>
         </div>
-        
+
         <div className="input-group">
-          <label className="input-label" htmlFor="password">Contraseña</label>
+          <label className="input-label" htmlFor="password">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Contraseña
+          </label>
           <div className="input-wrapper">
-            <div className="input-icon" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
-            </div>
-            <input 
+            <input
               id="password"
               type={showPassword ? 'text' : 'password'}
               name="password"
-              placeholder="••••••••" 
+              placeholder="••••••••"
               className="form-input"
               value={formData.password}
               onChange={handleChange}
