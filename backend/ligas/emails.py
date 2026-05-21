@@ -7,7 +7,7 @@ INVITACION_SUBJECT = '🏆 Has sido invitado a una Liga de la Copa Mundial FIFA 
 
 def render_mensaje_invitacion(invitacion):
     mensaje_admin = invitacion.mensaje_invitacion or 'Sin mensaje personalizado'
-    enlace = f"{settings.FRONTEND_URL}/invitaciones/{invitacion.id_invitacion}"
+    enlace = f"{settings.FRONTEND_URL}/invitaciones/{invitacion.codigo_invitacion}"
     return f"""
 ¡Hola!
 

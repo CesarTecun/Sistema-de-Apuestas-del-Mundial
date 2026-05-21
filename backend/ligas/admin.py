@@ -23,15 +23,15 @@ class LigaAdmin(admin.ModelAdmin):
 
 @admin.register(Invitacion)
 class InvitacionAdmin(admin.ModelAdmin):
-    list_display = ('id_invitacion', 'fk_id_liga', 'email_invitado', 'estado_invitacion', 'fecha_invitacion')
+    list_display = ('id_invitacion', 'fk_id_liga', 'email_invitado', 'estado_invitacion', 'codigo_invitacion', 'fecha_invitacion')
     list_filter = ('estado_invitacion', 'fecha_invitacion')
-    search_fields = ('email_invitado', 'mensaje_invitacion')
-    readonly_fields = ('id_invitacion', 'fecha_invitacion')
+    search_fields = ('email_invitado', 'codigo_invitacion', 'mensaje_invitacion')
+    readonly_fields = ('id_invitacion', 'codigo_invitacion', 'fecha_invitacion')
     ordering = ('-fecha_invitacion',)
     
     fieldsets = (
         ('Información de la Invitación', {
-            'fields': ('id_invitacion', 'fk_id_liga', 'email_invitado')
+            'fields': ('id_invitacion', 'codigo_invitacion', 'fk_id_liga', 'email_invitado')
         }),
         ('Participantes', {
             'fields': ('fk_id_usuario_invitado', 'fk_id_usuario_administrador')

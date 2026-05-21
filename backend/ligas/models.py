@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from backend.utils.models import SoftDeleteModel
 
@@ -73,7 +75,8 @@ class Invitacion(models.Model):
 
     id_invitacion = models.AutoField(primary_key=True)
     fk_id_liga = models.IntegerField()
-    fk_id_usuario_invitado = models.IntegerField()
+    codigo_invitacion = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
+    fk_id_usuario_invitado = models.IntegerField(null=True, blank=True, db_index=True)
     fk_id_usuario_administrador = models.IntegerField()
     fecha_invitacion = models.DateTimeField(auto_now_add=True)
     estado_invitacion = models.CharField(max_length=50, choices=ESTADOS, default='Pendiente')

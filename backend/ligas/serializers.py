@@ -32,6 +32,7 @@ class InvitacionSerializer(serializers.ModelSerializer):
         fields = [
             'id_invitacion',
             'fk_id_liga',
+            'codigo_invitacion',
             'fk_id_usuario_invitado',
             'fk_id_usuario_administrador',
             'email_invitado',
@@ -39,4 +40,15 @@ class InvitacionSerializer(serializers.ModelSerializer):
             'estado_invitacion',
             'fecha_invitacion'
         ]
-        read_only_fields = ['id_invitacion', 'fecha_invitacion', 'estado_invitacion']
+        read_only_fields = ['id_invitacion', 'codigo_invitacion', 'fecha_invitacion', 'estado_invitacion']
+
+    def validate(self, attrs):
+        email = attrs.get('email_invitado')
+        usuario_id = attrs.get('fk_id_usuario_invitado')
+
+        if not usuario_id and not email:
+            raise serializers.ValidationError({
+                'email_invitado': 'Debes proporcionar el correo del invitado si aún no existe en el sistema.'
+            })
+
+        return attrs

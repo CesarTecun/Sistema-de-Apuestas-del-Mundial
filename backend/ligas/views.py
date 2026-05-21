@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
@@ -33,13 +34,12 @@ class LigaViewSet(SoftDeleteModelViewSet):
         
         # Ligas donde el usuario tiene invitación pendiente o aceptada
         ligas_invitacion_ids = Invitacion.objects.filter(
-            fk_id_usuario_invitado=usuario_id,
+            Q(fk_id_usuario_invitado=usuario_id) | Q(email_invitado__iexact=user.email),
             estado_invitacion__in=['Pendiente', 'Aceptada']
         ).values_list('fk_id_liga', flat=True)
         ligas_invitacion = Liga.objects.filter(id_liga__in=ligas_invitacion_ids)
         
         # Combinar todos los querysets y eliminar duplicados
-        from django.db.models import Q
         queryset = ligas_admin | ligas_participante | ligas_invitacion
         return queryset.distinct()
     
@@ -63,29 +63,47 @@ class LigaViewSet(SoftDeleteModelViewSet):
             return Response({'error': 'Solo el administrador puede enviar invitaciones'}, status=status.HTTP_403_FORBIDDEN)
         
         usuario_invitado_id = request.data.get('fk_id_usuario_invitado')
-        if not usuario_invitado_id:
-            return Response({'error': 'Se requiere el ID del usuario invitado'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Verificar que el usuario invitado existe
-        try:
-            usuario_invitado = Usuario.objects.get(id_usuario=usuario_invitado_id)
-        except Usuario.DoesNotExist:
-            return Response({'error': 'Usuario invitado no encontrado'}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Verificar que no exista una invitación previa
-        if Invitacion.objects.filter(
+        email_invitado = request.data.get('email_invitado')
+        usuario_invitado = None
+
+        if usuario_invitado_id:
+            try:
+                usuario_invitado = Usuario.objects.get(id_usuario=usuario_invitado_id)
+            except Usuario.DoesNotExist:
+                return Response({'error': 'Usuario invitado no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        elif email_invitado:
+            try:
+                usuario_invitado = Usuario.objects.get(email__iexact=email_invitado)
+                usuario_invitado_id = usuario_invitado.id_usuario
+            except Usuario.DoesNotExist:
+                usuario_invitado = None
+
+        if not usuario_invitado_id and not email_invitado:
+            return Response({'error': 'Debes indicar el correo del invitado si aún no está registrado'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if usuario_invitado and not email_invitado:
+            email_invitado = usuario_invitado.email
+
+        if not email_invitado:
+            return Response({'error': 'No se pudo determinar el correo del invitado'}, status=status.HTTP_400_BAD_REQUEST)
+
+        invitacion_existente = Invitacion.objects.filter(
             fk_id_liga=liga.id_liga,
-            fk_id_usuario_invitado=usuario_invitado_id,
             estado_invitacion__in=['Pendiente', 'Aceptada']
-        ).exists():
-            return Response({'error': 'Ya existe una invitación pendiente o aceptada para este usuario'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Crear la invitación
+        )
+        if usuario_invitado_id:
+            invitacion_existente = invitacion_existente.filter(fk_id_usuario_invitado=usuario_invitado_id)
+        else:
+            invitacion_existente = invitacion_existente.filter(email_invitado__iexact=email_invitado)
+
+        if invitacion_existente.exists():
+            return Response({'error': 'Ya existe una invitación pendiente para este usuario/correo'}, status=status.HTTP_400_BAD_REQUEST)
+
         invitacion = Invitacion.objects.create(
             fk_id_liga=liga.id_liga,
             fk_id_usuario_invitado=usuario_invitado_id,
             fk_id_usuario_administrador=request.user.id_usuario,
-            email_invitado=request.data.get('email_invitado', usuario_invitado.email),
+            email_invitado=email_invitado,
             mensaje_invitacion=request.data.get('mensaje_invitacion', '')
         )
         
@@ -160,7 +178,9 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
     def get_queryset(self):
         """Solo mostrar invitaciones del usuario actual"""
         user = self.request.user
-        return Invitacion.objects.filter(fk_id_usuario_invitado=user.id_usuario)
+        return Invitacion.objects.filter(
+            Q(fk_id_usuario_invitado=user.id_usuario) | Q(email_invitado__iexact=user.email)
+        )
     
     @action(detail=True, methods=['post'], url_path='aceptar')
     def aceptar(self, request, pk=None):
@@ -173,16 +193,27 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
         if invitacion.estado_invitacion != 'Pendiente':
             return Response({'error': 'Esta invitación ya no está pendiente'}, status=status.HTTP_400_BAD_REQUEST)
         
+        # Validar que la invitación corresponde al usuario
+        if invitacion.email_invitado and invitacion.email_invitado.lower() != request.user.email.lower():
+            return Response({'error': 'Esta invitación pertenece a otro correo'}, status=status.HTTP_403_FORBIDDEN)
+
+        if invitacion.fk_id_usuario_invitado is None:
+            invitacion.fk_id_usuario_invitado = request.user.id_usuario
+
         # Actualizar estado de la invitación
         invitacion.estado_invitacion = 'Aceptada'
-        invitacion.save()
+        invitacion.save(update_fields=['estado_invitacion', 'fk_id_usuario_invitado'])
         
         # Crear registro de participante en la liga
-        ParticipanteLiga.objects.create(
+        if not ParticipanteLiga.objects.filter(
             fk_id_liga=invitacion.fk_id_liga,
-            fk_id_usuario=request.user.id_usuario,
-            estado_participacion='Activo'
-        )
+            fk_id_usuario=request.user.id_usuario
+        ).exists():
+            ParticipanteLiga.objects.create(
+                fk_id_liga=invitacion.fk_id_liga,
+                fk_id_usuario=request.user.id_usuario,
+                estado_participacion='Activo'
+            )
         
         return Response({
             'message': 'Invitación aceptada exitosamente',
@@ -199,6 +230,12 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
         
         if invitacion.estado_invitacion != 'Pendiente':
             return Response({'error': 'Esta invitación ya no está pendiente'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if invitacion.email_invitado and invitacion.email_invitado.lower() != request.user.email.lower():
+            return Response({'error': 'Esta invitación pertenece a otro correo'}, status=status.HTTP_403_FORBIDDEN)
+        
+        if invitacion.fk_id_usuario_invitado and invitacion.fk_id_usuario_invitado != request.user.id_usuario:
+            return Response({'error': 'Esta invitación pertenece a otro usuario'}, status=status.HTTP_403_FORBIDDEN)
         
         invitacion.estado_invitacion = 'Rechazada'
         invitacion.save()
