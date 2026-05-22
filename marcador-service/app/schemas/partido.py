@@ -50,6 +50,7 @@ class MarcadorUpdate(BaseModel):
 
 class PartidoControlUpdate(BaseModel):
     """Schema para controlar el partido en vivo"""
+    estado: str | None = Field(None, max_length=20)  # programado, en_juego, finalizado
     minuto_actual: int | None = None
     periodo_actual: str | None = Field(None, max_length=20)  # 1T, 2T, ET1, ET2
     tiempo_extra_periodo: int | None = None

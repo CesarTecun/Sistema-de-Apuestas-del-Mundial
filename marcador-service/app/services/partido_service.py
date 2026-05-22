@@ -16,19 +16,25 @@ def _notify_django(partido: Partido) -> None:
     if not DJANGO_WEBHOOK_URL:
         return
     try:
-        requests.post(
+        payload = {
+            "id_partido": partido.id_partido,
+            "gol_local": partido.gol_local,
+            "gol_visitante": partido.gol_visitante,
+            "estado": partido.estado,
+            "resultado": partido.resultado,
+            "ganador_penales": partido.ganador_penales,
+        }
+        print(f"[WEBHOOK] Enviando notificación a Django: {DJANGO_WEBHOOK_URL}")
+        print(f"[WEBHOOK] Payload: id_partido={partido.id_partido}, estado={partido.estado}, gol_local={partido.gol_local}, gol_visitante={partido.gol_visitante}")
+        response = requests.post(
             DJANGO_WEBHOOK_URL,
-            json={
-                "id_partido": partido.id_partido,
-                "gol_local": partido.gol_local,
-                "gol_visitante": partido.gol_visitante,
-                "estado": partido.estado,
-                "resultado": partido.resultado,
-                "ganador_penales": partido.ganador_penales,
-            },
+            json=payload,
             timeout=3,
         )
-    except Exception:
+        print(f"[WEBHOOK] Response status: {response.status_code}")
+        print(f"[WEBHOOK] Response body: {response.text}")
+    except Exception as e:
+        print(f"[WEBHOOK] Error: {e}")
         pass  # No fallar si Django no está disponible
 
 
@@ -120,9 +126,19 @@ def controlar_partido(db: Session, partido: Partido, data: PartidoControlUpdate)
     Controla el partido en vivo: iniciar, pausar, cambiar tiempo, agregar tiempo extra
     """
     payload = data.model_dump(exclude_unset=True)
+    print(f"🎮 controlar_partido recibido: id_partido={partido.id_partido}, payload={payload}")
     
+    # Finalizar partido - manejar primero para asegurar que no se sobrescriba
+    if payload.get("estado") == "finalizado":
+        print(f"✅ Finalizando partido {partido.id_partido}")
+        partido.estado = "finalizado"
+        partido.partido_pausado = True
+        partido.partido_iniciado = False
+        # Generar resultado si no existe
+        if not partido.resultado:
+            partido.resultado = f"{partido.gol_local} - {partido.gol_visitante}"
     # Manejo especial para iniciar partido
-    if payload.get("partido_iniciado") == True and not partido.partido_iniciado:
+    elif payload.get("partido_iniciado") == True and not partido.partido_iniciado:
         partido.estado = "en_juego"
         partido.partido_iniciado = True
         partido.partido_pausado = False
@@ -134,9 +150,9 @@ def controlar_partido(db: Session, partido: Partido, data: PartidoControlUpdate)
     if payload.get("partido_pausado") is not None:
         partido.partido_pausado = payload["partido_pausado"]
     
-    # Actualizar otros campos
+    # Actualizar otros campos (excepto estado que ya se manejó)
     for field, value in payload.items():
-        if field not in ["partido_iniciado", "partido_pausado"]:
+        if field not in ["partido_iniciado", "partido_pausado", "estado"]:
             setattr(partido, field, value)
     
     # Cambio de período
@@ -144,11 +160,6 @@ def controlar_partido(db: Session, partido: Partido, data: PartidoControlUpdate)
         partido.periodo_actual = payload["periodo_actual"]
         partido.minuto_actual = 0  # Reiniciar minuto al cambiar período
         partido.tiempo_extra_periodo = 0
-    
-    # Finalizar partido
-    if payload.get("estado") == "finalizado":
-        partido.partido_pausado = True
-        partido.partido_iniciado = False
     
     db.commit()
     db.refresh(partido)
@@ -164,6 +175,12 @@ def delete_partido(db: Session, partido: Partido) -> None:
 def enrich_marcador(db: Session, partido: Partido) -> PartidoMarcadorResponse:
     local = get_seleccion_safe(db, partido.equipo_local)
     visitante = get_seleccion_safe(db, partido.equipo_visitante)
+    
+    if not local:
+        print(f"⚠️ No se encontró selección local para partido {partido.id_partido}: equipo_local={partido.equipo_local}")
+    if not visitante:
+        print(f"⚠️ No se encontró selección visitante para partido {partido.id_partido}: equipo_visitante={partido.equipo_visitante}")
+    
     base = PartidoMarcadorResponse.model_validate(partido)
     return base.model_copy(
         update={
@@ -181,4 +198,8 @@ def get_seleccion_safe(db: Session, id_seleccion: int):
         .filter(Seleccion.id_seleccion == id_seleccion, Seleccion.status.is_(True))
         .first()
     )
-    return SeleccionResponse.model_validate(row) if row else None
+    if row:
+        return SeleccionResponse.model_validate(row)
+    else:
+        print(f"⚠️ Selección no encontrada: id_seleccion={id_seleccion}")
+        return None

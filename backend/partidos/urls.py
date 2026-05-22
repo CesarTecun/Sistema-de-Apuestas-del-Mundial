@@ -14,15 +14,16 @@ router.register(r'selecciones', SeleccionViewSet, basename='seleccion')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('partidos/por-liga/', partidos_por_liga, name='partidos_por_liga'),
-    path('partidos/por-equipo/', partidos_por_equipo, name='partidos_por_equipo'),
-    path('partidos/<int:pk>/actualizar-resultado/', actualizar_resultado, name='actualizar_resultado'),
-    path('partidos/marcador/webhook/', marcador_views.marcador_webhook, name='marcador_webhook'),
+    path('por-liga/', partidos_por_liga, name='partidos_por_liga'),
+    path('por-equipo/', partidos_por_equipo, name='partidos_por_equipo'),
+    path('<int:pk>/actualizar-resultado/', actualizar_resultado, name='actualizar_resultado'),
+    path('marcador/webhook/', marcador_views.marcador_webhook, name='marcador_webhook'),
     path('bracket/', bracket_eliminatoria, name='bracket_eliminatoria'),
     path('bracket/generar/', generar_bracket, name='generar_bracket'),
     # --- Proxy al microservicio Marcador ---
     path('marcador/selecciones/', marcador_views.marcador_selecciones, name='marcador_selecciones'),
     path('marcador/partidos/', marcador_views.marcador_partidos, name='marcador_partidos'),
+    path('marcador/partidos/todos/', marcador_views.marcador_partidos_en_vivo, name='marcador_partidos_todos'),
     path('marcador/partidos/en-vivo/', marcador_views.marcador_partidos_en_vivo, name='marcador_partidos_en_vivo'),
     path('marcador/partidos/<int:id_partido>/', marcador_views.marcador_partido_detalle, name='marcador_partido_detalle'),
     path('marcador/partidos/por-equipo/', marcador_views.marcador_partidos_por_equipo, name='marcador_partidos_por_equipo'),

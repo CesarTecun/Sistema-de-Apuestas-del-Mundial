@@ -30,6 +30,13 @@ def partidos_en_vivo(db: Session = Depends(get_db)):
     return [partido_service.enrich_marcador(db, p) for p in partidos]
 
 
+@router.get("/todos", response_model=list[PartidoMarcadorResponse])
+def todos_partidos(db: Session = Depends(get_db)):
+    """Obtiene todos los partidos para el marcador (sin filtrar por estado)"""
+    partidos = partido_service.list_partidos(db)
+    return [partido_service.enrich_marcador(db, p) for p in partidos]
+
+
 @router.get("/por-equipo", response_model=list[PartidoResponse])
 def partidos_por_equipo(equipo_id: int = Query(...), db: Session = Depends(get_db)):
     return partido_service.partidos_por_equipo(db, equipo_id)
@@ -82,6 +89,7 @@ def controlar_partido(id_partido: int, data: PartidoControlUpdate, db: Session =
     """
     Controla el partido en vivo: iniciar, pausar, cambiar tiempo, agregar tiempo extra
     """
+    print(f"🎮 Router controlar_partido: id_partido={id_partido}, data={data}")
     partido = partido_service.get_partido(db, id_partido)
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")

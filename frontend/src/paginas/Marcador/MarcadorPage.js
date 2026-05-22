@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
 import { useMarcador } from '../../hooks/useMarcador';
 import TopBar from '../Partidos/componentes/TopBar';
@@ -62,6 +62,7 @@ const Cronometro = ({ partido, onTick }) => {
 const MarcadorPage = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     partidosEnVivo,
     loading,
@@ -71,6 +72,15 @@ const MarcadorPage = () => {
     actualizarMarcador,
     controlarPartido,
   } = useMarcador();
+
+  const [selectedPartidoId, setSelectedPartidoId] = useState(null);
+
+  useEffect(() => {
+    // Si viene un partidoId desde la navegación, seleccionarlo
+    if (location.state?.partidoId) {
+      setSelectedPartidoId(location.state.partidoId);
+    }
+  }, [location.state]);
 
   const handleLogout = async () => {
     await logout();
@@ -84,6 +94,21 @@ const MarcadorPage = () => {
     }, 10000);
     return () => clearInterval(interval);
   }, [cargarPartidosEnVivo]);
+
+  // Debug: log partidos cuando cambian
+  useEffect(() => {
+    if (partidosEnVivo.length > 0) {
+      console.log('Partidos recibidos:', partidosEnVivo);
+      partidosEnVivo.forEach(p => {
+        console.log(`Partido ${p.id_partido}:`, {
+          equipo_local: p.equipo_local,
+          equipo_visitante: p.equipo_visitante,
+          equipo_local_detalle: p.equipo_local_detalle,
+          equipo_visitante_detalle: p.equipo_visitante_detalle
+        });
+      });
+    }
+  }, [partidosEnVivo]);
 
   const handleActualizarMarcador = async (idPartido, golLocal, golVisitante, faltasLocal, faltasVisitante) => {
     await actualizarMarcador(idPartido, golLocal, golVisitante, 'en_juego', faltasLocal, faltasVisitante);
@@ -110,7 +135,10 @@ const MarcadorPage = () => {
   };
 
   const handleFinalizarPartido = async (idPartido) => {
+    console.log('🎮 Finalizando partido:', idPartido, 'con estado: finalizado');
     await controlarPartido(idPartido, { estado: 'finalizado' });
+    // Regresar a la lista de partidos después de finalizar
+    navigate('/partidos');
   };
 
   if (loading && partidosEnVivo.length === 0) {
@@ -174,11 +202,14 @@ const MarcadorPage = () => {
                     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                   </svg>
                 </div>
-                <h3>No hay partidos en vivo</h3>
-                <p>Los partidos en juego aparecerán aquí automáticamente.</p>
+                <h3>No hay partidos disponibles</h3>
+                <p>Selecciona un partido desde la página de partidos para ver su marcador.</p>
               </div>
             ) : (
-              partidosEnVivo.map((partido) => (
+              (selectedPartidoId 
+                ? partidosEnVivo.filter(p => p.id_partido === selectedPartidoId)
+                : partidosEnVivo
+              ).map((partido) => (
                 <div key={partido.id_partido} className="partido-card">
                   {/* Encabezado del partido */}
                   <div className="partido-header">
@@ -194,108 +225,134 @@ const MarcadorPage = () => {
                     </div>
                   </div>
 
-                  {/* Cronómetro */}
-                  <Cronometro 
-                    partido={partido}
-                    onTick={(minuto) => handleActualizarMinuto(partido.id_partido, minuto)}
-                  />
-
-                  {/* Controles de marcador */}
-                  <div className="controls-section">
-                    <h4>⚽ Goles</h4>
-                    <div className="controls-grid">
-                      <button
-                        onClick={() => handleActualizarMarcador(partido.id_partido, partido.gol_local + 1, partido.gol_visitante, partido.faltas_local, partido.faltas_visitante)}
-                        className="control-button control-button-green"
-                      >
-                        +1 Local
-                      </button>
-                      <button
-                        onClick={() => handleActualizarMarcador(partido.id_partido, partido.gol_local, partido.gol_visitante + 1, partido.faltas_local, partido.faltas_visitante)}
-                        className="control-button control-button-green"
-                      >
-                        +1 Visitante
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Controles de faltas */}
-                  <div className="controls-section">
-                    <h4>🟨 Faltas</h4>
-                    <div className="faltas-container">
-                      <div className="falta-control">
-                        <span>Local: {partido.faltas_local || 0}</span>
-                        <button
-                          onClick={() => handleActualizarMarcador(partido.id_partido, partido.gol_local, partido.gol_visitante, (partido.faltas_local || 0) + 1, partido.faltas_visitante)}
-                          className="control-button control-button-yellow"
-                        >
-                          +1
-                        </button>
+                  {/* Resultado final si está finalizado */}
+                  {partido.estado === 'finalizado' && (
+                    <div className="resultado-final">
+                      <h2>🏆 RESULTADO FINAL</h2>
+                      <div className="resultado-marcador">
+                        <div className="resultado-equipo">
+                          <span className="equipo-nombre">{partido.equipo_local_detalle?.pais || 'Equipo Local'}</span>
+                          <span className="equipo-goles">{partido.gol_local}</span>
+                        </div>
+                        <div className="resultado-separador">-</div>
+                        <div className="resultado-equipo">
+                          <span className="equipo-goles">{partido.gol_visitante}</span>
+                          <span className="equipo-nombre">{partido.equipo_visitante_detalle?.pais || 'Equipo Visitante'}</span>
+                        </div>
                       </div>
-                      <div className="falta-control">
-                        <span>Visitante: {partido.faltas_visitante || 0}</span>
-                        <button
-                          onClick={() => handleActualizarMarcador(partido.id_partido, partido.gol_local, partido.gol_visitante, partido.faltas_local, (partido.faltas_visitante || 0) + 1)}
-                          className="control-button control-button-yellow"
-                        >
-                          +1
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Control del partido */}
-                  <div className="controls-section">
-                    <h4>🎮 Control del Partido</h4>
-                    <div className="controls-grid">
-                      {!partido.partido_iniciado && (
-                        <button
-                          onClick={() => handleIniciarPartido(partido.id_partido)}
-                          className="control-button control-button-blue"
-                        >
-                          ▶️ Iniciar
-                        </button>
-                      )}
-                      {partido.partido_iniciado && (
-                        <>
-                          <button
-                            onClick={() => handlePausarPartido(partido.id_partido, !partido.partido_pausado)}
-                            className="control-button control-button-orange"
-                          >
-                            {partido.partido_pausado ? '▶️ Reanudar' : '⏸️ Pausar'}
-                          </button>
-                          <button
-                            onClick={() => handleCambiarPeriodo(partido.id_partido, partido.periodo_actual === '1T' ? '2T' : '1T')}
-                            className="control-button control-button-purple"
-                          >
-                            🔄 Cambiar Período
-                          </button>
-                          <button
-                            onClick={() => handleAgregarTiempoExtra(partido.id_partido, (partido.tiempo_extra_periodo || 0) + 3)}
-                            className="control-button control-button-indigo"
-                          >
-                            +3 min extra
-                          </button>
-                          <button
-                            onClick={() => handleFinalizarPartido(partido.id_partido)}
-                            className="control-button control-button-red"
-                          >
-                            ⏹️ Finalizar
-                          </button>
-                        </>
+                      {partido.resultado && (
+                        <p className="resultado-texto">{partido.resultado}</p>
                       )}
                     </div>
-                  </div>
+                  )}
 
-                  {/* Información del partido */}
-                  <div className="partido-info">
-                    <div className="partido-info-grid">
-                      <div>Período: {partido.periodo_actual || '1T'}</div>
-                      <div>Tiempo extra: {partido.tiempo_extra_periodo || 0} min</div>
-                      <div>Iniciado: {partido.partido_iniciado ? 'Sí' : 'No'}</div>
-                      <div>Pausado: {partido.partido_pausado ? 'Sí' : 'No'}</div>
-                    </div>
-                  </div>
+                  {/* Solo mostrar controles si NO está finalizado */}
+                  {partido.estado !== 'finalizado' && (
+                    <>
+                      {/* Cronómetro */}
+                      <Cronometro 
+                        partido={partido}
+                        onTick={(minuto) => handleActualizarMinuto(partido.id_partido, minuto)}
+                      />
+
+                      {/* Controles de marcador */}
+                      <div className="controls-section">
+                        <h4>⚽ Goles</h4>
+                        <div className="controls-grid">
+                          <button
+                            onClick={() => handleActualizarMarcador(partido.id_partido, partido.gol_local + 1, partido.gol_visitante, partido.faltas_local, partido.faltas_visitante)}
+                            className="control-button control-button-green"
+                          >
+                            +1 Local
+                          </button>
+                          <button
+                            onClick={() => handleActualizarMarcador(partido.id_partido, partido.gol_local, partido.gol_visitante + 1, partido.faltas_local, partido.faltas_visitante)}
+                            className="control-button control-button-green"
+                          >
+                            +1 Visitante
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Controles de faltas */}
+                      <div className="controls-section">
+                        <h4>🟨 Faltas</h4>
+                        <div className="faltas-container">
+                          <div className="falta-control">
+                            <span>Local: {partido.faltas_local || 0}</span>
+                            <button
+                              onClick={() => handleActualizarMarcador(partido.id_partido, partido.gol_local, partido.gol_visitante, (partido.faltas_local || 0) + 1, partido.faltas_visitante)}
+                              className="control-button control-button-yellow"
+                            >
+                              +1
+                            </button>
+                          </div>
+                          <div className="falta-control">
+                            <span>Visitante: {partido.faltas_visitante || 0}</span>
+                            <button
+                              onClick={() => handleActualizarMarcador(partido.id_partido, partido.gol_local, partido.gol_visitante, partido.faltas_local, (partido.faltas_visitante || 0) + 1)}
+                              className="control-button control-button-yellow"
+                            >
+                              +1
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Control del partido */}
+                      <div className="controls-section">
+                        <h4>🎮 Control del Partido</h4>
+                        <div className="controls-grid">
+                          {!partido.partido_iniciado && (
+                            <button
+                              onClick={() => handleIniciarPartido(partido.id_partido)}
+                              className="control-button control-button-blue"
+                            >
+                              ▶️ Iniciar
+                            </button>
+                          )}
+                          {partido.partido_iniciado && (
+                            <>
+                              <button
+                                onClick={() => handlePausarPartido(partido.id_partido, !partido.partido_pausado)}
+                                className="control-button control-button-orange"
+                              >
+                                {partido.partido_pausado ? '▶️ Reanudar' : '⏸️ Pausar'}
+                              </button>
+                              <button
+                                onClick={() => handleCambiarPeriodo(partido.id_partido, partido.periodo_actual === '1T' ? '2T' : '1T')}
+                                className="control-button control-button-purple"
+                              >
+                                🔄 Cambiar Período
+                              </button>
+                              <button
+                                onClick={() => handleAgregarTiempoExtra(partido.id_partido, (partido.tiempo_extra_periodo || 0) + 3)}
+                                className="control-button control-button-indigo"
+                              >
+                                +3 min extra
+                              </button>
+                              <button
+                                onClick={() => handleFinalizarPartido(partido.id_partido)}
+                                className="control-button control-button-red"
+                              >
+                                ⏹️ Finalizar
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Información del partido */}
+                      <div className="partido-info">
+                        <div className="partido-info-grid">
+                          <div>Período: {partido.periodo_actual || '1T'}</div>
+                          <div>Tiempo extra: {partido.tiempo_extra_periodo || 0} min</div>
+                          <div>Iniciado: {partido.partido_iniciado ? 'Sí' : 'No'}</div>
+                          <div>Pausado: {partido.partido_pausado ? 'Sí' : 'No'}</div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))
             )}

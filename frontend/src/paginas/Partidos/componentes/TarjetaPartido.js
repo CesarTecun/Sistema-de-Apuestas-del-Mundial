@@ -1,7 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../estilos/TarjetaPartido.css';
 
 const TarjetaPartido = ({ partido, selecciones, onEdit, onDelete, canManage }) => {
+  const navigate = useNavigate();
+
   const getSeleccionNombre = (id) => {
     const seleccion = selecciones.find(s => s.id_seleccion === id);
     return seleccion ? seleccion.pais : `Equipo ${id}`;
@@ -13,11 +16,21 @@ const TarjetaPartido = ({ partido, selecciones, onEdit, onDelete, canManage }) =
   };
 
   const getEstadoClass = () => {
-    if (partido.resultado) return 'jugado';
+    if (partido.estado_partido === 'finalizado' || partido.resultado) return 'jugado';
+    if (partido.estado_partido === 'en_juego') return 'en-curso';
     const horario = new Date(partido.horario);
     const ahora = new Date();
     if (horario < ahora) return 'en-curso';
     return 'pendiente';
+  };
+
+  const getEstadoTexto = () => {
+    if (partido.estado_partido === 'finalizado' || partido.resultado) return 'Finalizado';
+    if (partido.estado_partido === 'en_juego') return 'En curso';
+    const horario = new Date(partido.horario);
+    const ahora = new Date();
+    if (horario < ahora) return 'En curso';
+    return 'Pendiente';
   };
 
   const formatearFecha = (fechaStr) => {
@@ -31,13 +44,17 @@ const TarjetaPartido = ({ partido, selecciones, onEdit, onDelete, canManage }) =
     });
   };
 
+  const handleIrMarcador = () => {
+    navigate('/marcador', { state: { partidoId: partido.id_partido } });
+  };
+
   const estadoClass = getEstadoClass();
 
   return (
     <div className={`tarjeta-partido ${estadoClass}`}>
       <div className="partido-header">
         <span className={`estado-badge ${estadoClass}`}>
-          {partido.resultado ? 'Finalizado' : 'Pendiente'}
+          {getEstadoTexto()}
         </span>
         <span className="partido-tipo">{partido.tipo_partido}</span>
       </div>
@@ -94,6 +111,18 @@ const TarjetaPartido = ({ partido, selecciones, onEdit, onDelete, canManage }) =
 
       {canManage && (
         <div className="partido-acciones">
+          <button 
+            className={`accion-btn marcador-btn ${partido.estado_partido === 'finalizado' || partido.resultado ? 'disabled' : ''}`}
+            onClick={handleIrMarcador}
+            title={partido.estado_partido === 'finalizado' || partido.resultado ? 'Partido finalizado' : 'Ir a Marcador en Vivo'}
+            disabled={partido.estado_partido === 'finalizado' || partido.resultado}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </button>
           <button 
             className="accion-btn editar-btn"
             onClick={() => onEdit(partido)}

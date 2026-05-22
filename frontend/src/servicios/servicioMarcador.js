@@ -40,7 +40,7 @@ export const servicioMarcador = {
   // Obtener partidos en vivo (en juego) del microservicio marcador
   getPartidosEnVivo: async () => {
     try {
-      const response = await servicioApi.get('/partidos/marcador/partidos/en-vivo/');
+      const response = await servicioApi.get('/partidos/marcador/partidos/todos/');
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al obtener partidos en vivo:', error);
