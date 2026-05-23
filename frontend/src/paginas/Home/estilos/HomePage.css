@@ -336,7 +336,6 @@ html, body {
   margin-top: 60px;
   margin-bottom: 80px;
   display: flex;
-  flex-wrap: wrap;
   gap: 24px;
   z-index: 20;
   padding: 0 40px;
@@ -362,10 +361,6 @@ html, body {
 
 .landing-card:nth-child(3) {
   animation-delay: 0.7s;
-}
-
-.landing-card:nth-child(4) {
-  animation-delay: 0.9s;
 }
 
 .landing-card:hover {

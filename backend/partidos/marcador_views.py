@@ -5,7 +5,7 @@ como si fueran nativos del proyecto.
 """
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -16,7 +16,7 @@ client = MarcadorClient()
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def marcador_selecciones(request):
     """Proxy: listar selecciones del microservicio marcador."""
     try:
@@ -27,7 +27,7 @@ def marcador_selecciones(request):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def marcador_partidos(request):
     """Proxy: listar partidos del microservicio marcador."""
     estado = request.query_params.get("estado")
@@ -44,7 +44,7 @@ def marcador_partidos(request):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def marcador_partidos_en_vivo(request):
     """Proxy: obtener partidos en juego desde el microservicio marcador."""
     try:
@@ -55,7 +55,7 @@ def marcador_partidos_en_vivo(request):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def marcador_partido_detalle(request, id_partido):
     """Proxy: obtener detalle de un partido del microservicio marcador."""
     try:
@@ -66,7 +66,7 @@ def marcador_partido_detalle(request, id_partido):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def marcador_partidos_por_equipo(request):
     """Proxy: obtener partidos por equipo desde el microservicio marcador."""
     equipo_id = request.query_params.get("equipo_id")
@@ -130,7 +130,7 @@ def marcador_eliminar_partido(request, id_partido):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def marcador_health(request):
     """Verificar estado de conexión con el microservicio marcador."""
     try:

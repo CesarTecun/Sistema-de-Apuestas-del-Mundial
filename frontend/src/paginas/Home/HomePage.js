@@ -5,16 +5,10 @@ import './estilos/HomePage.css';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Redirigir al login si no está autenticado
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
     const handleResize = () => {
       if (window.innerWidth > 768 && mobileMenuOpen) {
         setMobileMenuOpen(false);
@@ -23,7 +17,7 @@ const HomePage = () => {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [user, navigate, mobileMenuOpen]);
+  }, [mobileMenuOpen]);
 
   const handleLogout = async () => {
     await logout();
@@ -169,8 +163,8 @@ const HomePage = () => {
             <div className="landing-card-image">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
                 <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                <path d="M2 12h20"></path>
               </svg>
             </div>
             <h3 className="landing-card-title">Selecciones</h3>
@@ -184,28 +178,6 @@ const HomePage = () => {
               }}
             >
               Ver Selecciones →
-            </a>
-          </div>
-
-          <div className="landing-card">
-            <div className="landing-card-image">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
-                <rect x="2" y="2" width="20" height="15" rx="2" ry="2"></rect>
-                <polyline points="4 22 4 17 20 17 20 22"></polyline>
-                <line x1="12" y1="17" x2="12" y2="2"></line>
-              </svg>
-            </div>
-            <h3 className="landing-card-title">Marcador en Vivo</h3>
-            <p className="landing-card-text">Sigue y gestiona los marcadores del microservicio en tiempo real</p>
-            <a 
-              href="#marcador" 
-              className="landing-card-link"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/marcador');
-              }}
-            >
-              Ver Marcador →
             </a>
           </div>
         </div>
