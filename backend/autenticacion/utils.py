@@ -202,4 +202,12 @@ def generar_tokens_y_sesion(usuario, request):
         refresh_token=refresh,
         jwt_jti=str(refresh_obj.get('jti'))
     )
+    if sesion:
+        # Incluir identificador de sesión en el token de acceso
+        access_obj = refresh_obj.access_token
+        access_obj['sesion_id'] = sesion.id_sesion
+        access = str(access_obj)
+        request.session['token_sesion'] = sesion.token_sesion
+        request.session['id_sesion'] = sesion.id_sesion
+
     return refresh, access, sesion

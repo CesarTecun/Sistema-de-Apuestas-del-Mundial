@@ -106,12 +106,25 @@ class LigaViewSet(SoftDeleteModelViewSet):
             email_invitado=email_invitado,
             mensaje_invitacion=request.data.get('mensaje_invitacion', '')
         )
+
+        correo_enviado = False
+        error_correo = None
+        if invitacion.email_invitado:
+            try:
+                enviar_correo_invitacion(invitacion)
+                correo_enviado = True
+            except Exception as exc:
+                error_correo = str(exc)
         
         serializer = InvitacionSerializer(invitacion)
-        return Response({
-            'message': 'Invitación enviada exitosamente',
-            'invitacion': serializer.data
-        }, status=status.HTTP_201_CREATED)
+        respuesta = {
+            'message': 'Invitación creada',
+            'invitacion': serializer.data,
+            'email_enviado': correo_enviado,
+        }
+        if error_correo:
+            respuesta['error_email'] = error_correo
+        return Response(respuesta, status=status.HTTP_201_CREATED)
     
     def retrieve(self, request, pk=None):
         """Obtener una liga específica"""

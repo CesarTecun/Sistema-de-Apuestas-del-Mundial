@@ -6,8 +6,6 @@ from rest_framework.response import Response
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError
 
 from django.contrib.auth import logout, get_user_model
 from django.utils import timezone
@@ -105,13 +103,8 @@ class LogoutView(APIView):
 
     def post(self, request):
         refresh_token = request.data.get('refresh')
-        if refresh_token:
-            try:
-                token = RefreshToken(refresh_token)
-                token.blacklist()
-            except TokenError:
-                pass
-        # Cerrar sesión en base de datos
+
+        # Cerrar sesión en base de datos (marca todas las sesiones activas del usuario)
         cerrar_sesion_usuario(request, refresh_token=refresh_token)
         
         # Logout de Django

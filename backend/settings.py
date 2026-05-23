@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'rest_framework',
     'corsheaders',
-    'rest_framework_simplejwt.token_blacklist',
     'backend.autenticacion',  # App de autenticación
     'backend.usuarios',       # App de usuarios
     'backend.ligas',          # App de ligas
@@ -180,7 +179,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'backend.autenticacion.authentication.SesionJWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
