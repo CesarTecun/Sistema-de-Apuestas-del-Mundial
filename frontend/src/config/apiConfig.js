@@ -9,6 +9,8 @@ export const API_ENDPOINTS = {
     PROFILE: `${API_BASE_URL}/api/auth/profile/`,
     TOKEN: `${API_BASE_URL}/api/token/`,
     TOKEN_REFRESH: `${API_BASE_URL}/api/token/refresh/`,
+    PASSWORD_RESET_REQUEST: `${API_BASE_URL}/api/auth/password/reset/`,
+    PASSWORD_RESET_CONFIRM: `${API_BASE_URL}/api/auth/password/reset/confirm/`,
   },
   // Ligas
   LIGAS: `${API_BASE_URL}/api/ligas/`,

@@ -1,13 +1,46 @@
-from django.db.models import Q
-from rest_framework import permissions, status
+from django.db.models import Q, Count, OuterRef, Subquery, IntegerField, F
+from django.db.models.functions import Coalesce
+from django.utils import timezone
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from backend.utils.viewsets import SoftDeleteModelViewSet
-from .models import Liga, Invitacion, ParticipanteLiga
-from .serializers import LigaSerializer, InvitacionSerializer
-from backend.ligas.serializers import ParticipanteLigaSerializer
+from .models import Liga, Invitacion, ParticipanteLiga, SolicitudParticipacion
+from .serializers import (
+    LigaSerializer,
+    InvitacionSerializer,
+    ParticipanteLigaSerializer,
+    SolicitudParticipacionSerializer,
+)
 from backend.usuarios.models import Usuario
 from .emails import enviar_correo_invitacion
+
+
+def contar_participantes_activos(liga_id: int) -> int:
+    return ParticipanteLiga.objects.filter(
+        fk_id_liga=liga_id,
+        estado_participacion='Activo'
+    ).count()
+
+
+def hay_cupo_disponible(liga: Liga) -> bool:
+    if liga.cupo_maximo is None:
+        return True
+    return contar_participantes_activos(liga.id_liga) < liga.cupo_maximo
+
+
+def agregar_participante_a_liga(liga: Liga, usuario_id: int) -> ParticipanteLiga:
+    participante, _ = ParticipanteLiga.objects.get_or_create(
+        fk_id_liga=liga.id_liga,
+        fk_id_usuario=usuario_id,
+        defaults={'estado_participacion': 'Activo'}
+    )
+    participante.estado_participacion = 'Activo'
+    participante.save(update_fields=['estado_participacion'])
+    return participante
 
 class LigaViewSet(SoftDeleteModelViewSet):
     """
@@ -125,6 +158,57 @@ class LigaViewSet(SoftDeleteModelViewSet):
         if error_correo:
             respuesta['error_email'] = error_correo
         return Response(respuesta, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['post'], url_path='solicitar-ingreso')
+    def solicitar_ingreso(self, request, pk=None):
+        """Permitir que un usuario solicite unirse a una liga pública."""
+        try:
+            liga = self.get_object()
+        except Liga.DoesNotExist:
+            return Response({'error': 'Liga no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+
+        if not liga.es_publica:
+            return Response({'error': 'Esta liga no acepta solicitudes públicas.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if ParticipanteLiga.objects.filter(
+            fk_id_liga=liga.id_liga,
+            fk_id_usuario=request.user.id_usuario,
+            estado_participacion='Activo'
+        ).exists():
+            return Response({'message': 'Ya eres participante de esta liga.'}, status=status.HTTP_200_OK)
+
+        if not hay_cupo_disponible(liga):
+            return Response({'error': 'La liga ya alcanzó su cupo máximo.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not liga.requiere_aprobacion:
+            participante = agregar_participante_a_liga(liga, request.user.id_usuario)
+            return Response({
+                'message': 'Te uniste a la liga exitosamente.',
+                'participante': ParticipanteLigaSerializer(participante).data,
+                'aprobacion_requerida': False
+            }, status=status.HTTP_200_OK)
+
+        solicitud, created = SolicitudParticipacion.objects.get_or_create(
+            liga=liga,
+            usuario=request.user,
+            estado='Pendiente',
+            defaults={
+                'email_contacto': request.user.email,
+                'mensaje': request.data.get('mensaje', ''),
+            }
+        )
+
+        if not created:
+            solicitud.email_contacto = request.user.email
+            solicitud.mensaje = request.data.get('mensaje', solicitud.mensaje)
+            solicitud.save(update_fields=['email_contacto', 'mensaje'])
+
+        serializer = SolicitudParticipacionSerializer(solicitud)
+        return Response({
+            'message': 'Solicitud enviada. El administrador revisará tu petición.',
+            'solicitud': serializer.data,
+            'aprobacion_requerida': True
+        }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
     
     def retrieve(self, request, pk=None):
         """Obtener una liga específica"""
@@ -166,6 +250,78 @@ def ligas_por_usuario(request):
     ligas = Liga.objects.filter(fk_administrador=usuario_id)
     serializer = LigaSerializer(ligas, many=True)
     return Response(serializer.data)
+
+
+# ---------- Solicitudes de participación ----------
+
+class SolicitudParticipacionViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = SolicitudParticipacionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id_solicitud'
+
+    def get_queryset(self):
+        user = self.request.user
+        estado = self.request.query_params.get('estado')
+        queryset = SolicitudParticipacion.objects.select_related('liga', 'usuario').filter(
+            liga__fk_administrador=user.id_usuario
+        )
+        if estado:
+            queryset = queryset.filter(estado=estado)
+        return queryset
+
+    def _ensure_admin(self, solicitud: SolicitudParticipacion, user_id: int):
+        if solicitud.liga.fk_administrador != user_id:
+            raise PermissionError('Solo el administrador de la liga puede gestionar solicitudes.')
+
+    @action(detail=True, methods=['post'], url_path='aprobar')
+    def aprobar(self, request, id_solicitud=None):
+        try:
+            solicitud = self.get_object()
+            self._ensure_admin(solicitud, request.user.id_usuario)
+        except PermissionError as exc:
+            return Response({'error': str(exc)}, status=status.HTTP_403_FORBIDDEN)
+
+        if solicitud.estado != 'Pendiente':
+            return Response({'error': 'La solicitud ya fue gestionada.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not hay_cupo_disponible(solicitud.liga):
+            return Response({'error': 'La liga ya no tiene cupos disponibles.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        participante = agregar_participante_a_liga(solicitud.liga, solicitud.usuario.id_usuario)
+
+        solicitud.estado = 'Aprobada'
+        solicitud.fecha_respuesta = timezone.now()
+        solicitud.respondido_por = request.user.id_usuario
+        solicitud.respuesta_admin = request.data.get('respuesta_admin', '')
+        solicitud.save(update_fields=['estado', 'fecha_respuesta', 'respondido_por', 'respuesta_admin'])
+
+        return Response({
+            'message': 'Solicitud aprobada y participante agregado.',
+            'solicitud': SolicitudParticipacionSerializer(solicitud).data,
+            'participante': ParticipanteLigaSerializer(participante).data,
+        })
+
+    @action(detail=True, methods=['post'], url_path='rechazar')
+    def rechazar(self, request, id_solicitud=None):
+        try:
+            solicitud = self.get_object()
+            self._ensure_admin(solicitud, request.user.id_usuario)
+        except PermissionError as exc:
+            return Response({'error': str(exc)}, status=status.HTTP_403_FORBIDDEN)
+
+        if solicitud.estado != 'Pendiente':
+            return Response({'error': 'La solicitud ya fue gestionada.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        solicitud.estado = 'Rechazada'
+        solicitud.fecha_respuesta = timezone.now()
+        solicitud.respondido_por = request.user.id_usuario
+        solicitud.respuesta_admin = request.data.get('respuesta_admin', '')
+        solicitud.save(update_fields=['estado', 'fecha_respuesta', 'respondido_por', 'respuesta_admin'])
+
+        return Response({
+            'message': 'Solicitud rechazada.',
+            'solicitud': SolicitudParticipacionSerializer(solicitud).data,
+        })
 
 
 class ParticipanteLigaViewSet(SoftDeleteModelViewSet):
@@ -327,3 +483,46 @@ def enviar_invitacion_email_api(request):
             {'error': f'Error al enviar correo: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+class LigasPublicasView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        search = request.query_params.get('search')
+        tipo = request.query_params.get('tipo')
+        disponibles = request.query_params.get('disponibles')
+        requiere_aprobacion = request.query_params.get('requiere_aprobacion')
+
+        participantes_subquery = ParticipanteLiga.objects.filter(
+            fk_id_liga=OuterRef('id_liga'),
+            estado_participacion='Activo'
+        ).values('fk_id_liga').annotate(total=Count('id_participante')).values('total')
+
+        queryset = Liga.objects.filter(status=True, es_publica=True).annotate(
+            total_participantes=Coalesce(
+                Subquery(participantes_subquery, output_field=IntegerField()),
+                0
+            )
+        )
+
+        if search:
+            queryset = queryset.filter(
+                Q(nombre_liga__icontains=search) |
+                Q(descripcion__icontains=search)
+            )
+
+        if tipo:
+            queryset = queryset.filter(tipo_liga=tipo)
+
+        if requiere_aprobacion in ['true', 'false']:
+            queryset = queryset.filter(requiere_aprobacion=(requiere_aprobacion == 'true'))
+
+        if disponibles == 'true':
+            queryset = queryset.filter(
+                Q(cupo_maximo__isnull=True) |
+                Q(cupo_maximo__gt=F('total_participantes'))
+            )
+
+        serializer = LigaSerializer(queryset.order_by('nombre_liga'), many=True)
+        return Response({'results': serializer.data})

@@ -4,6 +4,7 @@ import { ProveedorAutenticacion, useAuth } from './contextos/ContextoAutenticaci
 import { ModulosColorProvider, useModulosColor } from './contextos/ContextoModulos';
 import PaginaLogin from './paginas/Login';
 import PaginaRegistro from './paginas/Registro';
+import RecuperarContrasenaPage from './paginas/RecuperarContrasena';
 import { LigasPage } from './paginas/Ligas';
 import { PartidosPage } from './paginas/Partidos';
 import SeleccionesPage from './paginas/Selecciones';
@@ -26,7 +27,7 @@ const ThemeInitializer = () => {
 };
 
 function ContenidoApp() {
-  const { loading } = useAuth();
+  const { loading, isAuthenticated } = useAuth();
 
   if (loading) {
     return (
@@ -57,9 +58,17 @@ function ContenidoApp() {
 
   return (
     <Routes>
-      <Route path="/home" element={<HomePage />} />
+      <Route
+        path="/home"
+        element={
+          <RutaProtegida>
+            <HomePage />
+          </RutaProtegida>
+        }
+      />
       <Route path="/login" element={<PaginaLogin />} />
       <Route path="/registro" element={<PaginaRegistro />} />
+      <Route path="/recuperar-contrasena" element={<RecuperarContrasenaPage />} />
       <Route path="/GestionLigas" element={
         <RutaProtegida>
           <LigasPage />
@@ -85,7 +94,11 @@ function ContenidoApp() {
           <MarcadorPage />
         </RutaProtegida>
       } />
-      <Route path="/" element={<Navigate to="/home" replace />} />
+      <Route
+        path="/"
+        element={<Navigate to={isAuthenticated ? "/home" : "/login"} replace />}
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

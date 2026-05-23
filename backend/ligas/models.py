@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.db.models import Q
 from backend.utils.models import SoftDeleteModel
 
 class Liga(SoftDeleteModel):
@@ -15,6 +16,16 @@ class Liga(SoftDeleteModel):
     monto_total_recaudado = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     estado = models.CharField(max_length=50, null=True, blank=True)
     tipo_liga = models.CharField(max_length=50, choices=TIPOS_LIGA, default='Diversion')
+    descripcion = models.TextField(blank=True)
+    es_publica = models.BooleanField(
+        default=False,
+        help_text='Visible en el buscador público si está activa.'
+    )
+    cupo_maximo = models.PositiveIntegerField(blank=True, null=True)
+    requiere_aprobacion = models.BooleanField(
+        default=True,
+        help_text='Si está activo, los administradores deben aprobar cada solicitud.'
+    )
 
     class Meta:
         db_table = 'liga'
@@ -90,3 +101,51 @@ class Invitacion(models.Model):
 
     def __str__(self):
         return f"Invitación {self.id_invitacion} - Liga {self.fk_id_liga}"
+
+
+class SolicitudParticipacion(models.Model):
+    ESTADOS = [
+        ('Pendiente', 'Pendiente'),
+        ('Aprobada', 'Aprobada'),
+        ('Rechazada', 'Rechazada'),
+    ]
+
+    id_solicitud = models.AutoField(primary_key=True)
+    liga = models.ForeignKey(
+        Liga,
+        on_delete=models.CASCADE,
+        related_name='solicitudes'
+    )
+    usuario = models.ForeignKey(
+        'usuarios.Usuario',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='solicitudes_participacion'
+    )
+    email_contacto = models.EmailField()
+    mensaje = models.TextField(blank=True)
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADOS,
+        default='Pendiente',
+        db_index=True
+    )
+    respuesta_admin = models.TextField(blank=True)
+    fecha_solicitud = models.DateTimeField(auto_now_add=True)
+    fecha_respuesta = models.DateTimeField(null=True, blank=True)
+    respondido_por = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'solicitud_participacion'
+        ordering = ['-fecha_solicitud']
+        constraints = [
+            models.UniqueConstraint(
+                fields=('liga', 'usuario'),
+                condition=Q(estado='Pendiente') & Q(usuario__isnull=False),
+                name='unique_solicitud_liga_usuario_pendiente'
+            )
+        ]
+
+    def __str__(self):
+        return f"Solicitud {self.id_solicitud} - Liga {self.liga_id}"

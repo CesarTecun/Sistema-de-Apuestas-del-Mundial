@@ -25,12 +25,34 @@ export const ProveedorAutenticacion = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const limpiarSesionLocal = () => {
+    sessionStorage.removeItem('ligas_visited');
+    sessionStorage.removeItem('partidos_visited');
+    sessionStorage.removeItem('selecciones_visited');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    delete axios.defaults.headers.common['Authorization'];
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
   // Configurar axios para incluir token en todas las peticiones
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
+  }, []);
+
+  // Sincronizar cierre de sesión entre pestañas
+  useEffect(() => {
+    const handleStorage = (event) => {
+      if (event.key === 'access_token' && !event.newValue) {
+        limpiarSesionLocal();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   // Verificar autenticación al cargar
@@ -49,16 +71,14 @@ export const ProveedorAutenticacion = ({ children }) => {
             sessionStorage.removeItem('partidos_visited');
             sessionStorage.removeItem('selecciones_visited');
           } else {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            delete axios.defaults.headers.common['Authorization'];
+            limpiarSesionLocal();
           }
+        } else {
+          limpiarSesionLocal();
         }
       } catch (error) {
         console.error('Error verificando autenticación:', error);
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        delete axios.defaults.headers.common['Authorization'];
+        limpiarSesionLocal();
       } finally {
         setLoading(false);
       }
@@ -179,16 +199,7 @@ export const ProveedorAutenticacion = ({ children }) => {
       console.error('Error de logout:', error);
     } finally {
       // Limpiar sessionStorage de animaciones al cerrar sesión
-      sessionStorage.removeItem('ligas_visited');
-      sessionStorage.removeItem('partidos_visited');
-      sessionStorage.removeItem('selecciones_visited');
-      
-      // Limpiar tokens y estado con nombres consistentes
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      delete axios.defaults.headers.common['Authorization'];
-      setUser(null);
-      setIsAuthenticated(false);
+      limpiarSesionLocal();
     }
   };
 
