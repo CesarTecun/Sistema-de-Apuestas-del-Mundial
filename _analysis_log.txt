@@ -1,0 +1,4 @@
+Total países únicos: 0
+
+Extras: []
+Faltan: ['Egipto', 'Inglaterra', 'México', 'Curazao', 'Costa de Marfil', 'Colombia', 'Ecuador', 'Países Bajos', 'Túnez', 'Argelia', 'Canadá', 'España', 'Nueva Zelanda', 'Alemania', 'Australia', 'Uzbekistán', 'Estados Unidos', 'Irak', 'Argentina', 'Sudáfrica', 'Cabo Verde', 'Portugal', 'Croacia', 'Marruecos', 'Haití', 'República Democrática del Congo', 'Francia', 'Suecia', 'Irán', 'Escocia', 'Bosnia y Herzegovina', 'Corea del Sur', 'Arabia Saudita', 'Bélgica', 'Brasil', 'Noruega', 'Paraguay', 'República Checa', 'Suiza', 'Panamá', 'Ghana', 'Japón', 'Jordania', 'Catar', 'Uruguay', 'Austria', 'Turquía', 'Senegal']

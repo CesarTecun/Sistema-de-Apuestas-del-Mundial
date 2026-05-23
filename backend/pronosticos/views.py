@@ -1,3 +1,6 @@
+import datetime
+
+from django.utils import timezone
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -7,6 +10,23 @@ from backend.ligas.utils import obtener_ligas_usuario_ids
 from backend.partidos.models import Partido
 from .models import Pronostico
 from .serializers import PronosticoSerializer
+from .utils import calcular_puntos_pronostico, actualizar_ranking_por_liga
+
+
+def _validar_ventana_pronostico(partido_id):
+    """Valida que el partido aún permita pronósticos (15 min antes del inicio)."""
+    try:
+        partido = Partido.objects.get(id_partido=partido_id)
+    except Partido.DoesNotExist:
+        raise ValidationError({'fk_id_partido': 'El partido especificado no existe'})
+
+    if partido.horario:
+        cierre = partido.horario - datetime.timedelta(minutes=15)
+        if timezone.now() >= cierre:
+            raise ValidationError(
+                {'detail': 'El registro de pronósticos para este partido ha cerrado (15 min antes del inicio).'}
+            )
+    return partido
 
 class PronosticoViewSet(SoftDeleteModelViewSet):
     """
@@ -54,6 +74,8 @@ class PronosticoViewSet(SoftDeleteModelViewSet):
         ).exists():
             raise ValidationError({'detail': 'Ya registraste un pronóstico para este partido en esta liga.'})
 
+        _validar_ventana_pronostico(partido_id)
+
         serializer.save(fk_id_usuario=usuario_id)
 
     def perform_update(self, serializer):
@@ -64,6 +86,8 @@ class PronosticoViewSet(SoftDeleteModelViewSet):
         liga_id = pronostico.fk_id_liga
         if liga_id not in obtener_ligas_usuario_ids(self.request.user.id_usuario):
             raise PermissionDenied('No puedes modificar pronósticos de esta liga.')
+
+        _validar_ventana_pronostico(pronostico.fk_id_partido)
 
         serializer.save()
 

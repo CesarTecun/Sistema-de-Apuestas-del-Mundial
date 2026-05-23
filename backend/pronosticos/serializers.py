@@ -8,7 +8,7 @@ class PronosticoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pronostico
         fields = '__all__'
-        read_only_fields = ('id_pronostico', 'fk_id_usuario')
+        read_only_fields = ('id_pronostico', 'fk_id_usuario', 'puntos_obtenidos')
     
     def validate(self, data):
         """Validación personalizada para los goles"""

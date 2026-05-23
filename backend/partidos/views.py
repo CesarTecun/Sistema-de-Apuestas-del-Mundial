@@ -10,6 +10,8 @@ from backend.ligas.utils import (
     obtener_ligas_usuario_ids,
     obtener_ligas_administradas_ids,
 )
+from backend.pronosticos.models import Pronostico
+from backend.pronosticos.utils import calcular_puntos_pronostico, actualizar_ranking_por_liga
 
 class JugadorViewSet(SoftDeleteModelViewSet):
     """
@@ -184,6 +186,27 @@ def actualizar_resultado(request, pk):
             partido.resultado = resultado
 
         partido.save()
+
+        # Calcular puntos de pronósticos si ambos goles están definidos
+        if partido.gol_local is not None and partido.gol_visitante is not None:
+            pronosticos = Pronostico.objects.filter(fk_id_partido=partido.id_partido, status=True)
+            for pronostico in pronosticos:
+                puntos = calcular_puntos_pronostico(
+                    pronostico.gol_local,
+                    pronostico.gol_visitante,
+                    partido.gol_local,
+                    partido.gol_visitante,
+                )
+                # Solo actualizar si cambió el puntaje o si aún no fue calculado
+                if pronostico.puntos_obtenidos != puntos:
+                    diferencia = puntos - pronostico.puntos_obtenidos
+                    pronostico.puntos_obtenidos = puntos
+                    pronostico.save(update_fields=['puntos_obtenidos'])
+                    actualizar_ranking_por_liga(
+                        pronostico.fk_id_usuario,
+                        pronostico.fk_id_liga,
+                        diferencia,
+                    )
 
         serializer = PartidoSerializer(partido)
         return Response(serializer.data)
