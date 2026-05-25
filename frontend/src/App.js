@@ -8,6 +8,7 @@ import RecuperarContrasenaPage from './paginas/RecuperarContrasena';
 import { LigasPage, UnirmeLigaPage, LigasPublicasPage } from './paginas/Ligas';
 import { PartidosPage } from './paginas/Partidos';
 import SeleccionesPage from './paginas/Selecciones';
+import JugadoresSeleccionPage from './paginas/Selecciones/JugadoresSeleccionPage';
 import HomePage from './paginas/Home/HomePage';
 import MarcadorPage from './paginas/Marcador';
 import RutaProtegida from './componentes/RutaProtegida';
@@ -97,6 +98,11 @@ function ContenidoApp() {
       <Route path="/selecciones" element={
         <RutaProtegida>
           <SeleccionesPage />
+        </RutaProtegida>
+      } />
+      <Route path="/selecciones/:id_seleccion/jugadores" element={
+        <RutaProtegida>
+          <JugadoresSeleccionPage />
         </RutaProtegida>
       } />
       <Route path="/marcador" element={

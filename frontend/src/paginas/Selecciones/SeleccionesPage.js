@@ -124,6 +124,10 @@ const SeleccionesPage = () => {
     setShowForm(true);
   };
 
+  const handleVerJugadores = (idSeleccion) => {
+    navigate(`/selecciones/${idSeleccion}/jugadores`);
+  };
+
   const handleDeleteSeleccion = (seleccionId) => {
     setAlertaConfirmacion({
       mostrar: true,
@@ -239,6 +243,7 @@ const SeleccionesPage = () => {
                       seleccion={seleccion}
                       onEdit={handleEditClick}
                       onDelete={handleDeleteSeleccion}
+                      onVerJugadores={handleVerJugadores}
                     />
                   ))}
                 </div>

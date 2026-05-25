@@ -1,7 +1,7 @@
 import React from 'react';
 import '../estilos/TarjetaSeleccion.css';
 
-const TarjetaSeleccion = ({ seleccion, onEdit, onDelete }) => {
+const TarjetaSeleccion = ({ seleccion, onEdit, onDelete, onVerJugadores }) => {
   return (
     <div className="tarjeta-seleccion">
       <div className="seleccion-header">
@@ -42,7 +42,19 @@ const TarjetaSeleccion = ({ seleccion, onEdit, onDelete }) => {
       </div>
 
       <div className="seleccion-acciones">
-        <button 
+        <button
+          className="accion-btn jugadores-btn"
+          onClick={() => onVerJugadores(seleccion.id_seleccion)}
+          title="Ver jugadores"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </button>
+        <button
           className="accion-btn editar-btn"
           onClick={() => onEdit(seleccion)}
           title="Editar selección"
@@ -52,7 +64,7 @@ const TarjetaSeleccion = ({ seleccion, onEdit, onDelete }) => {
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
           </svg>
         </button>
-        <button 
+        <button
           className="accion-btn eliminar-btn"
           onClick={() => onDelete(seleccion.id_seleccion)}
           title="Eliminar selección"

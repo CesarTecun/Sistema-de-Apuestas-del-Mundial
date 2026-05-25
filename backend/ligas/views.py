@@ -74,8 +74,11 @@ class LigaViewSet(SoftDeleteModelViewSet):
         ).values_list('fk_id_liga', flat=True)
         ligas_invitacion = Liga.objects.filter(id_liga__in=ligas_invitacion_ids)
         
+        # Ligas públicas (cualquier usuario puede verlas)
+        ligas_publicas = Liga.objects.filter(es_publica=True, status=True)
+
         # Combinar todos los querysets y eliminar duplicados
-        queryset = ligas_admin | ligas_participante | ligas_invitacion
+        queryset = ligas_admin | ligas_participante | ligas_invitacion | ligas_publicas
         return queryset.distinct()
     
     def create(self, request, *args, **kwargs):

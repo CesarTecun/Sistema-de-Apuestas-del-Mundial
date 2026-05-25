@@ -23,6 +23,13 @@ class JugadorViewSet(SoftDeleteModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id_jugador'
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        seleccion_id = self.request.query_params.get('fk_id_seleccion')
+        if seleccion_id is not None:
+            queryset = queryset.filter(fk_id_seleccion=seleccion_id)
+        return queryset
+
 
 class SeleccionViewSet(SoftDeleteModelViewSet):
     """
@@ -46,11 +53,21 @@ class PartidoViewSet(SoftDeleteModelViewSet):
     
     def get_queryset(self):
         """Filtrar partidos a las ligas permitidas y opcionalmente por liga específica."""
+        from backend.ligas.models import PartidoLiga
         ligas_usuario = obtener_ligas_usuario_ids(self.request.user.id_usuario)
         if not ligas_usuario:
             return Partido.objects.none()
 
-        queryset = Partido.objects.filter(fk_id_liga__in=ligas_usuario)
+        # Partidos cuyo fk_id_liga directo está en las ligas del usuario
+        partidos_directos = Partido.objects.filter(fk_id_liga__in=ligas_usuario)
+
+        # Partidos vinculados a ligas del usuario via tabla PartidoLiga
+        partidos_liga_ids = PartidoLiga.objects.filter(
+            fk_id_liga__in=ligas_usuario
+        ).values_list('fk_id_partido', flat=True)
+        partidos_via_liga = Partido.objects.filter(id_partido__in=partidos_liga_ids)
+
+        queryset = partidos_directos | partidos_via_liga
 
         liga_id = self.request.query_params.get('liga_id')
         if liga_id:
@@ -62,9 +79,15 @@ class PartidoViewSet(SoftDeleteModelViewSet):
             if liga_id_int not in ligas_usuario:
                 raise PermissionDenied('No tienes permisos para consultar esta liga.')
 
-            queryset = queryset.filter(fk_id_liga=liga_id_int)
+            # Filtrar por liga: partidos con fk_id_liga directo O vinculados via PartidoLiga
+            partidos_liga_filtrados = PartidoLiga.objects.filter(
+                fk_id_liga=liga_id_int
+            ).values_list('fk_id_partido', flat=True)
+            queryset = queryset.filter(
+                Q(fk_id_liga=liga_id_int) | Q(id_partido__in=partidos_liga_filtrados)
+            )
 
-        return queryset
+        return queryset.distinct()
     
     def create(self, request, *args, **kwargs):
         """Crear un nuevo partido"""
