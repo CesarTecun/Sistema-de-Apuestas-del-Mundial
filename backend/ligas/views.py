@@ -491,43 +491,91 @@ class LigasPublicasView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        search = request.query_params.get('search')
-        tipo = request.query_params.get('tipo')
-        disponibles = request.query_params.get('disponibles')
-        requiere_aprobacion = request.query_params.get('requiere_aprobacion')
+        try:
+            search = request.query_params.get('search')
+            tipo = request.query_params.get('tipo')
+            disponibles = request.query_params.get('disponibles')
+            requiere_aprobacion = request.query_params.get('requiere_aprobacion')
 
-        participantes_subquery = ParticipanteLiga.objects.filter(
-            fk_id_liga=OuterRef('id_liga'),
-            estado_participacion='Activo'
-        ).values('fk_id_liga').annotate(total=Count('id_participante')).values('total')
+            # Obtener usuario actual (si está autenticado)
+            user_id = None
+            if request.user and hasattr(request.user, 'id_usuario'):
+                user_id = request.user.id_usuario
 
-        queryset = Liga.objects.filter(status=True, es_publica=True).annotate(
-            total_participantes=Coalesce(
-                Subquery(participantes_subquery, output_field=IntegerField()),
-                0
-            )
-        )
+            print(f"[LigasPublicasView] Parámetros: search={search}, tipo={tipo}, disponibles={disponibles}, requiere_aprobacion={requiere_aprobacion}, user_id={user_id}")
 
-        if search:
-            queryset = queryset.filter(
-                Q(nombre_liga__icontains=search) |
-                Q(descripcion__icontains=search)
-            )
+            # Debug: Ver todas las ligas en la base de datos
+            todas_las_ligas = Liga.objects.all()
+            print(f"[LigasPublicasView] Total ligas en BD: {todas_las_ligas.count()}")
+            for liga in todas_las_ligas[:5]:  # Mostrar primeras 5
+                print(f"[LigasPublicasView] Liga {liga.id_liga}: {liga.nombre_liga}, status={liga.status}, es_publica={liga.es_publica}")
 
-        if tipo:
-            queryset = queryset.filter(tipo_liga=tipo)
+            # Enfoque: obtener ligas activas (no filtrar por es_publica)
+            queryset = Liga.objects.filter(status=True)
+            print(f"[LigasPublicasView] Queryset inicial (solo status=True): {queryset.count()} ligas")
 
-        if requiere_aprobacion in ['true', 'false']:
-            queryset = queryset.filter(requiere_aprobacion=(requiere_aprobacion == 'true'))
+            if search:
+                queryset = queryset.filter(
+                    Q(nombre_liga__icontains=search) |
+                    Q(descripcion__icontains=search)
+                )
 
-        if disponibles == 'true':
-            queryset = queryset.filter(
-                Q(cupo_maximo__isnull=True) |
-                Q(cupo_maximo__gt=F('total_participantes'))
-            )
+            if tipo:
+                queryset = queryset.filter(tipo_liga=tipo)
 
-        serializer = LigaSerializer(queryset.order_by('nombre_liga'), many=True)
-        return Response({'results': serializer.data})
+            if requiere_aprobacion in ['true', 'false']:
+                queryset = queryset.filter(requiere_aprobacion=(requiere_aprobacion == 'true'))
+
+            # Si hay filtro de disponibles, necesitamos contar participantes
+            if disponibles == 'true':
+                print(f"[LigasPublicasView] Filtrando ligas disponibles...")
+                ligas_disponibles = []
+                for liga in queryset:
+                    # Verificar si el usuario ya es participante
+                    es_participante = False
+                    if user_id:
+                        es_participante = ParticipanteLiga.objects.filter(
+                            fk_id_liga=liga.id_liga,
+                            fk_id_usuario=user_id,
+                            estado_participacion='Activo'
+                        ).exists()
+                    
+                    # Verificar si el usuario es administrador de la liga
+                    es_administrador = False
+                    if user_id and liga.fk_administrador == user_id:
+                        es_administrador = True
+                    
+                    if es_participante:
+                        print(f"[LigasPublicasView] Liga {liga.id_liga}: Usuario ya es participante, saltando")
+                        continue
+                    
+                    if es_administrador:
+                        print(f"[LigasPublicasView] Liga {liga.id_liga}: Usuario es administrador, saltando")
+                        continue
+
+                    print(f"[LigasPublicasView] Procesando liga {liga.id_liga}: {liga.nombre_liga}")
+                    total_participantes = ParticipanteLiga.objects.filter(
+                        fk_id_liga=liga.id_liga,
+                        estado_participacion='Activo'
+                    ).count()
+                    print(f"[LigasPublicasView] Liga {liga.id_liga}: {total_participantes} participantes, cupo_maximo={liga.cupo_maximo}")
+                    # Verificar si hay cupo disponible
+                    if liga.cupo_maximo is None or total_participantes < liga.cupo_maximo:
+                        ligas_disponibles.append({
+                            **LigaSerializer(liga).data,
+                            'total_participantes': total_participantes
+                        })
+                print(f"[LigasPublicasView] Ligas disponibles encontradas: {len(ligas_disponibles)}")
+                return Response({'results': ligas_disponibles})
+
+            # Si no hay filtro de disponibles, serializar normalmente
+            serializer = LigaSerializer(queryset.order_by('nombre_liga'), many=True)
+            return Response({'results': serializer.data})
+        except Exception as e:
+            print(f"[LigasPublicasView] ERROR: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return Response({'error': str(e)}, status=500)
 
 
 class InvitacionPublicaView(APIView):

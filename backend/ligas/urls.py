@@ -18,9 +18,9 @@ router.register(r'participantes', ParticipanteLigaViewSet, basename='participant
 router.register(r'solicitudes', SolicitudParticipacionViewSet, basename='solicitud-participacion')
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('por-usuario/', ligas_por_usuario, name='ligas_por_usuario'),
     path('publicas/', LigasPublicasView.as_view(), name='ligas_publicas'),
+    path('por-usuario/', ligas_por_usuario, name='ligas_por_usuario'),
     path('invitaciones/enviar-email/', enviar_invitacion_email_api, name='enviar_invitacion_email'),
     path('invitaciones/publico/<uuid:codigo>/', InvitacionPublicaView.as_view(), name='invitacion_publica'),
+    path('', include(router.urls)),
 ]
