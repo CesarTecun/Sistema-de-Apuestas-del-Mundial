@@ -15,13 +15,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+import os
 from django.contrib import admin
 from django.urls import path, include
+from django.http import HttpResponse
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework_simplejwt.views import TokenRefreshView
 from backend.autenticacion.views import SessionTokenObtainPairView
+
+def test_admin_view(request):
+    html_path = os.path.join(os.path.dirname(__file__), 'test_admin.html')
+    with open(html_path, encoding='utf-8') as f:
+        return HttpResponse(f.read(), content_type='text/html')
 
 @api_view(['GET'])
 @renderer_classes([JSONRenderer])
@@ -38,6 +45,7 @@ def api_root(request):
             'premios': '/api/premios/',
             'historial': '/api/historial/',
             'core': '/api/core/',
+            'usuarios_admin': '/api/usuarios/',
             'docs': '/api/docs/',
             'marcador': '/api/partidos/marcador/',
         }
@@ -59,6 +67,7 @@ def home_view(request):
 
 urlpatterns = [
     path("", home_view),
+    path("test-admin/", test_admin_view, name="test-admin"),
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("api/", api_root),
@@ -70,6 +79,7 @@ urlpatterns = [
     path("api/premios/", include("backend.premios.urls")),
     path("api/historial/", include("backend.historialganador.urls")),
     path("api/core/", include("backend.core.urls")),
+    path("api/usuarios/", include("backend.usuarios.urls")),
     # JWT endpoints
     path('api/token/', SessionTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

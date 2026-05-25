@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Admin M7 — Test</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f0f2f5;height:100vh;display:flex;flex-direction:column}
+.header{background:#1a1a2e;color:white;padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:15px;font-weight:600}
+.token-badge{font-size:11px;padding:4px 12px;border-radius:12px;background:#e74c3c}
+.token-badge.on{background:#27ae60}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:195px;background:#16213e;color:#aaa;overflow-y:auto;flex-shrink:0}
+.sidebar .sec{padding:8px 16px 4px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#555;margin-top:10px}
+.sidebar button{width:100%;text-align:left;background:none;border:none;color:#ccc;padding:9px 20px;cursor:pointer;font-size:13px}
+.sidebar button:hover{background:#1e3a5f;color:white}
+.sidebar button.active{background:#0f3460;color:#4fc3f7;border-left:3px solid #4fc3f7}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.content{flex:1;padding:18px;overflow-y:auto}
+.card{background:white;border-radius:8px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.card h2{font-size:13px;font-weight:600;margin-bottom:14px;color:#333;border-bottom:1px solid #eee;padding-bottom:8px}
+.row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:3px}
+.fg label{font-size:11px;color:#666;font-weight:500}
+input,select,textarea{border:1px solid #ddd;border-radius:4px;padding:6px 9px;font-size:13px;outline:none;background:#fafafa}
+input:focus,select:focus{border-color:#4fc3f7;background:white}
+textarea{min-height:80px;resize:vertical;font-family:monospace;font-size:11px}
+.btn{padding:6px 14px;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500}
+.btn-p{background:#0f3460;color:white}.btn-p:hover{background:#1a4a80}
+.btn-s{background:#27ae60;color:white}.btn-s:hover{background:#2ecc71}
+.btn-d{background:#e74c3c;color:white}.btn-d:hover{background:#c0392b}
+.btn-g{background:#ecf0f1;color:#333}.btn-g:hover{background:#ddd}
+.resp{border-top:1px solid #ddd;background:#1e1e1e;padding:10px 18px;max-height:260px;overflow-y:auto}
+.resp-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.resp-hdr span{color:#888;font-size:11px}
+.ok{color:#2ecc71;font-weight:600}.err{color:#e74c3c;font-weight:600}
+pre{color:#d4d4d4;font-size:11px;white-space:pre-wrap;word-break:break-word}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100}
+.login-box{background:white;padding:28px;border-radius:12px;width:340px}
+.login-box h2{margin-bottom:16px;color:#1a1a2e;font-size:16px}
+.login-box .fg{margin-bottom:10px}
+.login-box input{width:100%}
+.login-box .btn{width:100%;padding:9px;margin-top:4px}
+.lerr{color:#e74c3c;font-size:12px;margin-top:6px;display:none}
+.view{display:none}.view.active{display:block}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+th{text-align:left;padding:6px 10px;background:#f0f2f5;border-bottom:2px solid #ddd;white-space:nowrap}
+td{padding:6px 10px;vertical-align:middle;border-bottom:1px solid #f5f5f5}
+.tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px}
+.ta{background:#d5f5e3;color:#27ae60}.ti{background:#fce8e6;color:#e74c3c}.tad{background:#d6eaf8;color:#2980b9}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:12px}
+.sc{background:#f8f9fa;border-radius:8px;padding:12px;text-align:center;border-top:3px solid #ccc}
+.sc .v{font-size:22px;font-weight:700}.sc .l{font-size:10px;color:#888;margin-top:3px}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="ov">
+  <div class="login-box">
+    <h2>🔐 Panel Admin M7</h2>
+    <p style="font-size:12px;color:#888;margin-bottom:14px">Inicia sesión con una cuenta de administrador (fk_rol = 1)</p>
+    <div class="fg"><label>Email</label><input type="email" id="lemail" placeholder="admin@ejemplo.com"></div>
+    <div class="fg"><label>Contraseña</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lerr" id="lerr"></div>
+    <button class="btn btn-p" onclick="doLogin()">Iniciar sesión</button>
+  </div>
+</div>
+
+<div class="header">
+  <h1>⚽ Sistema de Apuestas del Mundial — Panel Admin M7</h1>
+  <span class="token-badge" id="tbadge">Sin sesión</span>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sec">Admin M7</div>
+    <button id="b-dashboard" class="active" onclick="go('dashboard')">📊 Dashboard</button>
+    <button id="b-usuarios" onclick="go('usuarios')">👥 Usuarios</button>
+    <button id="b-config" onclick="go('config')">⚙️ Configuración</button>
+    <button id="b-bitacora" onclick="go('bitacora')">📋 Bitácora</button>
+    <button id="b-audit" onclick="go('audit')">🔍 Audit Log</button>
+    <div class="sec">Sesión</div>
+    <button style="color:#e74c3c" onclick="doLogout()">🚪 Cerrar sesión</button>
+  </div>
+
+  <div class="main">
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="v-dashboard">
+        <div class="card">
+          <h2>📊 Resumen del Sistema</h2>
+          <button class="btn btn-p" onclick="loadDash()">↻ Actualizar</button>
+          <div id="dashContent"></div>
+        </div>
+      </div>
+
+      <!-- USUARIOS -->
+      <div class="view" id="v-usuarios">
+        <div class="card">
+          <h2>🔎 Filtrar usuarios</h2>
+          <div class="row">
+            <div class="fg"><label>Buscar (nombre / email)</label><input id="us" placeholder="buscar..." style="width:180px"></div>
+            <div class="fg"><label>Rol</label>
+              <select id="ur"><option value="">Todos</option><option value="1">Admin (1)</option><option value="2">Usuario (2)</option></select>
+            </div>
+            <div class="fg"><label>Estado</label>
+              <select id="ua"><option value="">Todos</option><option value="true">Activos</option><option value="false">Inactivos</option></select>
+            </div>
+            <div class="fg"><label>&nbsp;</label><button class="btn btn-p" onclick="loadUsers()">Buscar</button></div>
+          </div>
+          <div id="usersTable"></div>
+        </div>
+        <div class="card" id="editCard" style="display:none">
+          <h2>✏️ Editar usuario <span id="editId"></span></h2>
+          <div class="row">
+            <div class="fg"><label>Nuevo rol</label>
+              <select id="editRol"><option value="1">Admin (1)</option><option value="2">Usuario (2)</option></select>
+            </div>
+            <div class="fg"><label>&nbsp;</label><button class="btn btn-s" onclick="saveUser()">Guardar</button></div>
+            <div class="fg"><label>&nbsp;</label><button class="btn btn-g" onclick="document.getElementById('editCard').style.display='none'">Cancelar</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIGURACIÓN -->
+      <div class="view" id="v-config">
+        <div class="card">
+          <h2>⚙️ Configuración del Torneo</h2>
+          <button class="btn btn-g" onclick="loadConfig()" style="margin-bottom:14px">↻ Cargar actual</button>
+          <div class="row">
+            <div class="fg"><label>% Plataforma</label><input type="number" id="cfgP" step="0.01" style="width:110px"></div>
+            <div class="fg"><label>Puntos exacto</label><input type="number" id="cfgE" style="width:90px"></div>
+            <div class="fg"><label>Puntos ganador</label><input type="number" id="cfgG" style="width:90px"></div>
+          </div>
+          <div class="row">
+            <div class="fg"><label>Inicio torneo</label><input type="date" id="cfgFI"></div>
+            <div class="fg"><label>Fin torneo</label><input type="date" id="cfgFF"></div>
+            <div class="fg"><label>Registro abierto</label>
+              <select id="cfgR"><option value="true">Sí</option><option value="false">No</option></select>
+            </div>
+            <div class="fg"><label>Max ligas/usuario</label><input type="number" id="cfgM" placeholder="sin límite" style="width:120px"></div>
+          </div>
+          <button class="btn btn-s" onclick="saveConfig()">💾 Guardar configuración</button>
+        </div>
+      </div>
+
+      <!-- BITÁCORA -->
+      <div class="view" id="v-bitacora">
+        <div class="card">
+          <h2>📋 Bitácora de Actividad</h2>
+          <div class="row">
+            <div class="fg"><label>ID usuario</label><input type="number" id="bUid" placeholder="(todos)" style="width:110px"></div>
+            <div class="fg"><label>Fecha</label><input type="date" id="bFecha"></div>
+            <div class="fg"><label>&nbsp;</label><button class="btn btn-p" onclick="loadBit()">Cargar</button></div>
+          </div>
+          <div id="bitTable"></div>
+        </div>
+      </div>
+
+      <!-- AUDIT LOG -->
+      <div class="view" id="v-audit">
+        <div class="card">
+          <h2>🔍 Log de Auditoría</h2>
+          <div class="row">
+            <div class="fg"><label>Tabla</label><input id="aTab" placeholder="ej: liga" style="width:120px"></div>
+            <div class="fg"><label>Operación</label>
+              <select id="aOp"><option value="">Todas</option><option value="INSERT">INSERT</option><option value="UPDATE">UPDATE</option><option value="DELETE">DELETE</option></select>
+            </div>
+            <div class="fg"><label>&nbsp;</label><button class="btn btn-p" onclick="loadAudit()">Cargar</button></div>
+          </div>
+          <div id="auditTable"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Response Panel -->
+    <div class="resp">
+      <div class="resp-hdr">
+        <span>Última respuesta del API</span>
+        <span id="rStatus">—</span>
+      </div>
+      <pre id="rBody">// Las respuestas aparecerán aquí</pre>
+    </div>
+  </div>
+</div>
+
+<script>
+const B = 'http://localhost:8000';
+let tok = null, editUid = null;
+
+// ── Auth ─────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('lemail').value.trim();
+  const pass  = document.getElementById('lpass').value;
+  const errEl = document.getElementById('lerr');
+  errEl.style.display = 'none';
+  try {
+    const r = await fetch(`${B}/api/token/`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password:pass})});
+    const d = await r.json();
+    if (!r.ok) { errEl.textContent = d.detail || 'Credenciales incorrectas'; errEl.style.display='block'; return; }
+    tok = d.access;
+    document.getElementById('ov').style.display = 'none';
+    const badge = document.getElementById('tbadge');
+    badge.textContent = '✓ ' + email; badge.classList.add('on');
+    show(r.status, d);
+    loadDash();
+  } catch(e) { errEl.textContent = 'Error: el servidor no responde. ¿Está corriendo manage.py runserver?'; errEl.style.display='block'; }
+}
+
+function doLogout() {
+  tok = null;
+  const badge = document.getElementById('tbadge');
+  badge.textContent = 'Sin sesión'; badge.classList.remove('on');
+  document.getElementById('ov').style.display = 'flex';
+}
+
+// ── Helpers ───────────────────────────────────────────
+const H = () => ({'Content-Type':'application/json','Authorization':`Bearer ${tok}`});
+
+function show(status, data) {
+  const el = document.getElementById('rStatus');
+  el.textContent = 'HTTP ' + status;
+  el.className = status < 300 ? 'ok' : 'err';
+  document.getElementById('rBody').textContent = JSON.stringify(data, null, 2);
+}
+
+async function GET(url)       { const r=await fetch(B+url,{headers:H()}); const d=await r.json(); show(r.status,d); return {ok:r.ok,d}; }
+async function POST(url,body) { const r=await fetch(B+url,{method:'POST',headers:H(),body:JSON.stringify(body)}); const d=await r.json(); show(r.status,d); return {ok:r.ok,d}; }
+async function PUT(url,body)  { const r=await fetch(B+url,{method:'PUT',headers:H(),body:JSON.stringify(body)}); const d=await r.json(); show(r.status,d); return {ok:r.ok,d}; }
+async function PATCH(url,body){ const r=await fetch(B+url,{method:'PATCH',headers:H(),body:JSON.stringify(body)}); const d=await r.json(); show(r.status,d); return {ok:r.ok,d}; }
+
+function go(name) {
+  document.querySelectorAll('.view').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.sidebar button[id^="b-"]').forEach(e=>e.classList.remove('active'));
+  document.getElementById('v-'+name).classList.add('active');
+  document.getElementById('b-'+name).classList.add('active');
+}
+
+function mkTable(headers, rows) {
+  if (!rows.length) return '<p style="color:#888;font-size:13px;margin-top:8px">Sin resultados.</p>';
+  return `<div style="overflow-x:auto"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r}</tr>`).join('')}</tbody></table></div>`;
+}
+const C = v => `<td>${v??'—'}</td>`;
+
+// ── Dashboard ─────────────────────────────────────────
+async function loadDash() {
+  const {ok,d} = await GET('/api/core/reportes/resumen/');
+  if (!ok) return;
+  const sc = (label, value, color) =>
+    `<div class="sc" style="border-color:${color}"><div class="v" style="color:${color}">${value}</div><div class="l">${label}</div></div>`;
+  document.getElementById('dashContent').innerHTML = `
+    <div class="stats">
+      ${sc('Usuarios activos',   d.usuarios.activos,         '#27ae60')}
+      ${sc('Inactivos',          d.usuarios.inactivos,        '#e74c3c')}
+      ${sc('Admins',             d.usuarios.admins,           '#2980b9')}
+      ${sc('Sesiones activas',   d.sesiones.activas_ahora,    '#8e44ad')}
+      ${sc('Ligas activas',      d.ligas.activas,             '#16a085')}
+      ${sc('Ligas públicas',     d.ligas.publicas,            '#1abc9c')}
+      ${sc('Partidos total',     d.partidos.total,            '#2c3e50')}
+      ${sc('En juego',           d.partidos.en_juego,         '#e67e22')}
+      ${sc('Finalizados',        d.partidos.finalizados,      '#27ae60')}
+      ${sc('Pronósticos',        d.pronosticos.total,         '#9b59b6')}
+      ${sc('Recaudado (Q)',       'Q'+d.premios.total_recaudado,  '#f39c12')}
+      ${sc('Distribuido (Q)',     'Q'+d.premios.total_distribuido,'#d35400')}
+    </div>
+    <p style="font-size:10px;color:#aaa;margin-top:10px">Generado: ${new Date(d.generado_en).toLocaleString()}</p>`;
+}
+
+// ── Usuarios ─────────────────────────────────────────
+async function loadUsers() {
+  let url = '/api/usuarios/?';
+  const s=document.getElementById('us').value, r=document.getElementById('ur').value, a=document.getElementById('ua').value;
+  if(s) url+=`search=${encodeURIComponent(s)}&`;
+  if(r) url+=`fk_rol=${r}&`;
+  if(a) url+=`activo=${a}&`;
+  const {ok,d} = await GET(url);
+  if (!ok) return;
+  const list = d.results || d;
+  const rows = list.map(u => [
+    C(u.id_usuario),
+    C(`${u.primer_nombre||''} ${u.primer_apellido||''}`.trim() || '—'),
+    C(u.email),
+    C(u.fk_rol==1 ? '<span class="tag tad">Admin</span>' : '<span class="tag" style="background:#eee">Usuario</span>'),
+    C(u.status ? '<span class="tag ta">Activo</span>' : '<span class="tag ti">Inactivo</span>'),
+    `<td><button class="btn btn-g" style="font-size:11px;margin:1px" onclick="openEdit(${u.id_usuario},${u.fk_rol})">✏️ Rol</button>
+     ${u.status
+       ? `<button class="btn btn-d" style="font-size:11px;margin:1px" onclick="desactivar(${u.id_usuario})">Desactivar</button>`
+       : `<button class="btn btn-s" style="font-size:11px;margin:1px" onclick="activar(${u.id_usuario})">Activar</button>`
+     }</td>`,
+  ].join(''));
+  document.getElementById('usersTable').innerHTML = mkTable(['ID','Nombre','Email','Rol','Estado','Acciones'], rows);
+}
+
+function openEdit(id, rol) {
+  editUid = id;
+  document.getElementById('editId').textContent = '#'+id;
+  document.getElementById('editRol').value = rol;
+  const c = document.getElementById('editCard');
+  c.style.display = 'block';
+  c.scrollIntoView({behavior:'smooth'});
+}
+
+async function saveUser() {
+  const rol = parseInt(document.getElementById('editRol').value);
+  const {ok} = await PATCH(`/api/usuarios/${editUid}/`, {fk_rol: rol});
+  if (ok) { document.getElementById('editCard').style.display='none'; loadUsers(); }
+}
+
+async function activar(id) {
+  const {ok} = await POST(`/api/usuarios/${id}/activar/`, {});
+  if (ok) loadUsers();
+}
+
+async function desactivar(id) {
+  if (!confirm(`¿Desactivar usuario #${id}?`)) return;
+  const {ok} = await POST(`/api/usuarios/${id}/desactivar/`, {});
+  if (ok) loadUsers();
+}
+
+// ── Configuración ─────────────────────────────────────
+async function loadConfig() {
+  const {ok,d} = await GET('/api/core/configuracion/');
+  if (!ok) return;
+  document.getElementById('cfgP').value = d.porcentaje_plataforma;
+  document.getElementById('cfgE').value = d.puntos_exacto;
+  document.getElementById('cfgG').value = d.puntos_ganador;
+  document.getElementById('cfgFI').value = d.fecha_inicio_torneo || '';
+  document.getElementById('cfgFF').value = d.fecha_fin_torneo || '';
+  document.getElementById('cfgR').value  = d.permite_registro_abierto ? 'true' : 'false';
+  document.getElementById('cfgM').value  = d.max_ligas_por_usuario || '';
+}
+
+async function saveConfig() {
+  const body = {
+    porcentaje_plataforma: document.getElementById('cfgP').value,
+    puntos_exacto:   parseInt(document.getElementById('cfgE').value),
+    puntos_ganador:  parseInt(document.getElementById('cfgG').value),
+    fecha_inicio_torneo: document.getElementById('cfgFI').value || null,
+    fecha_fin_torneo:    document.getElementById('cfgFF').value || null,
+    permite_registro_abierto: document.getElementById('cfgR').value === 'true',
+    max_ligas_por_usuario: document.getElementById('cfgM').value || null,
+  };
+  await PUT('/api/core/configuracion/', body);
+}
+
+// ── Bitácora ─────────────────────────────────────────
+async function loadBit() {
+  let url = '/api/core/bitacora/?';
+  const u=document.getElementById('bUid').value, f=document.getElementById('bFecha').value;
+  if(u) url+=`usuario_id=${u}&`;
+  if(f) url+=`fecha=${f}&`;
+  const {ok,d} = await GET(url);
+  if (!ok) return;
+  const list = d.results || d;
+  document.getElementById('bitTable').innerHTML = mkTable(
+    ['#','Fecha','Hora','Usuario ID','Detalle'],
+    list.map(b=>[C(b.log),C(b.fecha),C(b.hora),C(b.fk_id_usuario),C(b.detalle_accion)].join(''))
+  );
+}
+
+// ── Audit Log ─────────────────────────────────────────
+async function loadAudit() {
+  let url = '/api/core/audit-log/?';
+  const t=document.getElementById('aTab').value, o=document.getElementById('aOp').value;
+  if(t) url+=`table_name=${t}&`;
+  if(o) url+=`operation=${o}&`;
+  const {ok,d} = await GET(url);
+  if (!ok) return;
+  const list = d.results || d;
+  const opColor = op => op==='INSERT'?'#d5f5e3':op==='DELETE'?'#fce8e6':'#fef9e7';
+  document.getElementById('auditTable').innerHTML = mkTable(
+    ['ID','Tabla','Operación','PK','Por','Fecha'],
+    list.map(a=>[
+      C(a.id_audit_log), C(a.table_name),
+      C(`<span class="tag" style="background:${opColor(a.operation)}">${a.operation}</span>`),
+      C(a.record_pk), C(a.changed_by),
+      C(a.changed_at ? new Date(a.changed_at).toLocaleString() : '—'),
+    ].join(''))
+  );
+}
+</script>
+</body>
+</html>
