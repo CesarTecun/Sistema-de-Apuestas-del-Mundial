@@ -5,7 +5,7 @@ import { ModulosColorProvider, useModulosColor } from './contextos/ContextoModul
 import PaginaLogin from './paginas/Login';
 import PaginaRegistro from './paginas/Registro';
 import RecuperarContrasenaPage from './paginas/RecuperarContrasena';
-import { LigasPage } from './paginas/Ligas';
+import { LigasPage, UnirmeLigaPage, LigasPublicasPage } from './paginas/Ligas';
 import { PartidosPage } from './paginas/Partidos';
 import SeleccionesPage from './paginas/Selecciones';
 import HomePage from './paginas/Home/HomePage';
@@ -72,6 +72,16 @@ function ContenidoApp() {
       <Route path="/GestionLigas" element={
         <RutaProtegida>
           <LigasPage />
+        </RutaProtegida>
+      } />
+      <Route path="/GestionLigas/unirme" element={
+        <RutaProtegida>
+          <UnirmeLigaPage />
+        </RutaProtegida>
+      } />
+      <Route path="/GestionLigas/publicas" element={
+        <RutaProtegida>
+          <LigasPublicasPage />
         </RutaProtegida>
       } />
       <Route path="/ligas" element={

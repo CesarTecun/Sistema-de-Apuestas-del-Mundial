@@ -6,6 +6,7 @@ from .views import (
     ParticipanteLigaViewSet,
     SolicitudParticipacionViewSet,
     LigasPublicasView,
+    InvitacionPublicaView,
     ligas_por_usuario,
     enviar_invitacion_email_api,
 )
@@ -21,4 +22,5 @@ urlpatterns = [
     path('por-usuario/', ligas_por_usuario, name='ligas_por_usuario'),
     path('publicas/', LigasPublicasView.as_view(), name='ligas_publicas'),
     path('invitaciones/enviar-email/', enviar_invitacion_email_api, name='enviar_invitacion_email'),
+    path('invitaciones/publico/<uuid:codigo>/', InvitacionPublicaView.as_view(), name='invitacion_publica'),
 ]

@@ -14,6 +14,10 @@ export const API_ENDPOINTS = {
   },
   // Ligas
   LIGAS: `${API_BASE_URL}/api/ligas/`,
+  LIGAS_PUBLICAS: `${API_BASE_URL}/api/ligas/publicas/`,
+  LIGA_SOLICITAR_INGRESO: (ligaId) => `${API_BASE_URL}/api/ligas/${ligaId}/solicitar-ingreso/`,
+  INVITACIONES: `${API_BASE_URL}/api/ligas/invitaciones/`,
+  INVITACION_PUBLICA: (codigo) => `${API_BASE_URL}/api/ligas/invitaciones/publico/${codigo}/`,
   // Partidos
   PARTIDOS: `${API_BASE_URL}/api/partidos/`,
   // Pronósticos

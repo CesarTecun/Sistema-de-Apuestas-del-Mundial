@@ -1,5 +1,6 @@
 from django.db.models import Q, Count, OuterRef, Subquery, IntegerField, F
 from django.db.models.functions import Coalesce
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import api_view, permission_classes, action
@@ -8,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from backend.utils.viewsets import SoftDeleteModelViewSet
+from backend.autenticacion.serializers import RegisterSerializer, UserSerializer
 from .models import Liga, Invitacion, ParticipanteLiga, SolicitudParticipacion
 from .serializers import (
     LigaSerializer,
@@ -65,10 +67,10 @@ class LigaViewSet(SoftDeleteModelViewSet):
         ).values_list('fk_id_liga', flat=True)
         ligas_participante = Liga.objects.filter(id_liga__in=ligas_participante_ids)
         
-        # Ligas donde el usuario tiene invitación pendiente o aceptada
+        # Ligas donde el usuario tiene invitación aceptada
         ligas_invitacion_ids = Invitacion.objects.filter(
             Q(fk_id_usuario_invitado=usuario_id) | Q(email_invitado__iexact=user.email),
-            estado_invitacion__in=['Pendiente', 'Aceptada']
+            estado_invitacion='Aceptada'
         ).values_list('fk_id_liga', flat=True)
         ligas_invitacion = Liga.objects.filter(id_liga__in=ligas_invitacion_ids)
         
@@ -263,7 +265,7 @@ class SolicitudParticipacionViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         estado = self.request.query_params.get('estado')
         queryset = SolicitudParticipacion.objects.select_related('liga', 'usuario').filter(
-            liga__fk_administrador=user.id_usuario
+            Q(liga__fk_administrador=user.id_usuario) | Q(usuario=user)
         )
         if estado:
             queryset = queryset.filter(estado=estado)
@@ -526,3 +528,71 @@ class LigasPublicasView(APIView):
 
         serializer = LigaSerializer(queryset.order_by('nombre_liga'), many=True)
         return Response({'results': serializer.data})
+
+
+class InvitacionPublicaView(APIView):
+    permission_classes = [AllowAny]
+
+    def _get_invitacion(self, codigo):
+        return get_object_or_404(Invitacion, codigo_invitacion=codigo)
+
+    def _get_liga(self, invitacion):
+        return Liga.objects.filter(id_liga=invitacion.fk_id_liga, status=True).first()
+
+    def get(self, request, codigo):
+        invitacion = self._get_invitacion(codigo)
+        liga = self._get_liga(invitacion)
+        liga_data = LigaSerializer(liga).data if liga else None
+        return Response({
+            'id_invitacion': invitacion.id_invitacion,
+            'estado': invitacion.estado_invitacion,
+            'email_invitado': invitacion.email_invitado,
+            'liga': liga_data,
+        })
+
+    def post(self, request, codigo):
+        invitacion = self._get_invitacion(codigo)
+        liga = self._get_liga(invitacion)
+
+        if not liga:
+            return Response({'error': 'La liga asociada a esta invitación no está disponible.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if invitacion.estado_invitacion != 'Pendiente':
+            return Response({'error': 'Esta invitación ya fue gestionada.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        email = request.data.get('email') or invitacion.email_invitado
+        if not email:
+            return Response({'error': 'Debes proporcionar un correo electrónico.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if invitacion.email_invitado and invitacion.email_invitado.lower() != email.lower():
+            return Response({'error': 'El correo proporcionado no coincide con el de la invitación.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        usuario = None
+        if invitacion.fk_id_usuario_invitado:
+            usuario = Usuario.objects.filter(id_usuario=invitacion.fk_id_usuario_invitado).first()
+
+        if not usuario:
+            try:
+                usuario = Usuario.objects.get(email__iexact=email)
+            except Usuario.DoesNotExist:
+                register_data = request.data.copy()
+                register_data['email'] = email
+                serializer = RegisterSerializer(data=register_data)
+                serializer.is_valid(raise_exception=True)
+                usuario = serializer.save()
+
+        if not hay_cupo_disponible(liga):
+            return Response({'error': 'La liga ya alcanzó su cupo máximo.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        participante = agregar_participante_a_liga(liga, usuario.id_usuario)
+
+        invitacion.fk_id_usuario_invitado = usuario.id_usuario
+        invitacion.estado_invitacion = 'Aceptada'
+        invitacion.save(update_fields=['estado_invitacion', 'fk_id_usuario_invitado'])
+
+        return Response({
+            'message': 'Invitación aceptada. Usuario vinculado y agregado a la liga.',
+            'liga': LigaSerializer(liga).data,
+            'usuario': UserSerializer(usuario).data,
+            'participante': ParticipanteLigaSerializer(participante).data,
+        }, status=status.HTTP_201_CREATED)

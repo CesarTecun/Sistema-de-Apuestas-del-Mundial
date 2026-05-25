@@ -19,6 +19,7 @@ const RecuperarContrasenaPage = () => {
   const [requestLoading, setRequestLoading] = useState(false);
 
   const [passwordData, setPasswordData] = useState({ password: '', password2: '' });
+  const [localValidationError, setLocalValidationError] = useState('');
   const [resetFeedback, setResetFeedback] = useState(initialFeedback);
   const [resetLoading, setResetLoading] = useState(false);
   const [showPasswords, setShowPasswords] = useState(false);
@@ -56,12 +57,34 @@ const RecuperarContrasenaPage = () => {
     event.preventDefault();
     setResetLoading(true);
     setResetFeedback(initialFeedback);
+    setLocalValidationError('');
+
+    const { password, password2 } = passwordData;
+    const hasLength = password.length >= 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSymbol = /[^A-Za-z0-9]/.test(password);
+
+    if (!hasLength || !hasUpper || !hasLower || !hasNumber || !hasSymbol) {
+      setLocalValidationError(
+        'La contraseña debe tener mínimo 8 caracteres e incluir mayúsculas, minúsculas, números y símbolos.'
+      );
+      setResetLoading(false);
+      return;
+    }
+
+    if (password !== password2) {
+      setLocalValidationError('Las contraseñas no coinciden.');
+      setResetLoading(false);
+      return;
+    }
 
     try {
       await axios.post(API_ENDPOINTS.AUTH.PASSWORD_RESET_CONFIRM, {
         token,
-        password: passwordData.password,
-        password2: passwordData.password2,
+        password,
+        password2,
       });
       setResetFeedback({
         status: 'success',
@@ -160,9 +183,9 @@ const RecuperarContrasenaPage = () => {
                 <li>Combina letras mayúsculas, minúsculas, números y símbolos.</li>
               </ul>
 
-              {resetFeedback.status !== 'idle' && (
+              {(localValidationError || resetFeedback.status !== 'idle') && (
                 <div className={`recovery-alert recovery-alert--${resetFeedback.status}`}>
-                  {resetFeedback.message}
+                  {localValidationError || resetFeedback.message}
                 </div>
               )}
 

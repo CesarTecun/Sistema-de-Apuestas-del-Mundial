@@ -25,6 +25,17 @@ const LigasHeader = ({ onCreateClick }) => {
           Partidos
         </button>
         <button 
+          className="join-button"
+          onClick={() => navigate('/GestionLigas/unirme')}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M4 4h16v16H4z"></path>
+            <path d="M12 8v8"></path>
+            <path d="M8 12h8"></path>
+          </svg>
+          Unirme
+        </button>
+        <button 
           className="create-button"
           onClick={onCreateClick}
         >

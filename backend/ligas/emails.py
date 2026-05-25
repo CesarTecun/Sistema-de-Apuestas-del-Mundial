@@ -7,7 +7,7 @@ INVITACION_SUBJECT = '🏆 Has sido invitado a una Liga de la Copa Mundial FIFA 
 
 def render_mensaje_invitacion(invitacion):
     mensaje_admin = invitacion.mensaje_invitacion or 'Sin mensaje personalizado'
-    enlace = f"{settings.FRONTEND_URL}/invitaciones/{invitacion.codigo_invitacion}"
+    login_url = f"{settings.FRONTEND_URL}/login"
     return f"""
 ¡Hola!
 
@@ -15,12 +15,18 @@ Has sido invitado a unirte a una liga en nuestro sistema de pronósticos para la
 
 📋 Detalles de la invitación:
 • ID de Liga: {invitacion.fk_id_liga}
+• Código de invitación: {invitacion.codigo_invitacion}
 • Estado: {invitacion.estado_invitacion}
 
 💬 Mensaje del administrador:
 {mensaje_admin}
 
-🔗 Para aceptar la invitación ingresa a: {enlace}
+� ¿Cómo unirme?
+1. Ingresa a {login_url}
+2. Si no tienes cuenta todavía, créala desde esa pantalla.
+3. Dentro del módulo "Ligas" presiona el botón "Unirme" y escribe tu código de invitación.
+
+Recuerda: el código es personal y se debe ingresar respetando guiones y mayúsculas/minúsculas.
 
 ¡Que gane el mejor!
 

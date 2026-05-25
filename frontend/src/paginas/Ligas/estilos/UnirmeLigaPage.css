@@ -1,0 +1,103 @@
+.join-card {
+  background: linear-gradient(135deg, rgba(26, 35, 4, 0.92), rgba(76, 92, 12, 0.82));
+  border-radius: 24px;
+  padding: 32px;
+  border: 1px solid rgba(227, 198, 72, 0.35);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45);
+  color: #f8fafc;
+}
+
+.join-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+  color: #f8fafc;
+}
+
+.join-hint {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(227, 198, 72, 0.35);
+  border-radius: 16px;
+  padding: 16px 20px;
+  max-width: 320px;
+  color: #f6f7fb;
+}
+
+.join-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 24px;
+}
+
+.panel {
+  background: linear-gradient(135deg, rgba(18, 24, 4, 0.92), rgba(56, 68, 8, 0.82));
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(227, 198, 72, 0.25);
+  color: #f8fafc;
+}
+
+.public-search input,
+.codigo-form input,
+.publicas-filtros input,
+.publicas-filtros select {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 12px 16px;
+  background: rgba(10, 14, 38, 0.9);
+  color: #f8fafc;
+}
+
+.public-card {
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: #f8fafc;
+}
+
+.public-card__actions button,
+.submit {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #f5a524, #d4af37);
+  color: #1b1f3a;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.panel__header h2,
+.panel__header p,
+.helper-text,
+.tag,
+.public-card__body span,
+.public-card__body strong {
+  color: rgba(248, 250, 252, 0.88);
+}
+
+.codigo-feedback {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.codigo-feedback--success {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+}
+
+.codigo-feedback--error {
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+}
+
+@media (max-width: 1024px) {
+  .join-grid {
+    grid-template-columns: 1fr;
+  }
+}

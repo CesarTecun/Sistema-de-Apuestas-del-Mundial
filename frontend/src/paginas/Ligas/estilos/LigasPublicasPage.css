@@ -1,0 +1,33 @@
+.publicas-card {
+  background: linear-gradient(135deg, rgba(26, 35, 4, 0.92), rgba(76, 92, 12, 0.82));
+  border-radius: 24px;
+  padding: 32px;
+  border: 1px solid rgba(227, 198, 72, 0.35);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45);
+  color: #f8fafc;
+}
+
+.publicas-filtros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.publicas-filtros input,
+.publicas-filtros select {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 14px;
+  background: rgba(10, 14, 38, 0.9);
+  color: #f8fafc;
+}
+
+.publicas-filtros .checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: rgba(248, 250, 252, 0.85);
+}

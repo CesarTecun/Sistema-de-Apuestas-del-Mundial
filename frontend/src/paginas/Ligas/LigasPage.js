@@ -32,7 +32,7 @@ const LigasPage = () => {
     filteredLigas,
     createLiga,
     updateLiga,
-    deleteLiga
+    deleteLiga,
   } = useLigas();
 
   const [showForm, setShowForm] = useState(false);
@@ -91,6 +91,7 @@ const LigasPage = () => {
     setEditingLiga(null);
     setShowForm(true);
   };
+
 
   const handleDeleteLiga = (ligaId) => {
     setAlertaConfirmacion({
@@ -241,6 +242,7 @@ const LigasPage = () => {
               onClose={() => setViewingLiga(null)}
               getEstadoColor={getEstadoColor}
             />
+
           </div>
         </div>
 

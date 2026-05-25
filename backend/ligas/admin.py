@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
 from django.utils import timezone
 
+from backend.usuarios.models import Usuario
 from .models import Liga, Invitacion, ParticipanteLiga, SolicitudParticipacion
 from .emails import enviar_correo_invitacion
 
@@ -67,7 +68,7 @@ class InvitacionAdmin(admin.ModelAdmin):
         }),
     )
     
-    actions = ['enviar_invitacion_email']
+    actions = ['enviar_invitacion_email', 'aceptar_invitaciones']
     
     @admin.action(description='Enviar invitación por correo')
     def enviar_invitacion_email(self, request, queryset):
@@ -125,6 +126,52 @@ class InvitacionAdmin(admin.ModelAdmin):
                     f'No se pudo enviar correo a {obj.email_invitado}: {exc}',
                     messages.ERROR
                 )
+
+    @admin.action(description='Aceptar invitaciones seleccionadas')
+    def aceptar_invitaciones(self, request, queryset):
+        aceptadas = sin_usuario = sin_cupo = ya_gestionadas = 0
+
+        for invitacion in queryset:
+            if invitacion.estado_invitacion != 'Pendiente':
+                ya_gestionadas += 1
+                continue
+
+            usuario_id = invitacion.fk_id_usuario_invitado
+
+            if not usuario_id and invitacion.email_invitado:
+                try:
+                    usuario = Usuario.objects.get(email__iexact=invitacion.email_invitado)
+                    usuario_id = usuario.id_usuario
+                except Usuario.DoesNotExist:
+                    sin_usuario += 1
+                    continue
+
+            if not usuario_id:
+                sin_usuario += 1
+                continue
+
+            try:
+                liga = Liga.objects.get(id_liga=invitacion.fk_id_liga)
+            except Liga.DoesNotExist:
+                continue
+
+            if not hay_cupo_disponible(liga):
+                sin_cupo += 1
+                continue
+
+            agregar_participante_a_liga(liga, usuario_id)
+            invitacion.estado_invitacion = 'Aceptada'
+            invitacion.save(update_fields=['estado_invitacion'])
+            aceptadas += 1
+
+        if aceptadas:
+            self.message_user(request, f'✅ {aceptadas} invitación(es) aceptada(s).', messages.SUCCESS)
+        if sin_usuario:
+            self.message_user(request, f'⚠️ {sin_usuario} invitación(es) sin usuario asociado.', messages.WARNING)
+        if sin_cupo:
+            self.message_user(request, f'⚠️ {sin_cupo} invitación(es) sin cupo disponible.', messages.WARNING)
+        if ya_gestionadas:
+            self.message_user(request, f'ℹ️ {ya_gestionadas} ya estaban gestionadas.', messages.INFO)
 
 
 @admin.register(SolicitudParticipacion)
