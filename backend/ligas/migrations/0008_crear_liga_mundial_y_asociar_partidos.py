@@ -47,6 +47,11 @@ def crear_liga_mundial_y_asociar_partidos(apps, schema_editor):
         else:
             total_existentes += 1
 
+        # Actualizar fk_id_liga del partido para que apunte a la liga mundial
+        if partido.fk_id_liga != liga_mundial.id_liga:
+            partido.fk_id_liga = liga_mundial.id_liga
+            partido.save(update_fields=['fk_id_liga'])
+
     print(
         f'[Migration] Partidos asociados a liga mundial: '
         f'{total_asociados} nuevos, {total_existentes} ya existentes, '

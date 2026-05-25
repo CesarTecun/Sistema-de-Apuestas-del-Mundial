@@ -26,7 +26,17 @@ def obtener_ligas_usuario_ids(usuario_id: int) -> Set[int]:
 
 
 def obtener_ligas_administradas_ids(usuario_id: int) -> Set[int]:
-    """IDs de las ligas donde el usuario es administrador (dueño)."""
-    return set(
+    """IDs de las ligas donde el usuario es administrador (dueño).
+    También incluye ligas públicas sin administrador, para que cualquier
+    usuario autenticado pueda gestionar sus partidos."""
+    admin_ids = set(
         Liga.objects.filter(fk_administrador=usuario_id).values_list('id_liga', flat=True)
     )
+    publicas_sin_admin = set(
+        Liga.objects.filter(
+            es_publica=True,
+            fk_administrador__isnull=True,
+            status=True
+        ).values_list('id_liga', flat=True)
+    )
+    return admin_ids | publicas_sin_admin
