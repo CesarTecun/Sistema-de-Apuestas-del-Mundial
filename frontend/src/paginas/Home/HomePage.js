@@ -162,6 +162,29 @@ const HomePage = () => {
           <div className="landing-card">
             <div className="landing-card-image">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
+            <h3 className="landing-card-title">Calendario</h3>
+            <p className="landing-card-text">Revisa todos los partidos por fecha y sus resultados en vivo</p>
+            <a
+              href="#calendario"
+              className="landing-card-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/calendario');
+              }}
+            >
+              Ver Calendario →
+            </a>
+          </div>
+
+          <div className="landing-card">
+            <div className="landing-card-image">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
                 <circle cx="12" cy="12" r="10"></circle>
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                 <path d="M2 12h20"></path>
@@ -169,8 +192,8 @@ const HomePage = () => {
             </div>
             <h3 className="landing-card-title">Selecciones</h3>
             <p className="landing-card-text">Gestiona las selecciones participantes del Mundial</p>
-            <a 
-              href="#selecciones" 
+            <a
+              href="#selecciones"
               className="landing-card-link"
               onClick={(e) => {
                 e.preventDefault();

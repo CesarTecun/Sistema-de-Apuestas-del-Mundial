@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../contextos/ContextoAutenticacion';
-import { API_ENDPOINTS, getAuthHeaders } from '../config/apiConfig';
+import { API_ENDPOINTS } from '../config/apiConfig';
 
 export const useLigas = () => {
   const { logout } = useAuth();
@@ -14,27 +15,16 @@ export const useLigas = () => {
   const cargarLigas = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_ENDPOINTS.LIGAS, {
-        headers: getAuthHeaders()
-      });
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          logout();
-          navigate('/login');
-          return;
-        }
-        if (response.status === 404) {
-          throw new Error('Endpoint no encontrado. El servidor puede no estar corriendo.');
-        }
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setLigas(data);
+      const response = await axios.get(API_ENDPOINTS.LIGAS);
+      setLigas(response.data);
       setError('');
     } catch (error) {
       console.error('Error al cargar ligas:', error);
+      if (error.response?.status === 401) {
+        logout();
+        navigate('/login');
+        return;
+      }
       setError('Error al cargar las ligas. Verifica que el backend esté corriendo.');
     } finally {
       setLoading(false);
@@ -43,94 +33,51 @@ export const useLigas = () => {
 
   const createLiga = async (ligaData) => {
     try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:8000/api/ligas/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(ligaData),
-      });
-
-      if (response.ok) {
-        const nuevaLiga = await response.json();
-        setLigas([...ligas, nuevaLiga]);
-        return { success: true };
-      } else {
-        if (response.status === 401) {
-          logout();
-          navigate('/login');
-          return { success: false, error: 'Sesión expirada' };
-        }
-        const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error al crear liga' };
-      }
+      const response = await axios.post(API_ENDPOINTS.LIGAS, ligaData);
+      setLigas([...ligas, response.data]);
+      return { success: true };
     } catch (err) {
       console.error('Error al crear liga:', err);
-      return { success: false, error: 'Error de conexión' };
+      if (err.response?.status === 401) {
+        logout();
+        navigate('/login');
+        return { success: false, error: 'Sesión expirada' };
+      }
+      return { success: false, error: 'Error al crear liga' };
     }
   };
 
   const updateLiga = async (ligaId, ligaData) => {
     try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch(`http://localhost:8000/api/ligas/${ligaId}/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(ligaData),
-      });
-
-      if (response.ok) {
-        const ligaActualizada = await response.json();
-        setLigas(ligas.map(liga => 
-          liga.id_liga === ligaActualizada.id_liga ? ligaActualizada : liga
-        ));
-        return { success: true };
-      } else {
-        if (response.status === 401) {
-          logout();
-          navigate('/login');
-          return { success: false, error: 'Sesión expirada' };
-        }
-        const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error al actualizar liga' };
-      }
+      const response = await axios.put(`${API_ENDPOINTS.LIGAS}${ligaId}/`, ligaData);
+      setLigas(ligas.map(liga => 
+        liga.id_liga === response.data.id_liga ? response.data : liga
+      ));
+      return { success: true };
     } catch (err) {
       console.error('Error al actualizar liga:', err);
-      return { success: false, error: 'Error de conexión' };
+      if (err.response?.status === 401) {
+        logout();
+        navigate('/login');
+        return { success: false, error: 'Sesión expirada' };
+      }
+      return { success: false, error: 'Error al actualizar liga' };
     }
   };
 
   const deleteLiga = async (ligaId) => {
     try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch(`http://localhost:8000/api/ligas/${ligaId}/`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        setLigas(ligas.filter(liga => liga.id_liga !== ligaId));
-        return { success: true };
-      } else {
-        if (response.status === 401) {
-          logout();
-          navigate('/login');
-          return { success: false, error: 'Sesión expirada' };
-        }
-        const errorData = await response.json();
-        return { success: false, error: errorData.message || 'Error al eliminar liga' };
-      }
+      await axios.delete(`${API_ENDPOINTS.LIGAS}${ligaId}/`);
+      setLigas(ligas.filter(liga => liga.id_liga !== ligaId));
+      return { success: true };
     } catch (err) {
       console.error('Error al eliminar liga:', err);
-      return { success: false, error: 'Error de conexión' };
+      if (err.response?.status === 401) {
+        logout();
+        navigate('/login');
+        return { success: false, error: 'Sesión expirada' };
+      }
+      return { success: false, error: 'Error al eliminar liga' };
     }
   };
 

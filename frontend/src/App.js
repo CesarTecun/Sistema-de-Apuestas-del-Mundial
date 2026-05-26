@@ -11,8 +11,10 @@ import SeleccionesPage from './paginas/Selecciones';
 import JugadoresSeleccionPage from './paginas/Selecciones/JugadoresSeleccionPage';
 import HomePage from './paginas/Home/HomePage';
 import MarcadorPage from './paginas/Marcador';
+import { CalendarioPage } from './paginas/Calendario';
 import RutaProtegida from './componentes/RutaProtegida';
 import PageTransition from './componentes/PageTransition';
+import NotificacionesProvider from './componentes/NotificacionesProvider';
 import './App.css';
 
 // Componente que aplica el tema automáticamente al cargar
@@ -110,6 +112,11 @@ function ContenidoApp() {
           <MarcadorPage />
         </RutaProtegida>
       } />
+      <Route path="/calendario" element={
+        <RutaProtegida>
+          <CalendarioPage />
+        </RutaProtegida>
+      } />
       <Route
         path="/"
         element={<Navigate to={isAuthenticated ? "/home" : "/login"} replace />}
@@ -131,12 +138,14 @@ function App() {
   return (
     <ModulosColorProvider>
       <ProveedorAutenticacion>
-        <Router>
-          <div className="App">
-            <ThemeInitializer />
-            <AppWithRouter />
-          </div>
-        </Router>
+        <NotificacionesProvider>
+          <Router>
+            <div className="App">
+              <ThemeInitializer />
+              <AppWithRouter />
+            </div>
+          </Router>
+        </NotificacionesProvider>
       </ProveedorAutenticacion>
     </ModulosColorProvider>
   );

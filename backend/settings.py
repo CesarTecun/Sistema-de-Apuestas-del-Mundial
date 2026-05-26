@@ -27,6 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver', 'host.docker.internal']
 
+# Idioma y localización
+LANGUAGE_CODE = 'es'
+USE_I18N = True
+USE_L10N = True
+
 
 # Application definition
 
