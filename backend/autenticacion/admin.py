@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.contrib import admin, messages
 from django.utils import timezone
 
-from .models import PasswordResetToken, EmailVerificationToken
+from .models import PasswordResetToken
 from .emails import enviar_correo_recuperacion
 
 
@@ -74,17 +74,3 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
             )
 
 
-@admin.register(EmailVerificationToken)
-class EmailVerificationTokenAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'usuario',
-        'token_hash',
-        'created_at',
-        'expires_at',
-        'used_at',
-        'is_active',
-    )
-    list_filter = ('created_at', 'expires_at', 'used_at')
-    search_fields = ('token_hash', 'usuario__email')
-    readonly_fields = ('token_hash', 'created_at', 'used_at')

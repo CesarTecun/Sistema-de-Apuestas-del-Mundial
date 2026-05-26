@@ -1,28 +1,51 @@
 from django.urls import path
+
 from .views import (
+
     RegisterView,
+
     LoginView,
+
     LogoutView,
+
     UserProfileView,
+
     CheckAuthView,
+
     SesionesActivasView,
+
     CerrarSesionView,
+
     PasswordResetRequestView,
+
     PasswordResetConfirmView,
+
     ChangePasswordView,
-    EmailVerificationView,
+
 )
 
+
+
 urlpatterns = [
+
     path('register/', RegisterView.as_view(), name='register'),
+
     path('login/', LoginView.as_view(), name='login'),
+
     path('logout/', LogoutView.as_view(), name='logout'),
+
     path('profile/', UserProfileView.as_view(), name='profile'),
+
     path('check/', CheckAuthView.as_view(), name='check-auth'),
+
     path('sesiones/', SesionesActivasView.as_view(), name='sesiones-activas'),
+
     path('sesiones/<int:sesion_id>/cerrar/', CerrarSesionView.as_view(), name='cerrar-sesion'),
+
     path('password/reset/', PasswordResetRequestView.as_view(), name='password-reset-request'),
+
     path('password/reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
+
     path('password/change/', ChangePasswordView.as_view(), name='password-change'),
-    path('verify-email/', EmailVerificationView.as_view(), name='verify-email'),
 ]
+

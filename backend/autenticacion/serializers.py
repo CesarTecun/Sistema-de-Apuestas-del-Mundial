@@ -10,7 +10,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from backend.usuarios.models import Usuario
-from backend.autenticacion.models import PasswordResetToken, EmailVerificationToken
+from backend.autenticacion.models import PasswordResetToken
 from .utils import generar_tokens_y_sesion, cerrar_todas_las_sesiones_usuario
 
 
@@ -107,8 +107,6 @@ class LoginSerializer(serializers.Serializer):
             if user:
                 if not user.is_active:
                     raise serializers.ValidationError("Usuario inactivo.")
-                if not user.email_verificado:
-                    raise serializers.ValidationError("Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.")
                 data['user'] = user
             else:
                 raise serializers.ValidationError("Credenciales inválidas.")
@@ -221,27 +219,4 @@ class ChangePasswordSerializer(serializers.Serializer):
         return user
 
 
-class EmailVerificationSerializer(serializers.Serializer):
-    """Serializer para verificación de email tras registro."""
-    token = serializers.CharField(required=True)
 
-    def validate(self, attrs):
-        token_hash = hashlib.sha256(attrs['token'].encode()).hexdigest()
-        try:
-            token_obj = EmailVerificationToken.objects.get(token_hash=token_hash)
-        except EmailVerificationToken.DoesNotExist:
-            raise serializers.ValidationError({'token': 'Token inválido o expirado.'})
-
-        if not token_obj.is_active:
-            raise serializers.ValidationError({'token': 'Token inválido o expirado.'})
-
-        self.context['token_obj'] = token_obj
-        return attrs
-
-    def save(self, **kwargs):
-        token_obj = self.context['token_obj']
-        usuario = token_obj.usuario
-        usuario.email_verificado = True
-        usuario.save(update_fields=['email_verificado'])
-        token_obj.mark_used()
-        return usuario

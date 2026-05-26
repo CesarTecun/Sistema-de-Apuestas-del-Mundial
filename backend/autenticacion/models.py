@@ -76,28 +76,3 @@ class PasswordResetToken(models.Model):
         self.save(update_fields=['used_at'])
 
 
-class EmailVerificationToken(models.Model):
-    """Tokens de verificación de email enviados al registrarse."""
-    usuario = models.ForeignKey(
-        'usuarios.Usuario',
-        on_delete=models.CASCADE,
-        related_name='email_verification_tokens'
-    )
-    token_hash = models.CharField(max_length=64, unique=True, db_index=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
-    used_at = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        db_table = 'email_verification_token'
-        ordering = ['-created_at']
-
-    @property
-    def is_active(self):
-        from django.utils import timezone
-        return self.used_at is None and timezone.now() <= self.expires_at
-
-    def mark_used(self):
-        from django.utils import timezone
-        self.used_at = timezone.now()
-        self.save(update_fields=['used_at'])

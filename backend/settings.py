@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'backend.premios',        # App de premios
     'backend.historialganador',  # App de historial de ganadores
     'backend.core',           # App para modelos de tablas sin modelo previo
+    'backend.seguridad',      # App de seguridad OWASP
 ]
 
 MIDDLEWARE = [
@@ -73,7 +74,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / 'backend' / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

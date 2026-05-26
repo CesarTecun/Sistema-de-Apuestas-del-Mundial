@@ -1,0 +1,16 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:6px;padding:16px;margin-bottom:20px;">
+  <h2 style="margin-top:0;color:#856404;">Como usar las herramientas OWASP</h2>
+  <p style="margin-bottom:8px;"><strong>No agregues datos manualmente</strong> en los modelos de abajo (Auditorias, Vulnerabilidades, etc.).</p>
+  <p style="margin-bottom:8px;">Esos modelos se llenan <strong>automaticamente</strong> al ejecutar los escaneos desde el Panel OWASP.</p>
+  <p style="margin-bottom:0;">
+    <a class="button" style="padding:10px 18px;background:#417690;color:#fff;text-decoration:none;border-radius:4px;font-size:1rem;" href="{% url 'admin:seguridad-panel' %}">
+      Abrir Panel OWASP
+    </a>
+  </p>
+</div>
+{{ block.super }}
+{% endblock %}

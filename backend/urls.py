@@ -74,4 +74,6 @@ urlpatterns = [
     # JWT endpoints
     path('api/token/', SessionTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # Seguridad OWASP
+    path('api/seguridad/', include('backend.seguridad.urls')),
 ]
