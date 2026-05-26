@@ -178,6 +178,8 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
+    ] if DEBUG else [
+        'rest_framework.renderers.JSONRenderer',
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
@@ -260,3 +262,17 @@ SERVER_EMAIL = 'quinielachechas@gmail.com'
 # =============================================================================
 MARCADOR_SERVICE_URL = os.getenv('MARCADOR_SERVICE_URL', 'http://localhost:8001')
 MARCADOR_SERVICE_TIMEOUT = int(os.getenv('MARCADOR_SERVICE_TIMEOUT', '5'))
+
+# =============================================================================
+# CONFIGURACIÓN DE SEGURIDAD HTTPS/HSTS/COOKIES (OWASP A03)
+# =============================================================================
+# Estas opciones se activan automáticamente cuando DEBUG=False (producción)
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG

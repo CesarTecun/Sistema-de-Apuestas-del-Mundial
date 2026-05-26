@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -11,6 +12,33 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from backend.usuarios.models import Usuario
 from backend.autenticacion.models import PasswordResetToken, EmailVerificationToken
 from .utils import generar_tokens_y_sesion, cerrar_todas_las_sesiones_usuario
+
+
+def validar_contrasena(password, user=None):
+    """Validador de contraseña con mensajes de error localizados."""
+    try:
+        validate_password(password, user)
+    except DjangoValidationError as exc:
+        mensajes_localizados = []
+        for msg in exc.messages:
+            if 'too common' in msg.lower():
+                mensajes_localizados.append('Contraseña muy común. Elige una más segura.')
+            elif 'too short' in msg.lower():
+                import re
+                match = re.search(r'(\d+)', msg)
+                if match:
+                    mensajes_localizados.append(
+                        f'La contraseña es muy corta. Debe contener al menos {match.group(1)} caracteres.'
+                    )
+                else:
+                    mensajes_localizados.append('La contraseña es muy corta.')
+            elif 'too similar' in msg.lower():
+                mensajes_localizados.append('La contraseña es muy similar a tus datos personales.')
+            elif 'entirely numeric' in msg.lower():
+                mensajes_localizados.append('La contraseña no puede ser completamente numérica.')
+            else:
+                mensajes_localizados.append(msg)
+        raise DjangoValidationError(mensajes_localizados)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -30,7 +58,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
         required=True,
-        validators=[validate_password]
+        validators=[validar_contrasena]
     )
     password2 = serializers.CharField(write_only=True, required=False)
 
@@ -133,7 +161,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     token = serializers.CharField()
-    password = serializers.CharField(write_only=True, validators=[validate_password])
+    password = serializers.CharField(write_only=True, validators=[validar_contrasena])
     password2 = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
@@ -170,7 +198,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 class ChangePasswordSerializer(serializers.Serializer):
     """Serializer para cambio de contraseña desde el perfil autenticado."""
     old_password = serializers.CharField(required=True, write_only=True)
-    new_password = serializers.CharField(required=True, write_only=True, validators=[validate_password])
+    new_password = serializers.CharField(required=True, write_only=True, validators=[validar_contrasena])
     new_password2 = serializers.CharField(required=True, write_only=True)
 
     def validate(self, attrs):
