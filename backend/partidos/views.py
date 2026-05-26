@@ -27,7 +27,11 @@ class JugadorViewSet(SoftDeleteModelViewSet):
         queryset = super().get_queryset()
         seleccion_id = self.request.query_params.get('fk_id_seleccion')
         if seleccion_id is not None:
-            queryset = queryset.filter(fk_id_seleccion=seleccion_id)
+            try:
+                seleccion_id = int(seleccion_id)
+                queryset = queryset.filter(fk_id_seleccion=seleccion_id)
+            except ValueError:
+                return queryset.none()
         return queryset
 
 
@@ -202,9 +206,15 @@ def actualizar_resultado(request, pk):
         resultado = request.data.get('resultado')
 
         if gol_local is not None:
-            partido.gol_local = int(gol_local)
+            try:
+                partido.gol_local = int(gol_local)
+            except ValueError:
+                return Response({'error': 'gol_local debe ser un número entero'}, status=status.HTTP_400_BAD_REQUEST)
         if gol_visitante is not None:
-            partido.gol_visitante = int(gol_visitante)
+            try:
+                partido.gol_visitante = int(gol_visitante)
+            except ValueError:
+                return Response({'error': 'gol_visitante debe ser un número entero'}, status=status.HTTP_400_BAD_REQUEST)
         if resultado is not None:
             partido.resultado = resultado
 
@@ -327,7 +337,15 @@ def generar_bracket(request):
         if 'horario' in item and isinstance(item['horario'], str):
             item['horario'] = parse_datetime(item['horario'])
 
-    resultado = generar_cruces_eliminatoria(int(liga_id), octavos_data)
+    try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    resultado = generar_cruces_eliminatoria(liga_id_int, octavos_data)
     if 'error' in resultado:
         return Response(resultado, status=status.HTTP_400_BAD_REQUEST)
 

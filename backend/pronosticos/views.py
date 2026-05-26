@@ -50,9 +50,17 @@ class PronosticoViewSet(SoftDeleteModelViewSet):
         partido_id = self.request.query_params.get('partido_id')
 
         if liga_id:
-            queryset = queryset.filter(fk_id_liga=liga_id)
+            try:
+                liga_id = int(liga_id)
+                queryset = queryset.filter(fk_id_liga=liga_id)
+            except ValueError:
+                return queryset.none()
         if partido_id:
-            queryset = queryset.filter(fk_id_partido=partido_id)
+            try:
+                partido_id = int(partido_id)
+                queryset = queryset.filter(fk_id_partido=partido_id)
+            except ValueError:
+                return queryset.none()
 
         return queryset
 
@@ -135,7 +143,12 @@ def pronosticos_por_usuario(request):
     if not usuario_id:
         return Response({'error': 'Se requiere el ID del usuario'}, status=status.HTTP_400_BAD_REQUEST)
     
-    pronosticos = Pronostico.objects.filter(fk_id_usuario=usuario_id)
+    try:
+        usuario_id_int = int(usuario_id)
+    except ValueError:
+        return Response({'error': 'usuario_id debe ser numérico'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    pronosticos = Pronostico.objects.filter(fk_id_usuario=usuario_id_int)
     serializer = PronosticoSerializer(pronosticos, many=True)
     return Response(serializer.data)
 
@@ -147,7 +160,12 @@ def pronosticos_por_liga(request):
     if not liga_id:
         return Response({'error': 'Se requiere el ID de la liga'}, status=status.HTTP_400_BAD_REQUEST)
     
-    pronosticos = Pronostico.objects.filter(fk_id_liga=liga_id)
+    try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response({'error': 'liga_id debe ser numérico'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    pronosticos = Pronostico.objects.filter(fk_id_liga=liga_id_int)
     serializer = PronosticoSerializer(pronosticos, many=True)
     return Response(serializer.data)
 
@@ -159,7 +177,12 @@ def pronosticos_por_partido(request):
     if not partido_id:
         return Response({'error': 'Se requiere el ID del partido'}, status=status.HTTP_400_BAD_REQUEST)
     
-    pronosticos = Pronostico.objects.filter(fk_id_partido=partido_id)
+    try:
+        partido_id_int = int(partido_id)
+    except ValueError:
+        return Response({'error': 'partido_id debe ser numérico'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    pronosticos = Pronostico.objects.filter(fk_id_partido=partido_id_int)
     serializer = PronosticoSerializer(pronosticos, many=True)
     return Response(serializer.data)
 
@@ -176,9 +199,18 @@ def pronosticos_usuario_liga(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    try:
+        usuario_id_int = int(usuario_id)
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'Los IDs deben ser numéricos'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
     pronosticos = Pronostico.objects.filter(
-        fk_id_usuario=usuario_id,
-        fk_id_liga=liga_id
+        fk_id_usuario=usuario_id_int,
+        fk_id_liga=liga_id_int
     )
     serializer = PronosticoSerializer(pronosticos, many=True)
     return Response(serializer.data)
@@ -197,10 +229,20 @@ def verificar_pronostico_disponible(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    try:
+        usuario_id_int = int(usuario_id)
+        partido_id_int = int(partido_id)
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'Los IDs deben ser numéricos'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
     existe = Pronostico.objects.filter(
-        fk_id_usuario=usuario_id,
-        fk_id_partido=partido_id,
-        fk_id_liga=liga_id
+        fk_id_usuario=usuario_id_int,
+        fk_id_partido=partido_id_int,
+        fk_id_liga=liga_id_int
     ).exists()
     
     return Response({
