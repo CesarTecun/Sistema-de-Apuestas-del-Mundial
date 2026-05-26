@@ -5,7 +5,7 @@ import './estilos/HomePage.css';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -66,6 +66,15 @@ const HomePage = () => {
               </svg>
             </a>
           </div>
+          {user?.fk_rol === 1 && (
+            <button
+              className="landing-menu-button"
+              onClick={() => navigate('/admin')}
+              style={{ background: 'linear-gradient(135deg, #a83279 0%, #6a4c93 100%)', color: 'white', border: 'none' }}
+            >
+              ADMIN
+            </button>
+          )}
           <button className="landing-menu-button">MENÚ</button>
           <button 
             className="landing-hamburger"

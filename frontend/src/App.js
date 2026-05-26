@@ -11,7 +11,8 @@ import SeleccionesPage from './paginas/Selecciones';
 import JugadoresSeleccionPage from './paginas/Selecciones/JugadoresSeleccionPage';
 import HomePage from './paginas/Home/HomePage';
 import MarcadorPage from './paginas/Marcador';
-import { CalendarioPage } from './paginas/Calendario';
+import CalendarioPage from './paginas/Calendario/CalendarioPage';
+import AdminPage from './paginas/Admin/AdminPage';
 import RutaProtegida from './componentes/RutaProtegida';
 import PageTransition from './componentes/PageTransition';
 import NotificacionesProvider from './componentes/NotificacionesProvider';
@@ -115,6 +116,11 @@ function ContenidoApp() {
       <Route path="/calendario" element={
         <RutaProtegida>
           <CalendarioPage />
+        </RutaProtegida>
+      } />
+      <Route path="/admin" element={
+        <RutaProtegida>
+          <AdminPage />
         </RutaProtegida>
       } />
       <Route

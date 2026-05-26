@@ -1,1 +1,4 @@
-export { default as CalendarioPage } from './CalendarioPage';
+import CalendarioPage from './CalendarioPage';
+
+export { CalendarioPage };
+export default CalendarioPage;

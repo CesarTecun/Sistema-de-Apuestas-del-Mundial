@@ -23,6 +23,7 @@ from .serializers import (
 from .utils import cerrar_sesion_usuario, obtener_sesiones_activas, generar_tokens_y_sesion
 from .models import SesionUsuario
 from .emails import enviar_correo_recuperacion
+from backend.utils.bitacora import registrar_bitacora
 
 
 
@@ -47,6 +48,7 @@ class RegisterView(APIView):
         if serializer.is_valid():
 
             user = serializer.save()
+            registrar_bitacora(user.id_usuario, f'Registro de nuevo usuario: {user.email}')
 
             return Response({
 
@@ -72,7 +74,8 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data['user']
             refresh, access, sesion = generar_tokens_y_sesion(user, request)
-            
+            registrar_bitacora(user.id_usuario, f'Inicio de sesión: {user.email}')
+
             # Preparar respuesta con info de sesión
             response_data = {
                 'message': 'Login exitoso',
@@ -104,9 +107,11 @@ class LogoutView(APIView):
     def post(self, request):
         refresh_token = request.data.get('refresh')
 
+        registrar_bitacora(request.user.id_usuario, f'Cierre de sesión: {request.user.email}')
+
         # Cerrar sesión en base de datos (marca todas las sesiones activas del usuario)
         cerrar_sesion_usuario(request, refresh_token=refresh_token)
-        
+
         # Logout de Django
         logout(request)
 

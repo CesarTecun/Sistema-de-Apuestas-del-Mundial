@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from backend.utils.permissions import EsAdministrador
 from .models import Sede, FaseGrupo, Bitacora, AuditLog, ConfiguracionTorneo
 from .serializers import (
     SedeSerializer, FaseGrupoSerializer,
@@ -41,7 +42,7 @@ def sedes_lista(request):
 class BitacoraViewSet(viewsets.ReadOnlyModelViewSet):
     """Lista entradas de bitácora. Solo administradores."""
     serializer_class = BitacoraSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [EsAdministrador]
 
     def get_queryset(self):
         qs = Bitacora.objects.all()
@@ -57,7 +58,7 @@ class BitacoraViewSet(viewsets.ReadOnlyModelViewSet):
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     """Lista entradas del log de auditoría. Solo administradores."""
     serializer_class = AuditLogSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [EsAdministrador]
 
     def get_queryset(self):
         qs = AuditLog.objects.all()
@@ -76,7 +77,7 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ConfiguracionTorneoView(APIView):
     """GET/PUT de la configuración global del torneo. Solo administradores."""
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [EsAdministrador]
 
     def get(self, request):
         config = ConfiguracionTorneo.get_config()
@@ -95,7 +96,7 @@ class ConfiguracionTorneoView(APIView):
 # ──────────────────────────────────────────────
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAdminUser])
+@permission_classes([EsAdministrador])
 def reporte_resumen(request):
     """Resumen global del sistema para el dashboard administrativo."""
     from backend.usuarios.models import Usuario
