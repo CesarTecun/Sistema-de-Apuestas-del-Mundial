@@ -30,6 +30,7 @@ class Usuario(SoftDeleteModel):
     email = models.CharField(unique=True, max_length=100, db_index=True)
     telefono = models.IntegerField(blank=True, null=True)
     contrasena = models.CharField(max_length=255)
+    email_verificado = models.BooleanField(default=False)
     fk_rol = models.IntegerField(blank=True, null=True, db_index=True)
 
     objects = UsuarioManager()

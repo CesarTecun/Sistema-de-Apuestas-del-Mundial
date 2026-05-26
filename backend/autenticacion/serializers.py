@@ -1,3 +1,4 @@
+import hashlib
 import secrets
 from datetime import timedelta
 
@@ -8,8 +9,8 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from backend.usuarios.models import Usuario
-from backend.autenticacion.models import PasswordResetToken
-from .utils import generar_tokens_y_sesion
+from backend.autenticacion.models import PasswordResetToken, EmailVerificationToken
+from .utils import generar_tokens_y_sesion, cerrar_todas_las_sesiones_usuario
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -76,10 +77,11 @@ class LoginSerializer(serializers.Serializer):
             # Usar authenticate con email como username
             user = authenticate(request=self.context.get('request'), username=email, password=password)
             if user:
-                if user.is_active:
-                    data['user'] = user
-                else:
+                if not user.is_active:
                     raise serializers.ValidationError("Usuario inactivo.")
+                if not user.email_verificado:
+                    raise serializers.ValidationError("Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.")
+                data['user'] = user
             else:
                 raise serializers.ValidationError("Credenciales inválidas.")
         else:
@@ -116,15 +118,17 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         try:
             usuario = Usuario.objects.get(email=email)
         except Usuario.DoesNotExist:
-            return None
+            return None, None
 
-        token = secrets.token_hex(32)
+        token_plano = secrets.token_hex(32)
+        token_hash = hashlib.sha256(token_plano.encode()).hexdigest()
         expires_at = timezone.now() + timedelta(hours=24)
-        return PasswordResetToken.objects.create(
+        token_obj = PasswordResetToken.objects.create(
             usuario=usuario,
-            token=token,
+            token_hash=token_hash,
             expires_at=expires_at
         )
+        return token_obj, token_plano
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
@@ -136,8 +140,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({'password': 'Las contraseñas no coinciden.'})
 
+        token_hash = hashlib.sha256(attrs['token'].encode()).hexdigest()
         try:
-            token_obj = PasswordResetToken.objects.get(token=attrs['token'])
+            token_obj = PasswordResetToken.objects.get(token_hash=token_hash)
         except PasswordResetToken.DoesNotExist:
             raise serializers.ValidationError({'token': 'Token inválido o expirado.'})
 
@@ -154,5 +159,61 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
         usuario.set_password(password)
         usuario.save(update_fields=['contrasena'])
+        token_obj.mark_used()
+
+        # Invalidar todas las sesiones activas del usuario tras cambiar contraseña
+        cerrar_todas_las_sesiones_usuario(usuario.id_usuario)
+
+        return usuario
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """Serializer para cambio de contraseña desde el perfil autenticado."""
+    old_password = serializers.CharField(required=True, write_only=True)
+    new_password = serializers.CharField(required=True, write_only=True, validators=[validate_password])
+    new_password2 = serializers.CharField(required=True, write_only=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['new_password2']:
+            raise serializers.ValidationError({'new_password': 'Las contraseñas no coinciden.'})
+        return attrs
+
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("La contraseña actual es incorrecta.")
+        return value
+
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save(update_fields=['contrasena'])
+        # Invalidar todas las sesiones activas del usuario
+        cerrar_todas_las_sesiones_usuario(user.id_usuario)
+        return user
+
+
+class EmailVerificationSerializer(serializers.Serializer):
+    """Serializer para verificación de email tras registro."""
+    token = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        token_hash = hashlib.sha256(attrs['token'].encode()).hexdigest()
+        try:
+            token_obj = EmailVerificationToken.objects.get(token_hash=token_hash)
+        except EmailVerificationToken.DoesNotExist:
+            raise serializers.ValidationError({'token': 'Token inválido o expirado.'})
+
+        if not token_obj.is_active:
+            raise serializers.ValidationError({'token': 'Token inválido o expirado.'})
+
+        self.context['token_obj'] = token_obj
+        return attrs
+
+    def save(self, **kwargs):
+        token_obj = self.context['token_obj']
+        usuario = token_obj.usuario
+        usuario.email_verificado = True
+        usuario.save(update_fields=['email_verificado'])
         token_obj.mark_used()
         return usuario

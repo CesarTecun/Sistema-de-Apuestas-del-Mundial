@@ -156,6 +156,43 @@ def obtener_sesiones_activas(usuario_id):
     ).order_by('-fecha_ultima_actividad')
 
 
+def cerrar_todas_las_sesiones_usuario(usuario_id, excepto_token_sesion=None):
+    """
+    Cierra todas las sesiones activas de un usuario.
+    Se usa tras cambio/recuperación de contraseña para invalidar tokens JWT previos.
+
+    Args:
+        usuario_id: ID del usuario
+        excepto_token_sesion: Opcional, token de sesión a preservar (ej. sesión actual)
+    """
+    queryset = SesionUsuario.objects.filter(
+        fk_id_usuario=usuario_id,
+        estado_sesion='Activa'
+    )
+    if excepto_token_sesion:
+        queryset = queryset.exclude(token_sesion=excepto_token_sesion)
+
+    queryset.update(
+        estado_sesion='Cerrada',
+        fecha_cierre=timezone.now()
+    )
+
+
+def _limitar_sesiones_concurrentes(usuario_id, max_sesiones=3):
+    """
+    Si un usuario excede el límite de sesiones activas, cierra la más antigua.
+    """
+    sesiones = SesionUsuario.objects.filter(
+        fk_id_usuario=usuario_id,
+        estado_sesion='Activa'
+    ).order_by('fecha_ultima_actividad')
+
+    while sesiones.count() > max_sesiones:
+        sesion_antigua = sesiones.first()
+        if sesion_antigua:
+            sesion_antigua.cerrar_sesion()
+
+
 def _get_ip_address(request):
     """Obtiene la IP del request."""
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -193,6 +230,9 @@ def _build_token_value(refresh_token: str | None) -> str:
 
 def generar_tokens_y_sesion(usuario, request):
     """Genera tokens JWT y registra la sesión asociada."""
+    # Limitar sesiones concurrentes antes de crear una nueva
+    _limitar_sesiones_concurrentes(usuario.id_usuario, max_sesiones=3)
+
     refresh_obj = RefreshToken.for_user(usuario)
     refresh = str(refresh_obj)
     access = str(refresh_obj.access_token)

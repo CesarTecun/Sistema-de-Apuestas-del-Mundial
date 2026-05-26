@@ -9,6 +9,8 @@ from .views import (
     CerrarSesionView,
     PasswordResetRequestView,
     PasswordResetConfirmView,
+    ChangePasswordView,
+    EmailVerificationView,
 )
 
 urlpatterns = [
@@ -21,4 +23,6 @@ urlpatterns = [
     path('sesiones/<int:sesion_id>/cerrar/', CerrarSesionView.as_view(), name='cerrar-sesion'),
     path('password/reset/', PasswordResetRequestView.as_view(), name='password-reset-request'),
     path('password/reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
+    path('password/change/', ChangePasswordView.as_view(), name='password-change'),
+    path('verify-email/', EmailVerificationView.as_view(), name='verify-email'),
 ]

@@ -6,10 +6,14 @@ from rest_framework.response import Response
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
 
 from django.contrib.auth import logout, get_user_model
 from django.utils import timezone
-
+import hashlib
+import secrets
+from datetime import timedelta
 
 
 from .serializers import (
@@ -19,10 +23,12 @@ from .serializers import (
     SessionTokenObtainPairSerializer,
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
+    ChangePasswordSerializer,
+    EmailVerificationSerializer,
 )
 from .utils import cerrar_sesion_usuario, obtener_sesiones_activas, generar_tokens_y_sesion
-from .models import SesionUsuario
-from .emails import enviar_correo_recuperacion
+from .models import SesionUsuario, EmailVerificationToken
+from .emails import enviar_correo_recuperacion, enviar_correo_verificacion
 from backend.utils.bitacora import registrar_bitacora
 
 
@@ -34,28 +40,29 @@ User = get_user_model()
 
 
 class RegisterView(APIView):
-
-    """Vista para registro de nuevos usuarios"""
-
+    """Vista para registro de nuevos usuarios con verificación de email."""
     permission_classes = [AllowAny]
 
-
-
     def post(self, request):
-
         serializer = RegisterSerializer(data=request.data)
 
         if serializer.is_valid():
-
             user = serializer.save()
             registrar_bitacora(user.id_usuario, f'Registro de nuevo usuario: {user.email}')
 
+            # Generar token de verificación de email (hash en BD)
+            token_plano = secrets.token_hex(32)
+            token_hash = hashlib.sha256(token_plano.encode()).hexdigest()
+            EmailVerificationToken.objects.create(
+                usuario=user,
+                token_hash=token_hash,
+                expires_at=timezone.now() + timedelta(hours=24)
+            )
+            enviar_correo_verificacion(user, token_plano)
+
             return Response({
-
-                'message': 'Usuario creado exitosamente',
-
+                'message': 'Usuario creado exitosamente. Revisa tu email para activar tu cuenta.',
                 'user': UserSerializer(user).data
-
             }, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -68,7 +75,14 @@ class LoginView(APIView):
     """Vista para login de usuarios con seguimiento de sesión"""
     permission_classes = [AllowAny]
 
+    @method_decorator(ratelimit(key='ip', rate='5/5m', method='POST', block=False))
     def post(self, request):
+        if getattr(request, 'limited', False):
+            return Response(
+                {'detail': 'Demasiados intentos fallidos de inicio de sesión. Por favor, inténtalo de nuevo más tarde.'},
+                status=status.HTTP_429_TOO_MANY_REQUESTS
+            )
+
         serializer = LoginSerializer(data=request.data)
         
         if serializer.is_valid():
@@ -249,13 +263,20 @@ class CerrarSesionView(APIView):
 class PasswordResetRequestView(APIView):
     permission_classes = [AllowAny]
 
+    @method_decorator(ratelimit(key='ip', rate='3/10m', method='POST', block=False))
     def post(self, request):
+        if getattr(request, 'limited', False):
+            return Response(
+                {'detail': 'Demasiados intentos de recuperación de contraseña. Por favor, inténtalo de nuevo más tarde.'},
+                status=status.HTTP_429_TOO_MANY_REQUESTS
+            )
+
         serializer = PasswordResetRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        token_obj = serializer.save()
+        token_obj, token_plano = serializer.save()
 
         if token_obj:
-            enviar_correo_recuperacion(token_obj)
+            enviar_correo_recuperacion(token_obj.usuario, token_plano)
 
         return Response({
             'message': 'Si el correo existe, recibirás instrucciones para restablecer la contraseña.'
@@ -270,6 +291,34 @@ class PasswordResetConfirmView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'message': 'Contraseña actualizada correctamente.'})
+
+
+class ChangePasswordView(APIView):
+    """Vista para cambiar contraseña del usuario autenticado."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'Contraseña actualizada correctamente. Todas tus sesiones han sido cerradas.'
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EmailVerificationView(APIView):
+    """Vista para verificar el email tras registro mediante token."""
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = EmailVerificationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'Email verificado correctamente. Ya puedes iniciar sesión.'
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SessionTokenObtainPairView(TokenObtainPairView):

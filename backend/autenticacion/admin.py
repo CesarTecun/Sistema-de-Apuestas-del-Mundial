@@ -1,6 +1,10 @@
+import hashlib
+import secrets
+from datetime import timedelta
 from django.contrib import admin, messages
+from django.utils import timezone
 
-from .models import PasswordResetToken
+from .models import PasswordResetToken, EmailVerificationToken
 from .emails import enviar_correo_recuperacion
 
 
@@ -9,15 +13,15 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'usuario',
-        'token',
+        'token_hash',
         'created_at',
         'expires_at',
         'used_at',
         'is_active',
     )
     list_filter = ('created_at', 'expires_at', 'used_at')
-    search_fields = ('token', 'usuario__email')
-    readonly_fields = ('token', 'created_at', 'used_at')
+    search_fields = ('token_hash', 'usuario__email')
+    readonly_fields = ('token_hash', 'created_at', 'used_at')
     actions = ('reenviar_correo_recuperacion',)
 
     def save_model(self, request, obj, form, change):
@@ -25,7 +29,12 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
 
         if not change and obj.is_active:
             try:
-                enviar_correo_recuperacion(obj)
+                # Generar token plano temporal para enviar correo
+                token_plano = secrets.token_hex(32)
+                # Actualizar el hash en el objeto
+                obj.token_hash = hashlib.sha256(token_plano.encode()).hexdigest()
+                obj.save(update_fields=['token_hash'])
+                enviar_correo_recuperacion(obj.usuario, token_plano)
                 self.message_user(
                     request,
                     'Se envió el correo de recuperación al crear el token.',
@@ -43,7 +52,12 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
         enviados = 0
         for token in queryset:
             if token.is_active:
-                enviar_correo_recuperacion(token)
+                # Generar nuevo token y actualizar hash
+                token_plano = secrets.token_hex(32)
+                token.token_hash = hashlib.sha256(token_plano.encode()).hexdigest()
+                token.expires_at = timezone.now() + timedelta(hours=24)
+                token.save(update_fields=['token_hash', 'expires_at'])
+                enviar_correo_recuperacion(token.usuario, token_plano)
                 enviados += 1
 
         if enviados:
@@ -58,3 +72,19 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
                 'No se reenviaron correos porque los tokens seleccionados están vencidos o usados.',
                 messages.WARNING,
             )
+
+
+@admin.register(EmailVerificationToken)
+class EmailVerificationTokenAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'usuario',
+        'token_hash',
+        'created_at',
+        'expires_at',
+        'used_at',
+        'is_active',
+    )
+    list_filter = ('created_at', 'expires_at', 'used_at')
+    search_fields = ('token_hash', 'usuario__email')
+    readonly_fields = ('token_hash', 'created_at', 'used_at')
