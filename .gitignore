@@ -32,6 +32,7 @@ db.sqlite3-journal
 venv/
 env/
 ENV/
+venv311/
 
 # Node.js
 node_modules/
@@ -96,6 +97,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+venv311/
 
 # Spyder project settings
 .spyderproject
