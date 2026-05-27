@@ -95,7 +95,9 @@ WSGI_APPLICATION = "backend.wsgi.application"
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+# Cargar variables desde config/.env (ubicado en la raíz del proyecto)
+ENV_PATH = Path(__file__).resolve().parent.parent / "config" / ".env"
+load_dotenv(dotenv_path=ENV_PATH)
 
 # PostgreSQL para producción con Docker
 DATABASES = {
@@ -106,6 +108,9 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_PASSWORD", "PASSWORD"),
         "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5432"),
+        "OPTIONS": {
+            "sslmode": os.getenv("DB_SSLMODE", "prefer"),
+        } if os.getenv("DB_SSLMODE") else {},
     }
 }
 
