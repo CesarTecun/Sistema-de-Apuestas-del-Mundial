@@ -76,7 +76,6 @@ function manejarExito({ status, method, url }, { success }) {
     else if (url.includes('/solicitar-ingreso/') || url.includes('/invitaciones/')) success('Solicitud procesada exitosamente');
   } else if (m === 'put' || m === 'patch') {
     if (url.includes('/ligas/')) success('Liga actualizada exitosamente');
-    else if (url.includes('/partidos/')) success('Partido actualizado exitosamente');
   } else if (m === 'delete') {
     if (url.includes('/ligas/')) success('Liga eliminada exitosamente');
     else if (url.includes('/partidos/')) success('Partido eliminado exitosamente');

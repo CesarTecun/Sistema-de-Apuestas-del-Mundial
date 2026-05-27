@@ -95,21 +95,6 @@ const MarcadorPage = () => {
     return () => clearInterval(interval);
   }, [cargarPartidosEnVivo]);
 
-  // Debug: log partidos cuando cambian
-  useEffect(() => {
-    if (partidosEnVivo.length > 0) {
-      console.log('Partidos recibidos:', partidosEnVivo);
-      partidosEnVivo.forEach(p => {
-        console.log(`Partido ${p.id_partido}:`, {
-          equipo_local: p.equipo_local,
-          equipo_visitante: p.equipo_visitante,
-          equipo_local_detalle: p.equipo_local_detalle,
-          equipo_visitante_detalle: p.equipo_visitante_detalle
-        });
-      });
-    }
-  }, [partidosEnVivo]);
-
   const handleActualizarMarcador = async (idPartido, golLocal, golVisitante, faltasLocal, faltasVisitante) => {
     await actualizarMarcador(idPartido, golLocal, golVisitante, 'en_juego', faltasLocal, faltasVisitante);
   };
@@ -135,7 +120,6 @@ const MarcadorPage = () => {
   };
 
   const handleFinalizarPartido = async (idPartido) => {
-    console.log('🎮 Finalizando partido:', idPartido, 'con estado: finalizado');
     await controlarPartido(idPartido, { estado: 'finalizado' });
     // Regresar a la lista de partidos después de finalizar
     navigate('/partidos');
