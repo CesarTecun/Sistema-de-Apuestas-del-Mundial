@@ -212,6 +212,30 @@ const HomePage = () => {
               Ver Selecciones →
             </a>
           </div>
+
+          <div className="landing-card">
+            <div className="landing-card-image">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <h3 className="landing-card-title">Historial</h3>
+            <p className="landing-card-text">Revisa tus pronósticos acertados, puntos y ligas ganadas</p>
+            <a
+              href="#historial"
+              className="landing-card-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/historial');
+              }}
+            >
+              Ver Historial →
+            </a>
+          </div>
         </div>
       </div>
     </div>

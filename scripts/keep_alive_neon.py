@@ -22,6 +22,9 @@ MARCADOR_DB = "postgresql://neondb_owner:npg_eZ7sPF3fGglv@ep-small-poetry-aqil41
 # Base de datos general de Django (proyecto 'BaseQuiniela')
 DJANGO_DB = "postgresql://neondb_owner:npg_pQrLmJXlZ78I@ep-falling-cherry-aqc89mqe.c-8.us-east-1.aws.neon.tech:5432/quiniela?sslmode=require"
 
+# Endpoint del microservicio marcador (para evitar que el servicio entre en sleep)
+MARCADOR_HEALTH_URL = "http://localhost:8001/health"
+
 INTERVAL_SECONDS = 120  # 2 minutos (menor que el cold-start de Neon)
 
 
@@ -46,6 +49,24 @@ def ping_db(conn_str, label):
         return False
 
 
+def ping_marcador_service(url, label):
+    try:
+        import urllib.request
+        start = time.time()
+        req = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            elapsed = (time.time() - start) * 1000
+            if resp.status == 200:
+                print(f"[{time.strftime('%H:%M:%S')}] {label} OK  ({elapsed:.0f}ms)")
+                return True
+            else:
+                print(f"[{time.strftime('%H:%M:%S')}] {label} FAIL  status={resp.status}")
+                return False
+    except Exception as exc:
+        print(f"[{time.strftime('%H:%M:%S')}] {label} FAIL  {exc}")
+        return False
+
+
 def main():
     print("Keep-alive para Neon (directo a BD) iniciado.")
     print(f"Intervalo: {INTERVAL_SECONDS}s")
@@ -54,6 +75,7 @@ def main():
     while True:
         ping_db(MARCADOR_DB, "TABLERO")
         ping_db(DJANGO_DB, "QUINIELA")
+        ping_marcador_service(MARCADOR_HEALTH_URL, "MARCADOR_SVC")
         print()
         time.sleep(INTERVAL_SECONDS)
 

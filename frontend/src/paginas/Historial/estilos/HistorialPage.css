@@ -1,0 +1,422 @@
+/* HistorialPage.css */
+
+.historial-container {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.historial-background {
+  min-height: 100vh;
+  background: linear-gradient(135deg, rgba(168, 50, 121, 0.85) 0%, rgba(106, 76, 147, 0.85) 100%);
+  padding: 20px;
+}
+
+.historial-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.historial-content {
+  margin-top: 20px;
+}
+
+.historial-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.historial-header h1 {
+  color: white;
+  font-size: 28px;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.historial-resumen {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.resumen-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px 24px;
+  text-align: center;
+  min-width: 120px;
+}
+
+.resumen-valor {
+  display: block;
+  font-size: 32px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.resumen-label {
+  display: block;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 4px;
+}
+
+/* Tabs */
+.tabs-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 8px;
+}
+
+.tab-button {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tab-button.active {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid #ffffff;
+}
+
+/* Filtros */
+.filtros-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filtros-row label {
+  color: white;
+  font-size: 14px;
+}
+
+.filtros-row select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 14px;
+}
+
+.filtros-row select option {
+  color: #333;
+}
+
+/* Pronósticos */
+.pronosticos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pronostico-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 16px;
+  color: white;
+}
+
+.pronostico-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.equipos {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.equipo {
+  font-weight: 600;
+}
+
+.vs {
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-exacto {
+  background: #22c55e;
+  color: white;
+}
+
+.badge-correcto {
+  background: #3b82f6;
+  color: white;
+}
+
+.badge-fallido {
+  background: #ef4444;
+  color: white;
+}
+
+.badge-pendiente {
+  background: #f59e0b;
+  color: white;
+}
+
+.pronostico-marcadores {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 12px;
+}
+
+.marcador-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.marcador-row .label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+}
+
+.marcador-row .valor {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.marcador-row .real {
+  color: #22c55e;
+}
+
+.pronostico-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 10px;
+}
+
+.puntos {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fbbf24;
+}
+
+.estado {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  text-transform: capitalize;
+}
+
+/* Ligas */
+.ligas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.liga-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 16px;
+  color: white;
+}
+
+.liga-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.liga-header h3 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.estado-liga {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estado-ganada {
+  background: #22c55e;
+  color: white;
+}
+
+.estado-posicion {
+  background: #3b82f6;
+  color: white;
+}
+
+.estado-sin-posicion {
+  background: #6b7280;
+  color: white;
+}
+
+.liga-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.stat {
+  text-align: center;
+  min-width: 70px;
+}
+
+.stat-valor {
+  display: block;
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  margin-top: 2px;
+}
+
+.liga-barra {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.1);
+}
+
+.barra-exacto {
+  background: #22c55e;
+  height: 100%;
+}
+
+.barra-correcto {
+  background: #3b82f6;
+  height: 100%;
+}
+
+.barra-fallido {
+  background: #ef4444;
+  height: 100%;
+}
+
+/* Estados vacíos */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: rgba(255,255,255,0.8);
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: white;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top: 3px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error */
+.error-message {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #fecaca;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.retry-button {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.retry-button:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .pronostico-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pronostico-marcadores {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .liga-stats {
+    gap: 10px;
+  }
+
+  .stat {
+    min-width: 55px;
+  }
+}

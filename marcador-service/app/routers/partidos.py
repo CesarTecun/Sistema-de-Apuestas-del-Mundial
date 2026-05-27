@@ -27,14 +27,14 @@ def listar_partidos(
 @router.get("/en-vivo", response_model=list[PartidoMarcadorResponse])
 def partidos_en_vivo(db: Session = Depends(get_db)):
     partidos = partido_service.list_partidos(db, estado="en_juego")
-    return [partido_service.enrich_marcador(db, p) for p in partidos]
+    return partido_service.enrich_marcador_list(db, partidos)
 
 
 @router.get("/todos", response_model=list[PartidoMarcadorResponse])
 def todos_partidos(db: Session = Depends(get_db)):
     """Obtiene todos los partidos para el marcador (sin filtrar por estado)"""
     partidos = partido_service.list_partidos(db)
-    return [partido_service.enrich_marcador(db, p) for p in partidos]
+    return partido_service.enrich_marcador_list(db, partidos)
 
 
 @router.get("/por-equipo", response_model=list[PartidoResponse])
@@ -47,7 +47,7 @@ def obtener_partido(id_partido: int, db: Session = Depends(get_db)):
     partido = partido_service.get_partido(db, id_partido)
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
-    return partido_service.enrich_marcador(db, partido)
+    return partido_service.enrich_marcador_single(db, partido)
 
 
 @router.post("/", response_model=PartidoResponse, status_code=201)
@@ -73,7 +73,7 @@ def actualizar_marcador(id_partido: int, data: MarcadorUpdate, db: Session = Dep
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
     partido = partido_service.actualizar_marcador(db, partido, data)
-    return partido_service.enrich_marcador(db, partido)
+    return partido_service.enrich_marcador_single(db, partido)
 
 
 @router.delete("/{id_partido}", status_code=204)
@@ -94,4 +94,4 @@ def controlar_partido(id_partido: int, data: PartidoControlUpdate, db: Session =
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
     partido = partido_service.controlar_partido(db, partido, data)
-    return partido_service.enrich_marcador(db, partido)
+    return partido_service.enrich_marcador_single(db, partido)

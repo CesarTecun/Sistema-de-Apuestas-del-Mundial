@@ -19,7 +19,7 @@ class MarcadorClient:
 
     def __init__(self):
         self.base_url = settings.MARCADOR_SERVICE_URL.rstrip("/")
-        self.timeout = getattr(settings, "MARCADOR_SERVICE_TIMEOUT", 5)
+        self.timeout = getattr(settings, "MARCADOR_SERVICE_TIMEOUT", 30)
 
     def _request(self, method, path, **kwargs):
         """Ejecuta una petición HTTP al microservicio."""
