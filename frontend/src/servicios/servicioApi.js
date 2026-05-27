@@ -5,6 +5,7 @@ const API_BASE_URL = 'http://localhost:8000/api';
 
 const servicioApi = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 30000,  // 30s para tolerar cold-start de Neon
   headers: {
     'Content-Type': 'application/json',
   },

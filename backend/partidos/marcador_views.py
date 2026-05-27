@@ -152,6 +152,11 @@ def marcador_health(request):
             {"marcador_service": {"status": "unavailable"}, "connected": False, "error": str(exc)},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
+    except Exception as exc:
+        return Response(
+            {"marcador_service": {"status": "error"}, "connected": False, "error": str(exc)},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
 
 
 @api_view(["POST"])

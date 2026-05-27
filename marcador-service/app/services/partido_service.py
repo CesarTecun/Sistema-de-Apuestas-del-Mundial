@@ -29,7 +29,7 @@ def _notify_django(partido: Partido) -> None:
         response = requests.post(
             DJANGO_WEBHOOK_URL,
             json=payload,
-            timeout=3,
+            timeout=30,
         )
         print(f"[WEBHOOK] Response status: {response.status_code}")
         print(f"[WEBHOOK] Response body: {response.text}")

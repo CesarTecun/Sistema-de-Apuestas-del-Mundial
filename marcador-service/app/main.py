@@ -46,6 +46,18 @@ def health():
     return {"status": "ok", "service": "marcador"}
 
 
+@app.get("/api/ping-db/")
+def ping_db():
+    """
+    Endpoint para mantener el compute de Neon activo.
+    Ejecuta SELECT 1 para evitar scale-to-zero (cold-start).
+    """
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+    return {"status": "ok", "db": "reachable"}
+
+
 @app.get("/")
 def read_root():
     return FileResponse(str(static_dir / "index.html"))

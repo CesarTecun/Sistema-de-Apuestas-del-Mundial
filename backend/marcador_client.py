@@ -118,7 +118,7 @@ class MarcadorClient:
         try:
             response = self._request("GET", "/health")
             return response.json()
-        except MarcadorClientError:
+        except (MarcadorClientError, requests.exceptions.RequestException):
             return {"status": "unavailable"}
 
     # ------------------------------------------------------------------
