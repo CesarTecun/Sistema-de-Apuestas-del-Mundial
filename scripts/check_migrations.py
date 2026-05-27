@@ -55,14 +55,14 @@ def main():
     uncommitted = check_uncommitted_migrations()
     
     if uncommitted:
-        print(f"   ⚠️  Encontradas {len(uncommitted)} migración(es) sin commitear:")
+        print(f"   Advertencia: se encontraron {len(uncommitted)} migración(es) sin commitear:")
         for f in uncommitted:
             print(f"      - {f}")
         print()
-        print("   💡 Recuerda: No commitees migraciones durante desarrollo.")
+        print("   Recuerda: no commitees migraciones durante desarrollo.")
         print("      Solo el responsable de migraciones las debe commitear.")
     else:
-        print("   ✅ No hay migraciones sin commitear")
+        print("   No hay migraciones sin commitear")
     print()
     
     # 2. Verificar migraciones pendientes
@@ -70,7 +70,7 @@ def main():
     pending = check_migration_status()
     
     if pending:
-        print(f"   ⚠️  Hay {len(pending)} migración(es) pendientes por aplicar:")
+        print(f"   Advertencia: hay {len(pending)} migración(es) pendientes por aplicar:")
         for p in pending[:5]:
             print(f"      {p}")
         if len(pending) > 5:
@@ -78,13 +78,13 @@ def main():
         print()
         print("   Ejecuta: python manage.py migrate")
     else:
-        print("   ✅ Todas las migraciones están aplicadas")
+        print("   Todas las migraciones están aplicadas")
     print()
     
     # 3. Recomendación
     print("=" * 60)
     if uncommitted or pending:
-        print("⚠️  ACCIÓN REQUERIDA:")
+        print("ACCION REQUERIDA:")
         if uncommitted:
             print("   - Descarta migraciones locales: git checkout -- backend/*/migrations/0*.py")
             print("   - O ejecuta: python scripts/reset_migrations.py")
@@ -92,7 +92,7 @@ def main():
             print("   - Aplica migraciones: python manage.py migrate")
         sys.exit(1)
     else:
-        print("✅ Todo listo para trabajar!")
+        print("Todo listo para trabajar")
         sys.exit(0)
 
 if __name__ == "__main__":

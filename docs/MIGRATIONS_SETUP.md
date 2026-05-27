@@ -104,7 +104,7 @@ python manage.py check
 python manage.py runserver  # Probar en navegador
 
 # 6. Commitear migraciones
-# ⚠️ Temporalmente desactivar el hook:
+# Temporalmente desactivar el hook:
 git commit --no-verify -m "chore: regenerate clean migrations for vX.Y.Z"
 
 # 7. Push a main

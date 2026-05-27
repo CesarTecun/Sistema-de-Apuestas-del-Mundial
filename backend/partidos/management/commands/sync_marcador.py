@@ -146,12 +146,12 @@ class Command(BaseCommand):
         self.stdout.write(f'Sin codigo_iso: {sin_iso}')
 
         if sin_iso > 0:
-            self.stdout.write(self.style.WARNING(f'⚠️  {sin_iso} selecciones sin codigo_iso:'))
+            self.stdout.write(self.style.WARNING(f'{sin_iso} selecciones sin codigo_iso:'))
             sin_iso_list = Seleccion.objects.filter(codigo_iso__isnull=True) | Seleccion.objects.filter(codigo_iso='')
             for s in sin_iso_list:
                 self.stdout.write(f'  - ID: {s.id_seleccion:2d} | País: {s.pais}')
         else:
-            self.stdout.write(self.style.SUCCESS('✅ Todas las selecciones tienen codigo_iso'))
+            self.stdout.write(self.style.SUCCESS('Todas las selecciones tienen codigo_iso'))
 
     def _fix_codigo_iso(self):
         """Asigna codigo_iso faltantes basándose en el nombre del país."""
@@ -166,10 +166,10 @@ class Command(BaseCommand):
             if codigo_iso:
                 seleccion.codigo_iso = codigo_iso
                 seleccion.save(update_fields=['codigo_iso'])
-                self.stdout.write(self.style.SUCCESS(f'✅ {seleccion.pais} -> {codigo_iso}'))
+                self.stdout.write(self.style.SUCCESS(f'{seleccion.pais} -> {codigo_iso}'))
                 actualizados += 1
             else:
-                self.stdout.write(self.style.WARNING(f'⚠️  No se encontró codigo_iso para: {seleccion.pais}'))
+                self.stdout.write(self.style.WARNING(f'No se encontró codigo_iso para: {seleccion.pais}'))
 
         self.stdout.write(f'\nTotal actualizados: {actualizados}/{sin_iso.count()}')
 
@@ -193,10 +193,10 @@ class Command(BaseCommand):
             }
             try:
                 marcador_client.sync_seleccion(payload)
-                self.stdout.write(f'✅ {seleccion.pais} (ID: {seleccion.id_seleccion})')
+                self.stdout.write(f'{seleccion.pais} (ID: {seleccion.id_seleccion})')
                 exitosos += 1
             except MarcadorClientError as e:
-                self.stdout.write(self.style.ERROR(f'❌ {seleccion.pais}: {e}'))
+                self.stdout.write(self.style.ERROR(f'Error sincronizando {seleccion.pais}: {e}'))
                 fallidos += 1
 
         self.stdout.write(f'\nSelecciones sincronizadas: {exitosos}/{total}')
@@ -231,10 +231,10 @@ class Command(BaseCommand):
             }
             try:
                 marcador_client.sync_partido(payload)
-                self.stdout.write(f'✅ Partido {partido.id_partido}')
+                self.stdout.write(f'Partido {partido.id_partido} sincronizado')
                 exitosos += 1
             except MarcadorClientError as e:
-                self.stdout.write(self.style.ERROR(f'❌ Partido {partido.id_partido}: {e}'))
+                self.stdout.write(self.style.ERROR(f'Error sincronizando partido {partido.id_partido}: {e}'))
                 fallidos += 1
 
         self.stdout.write(f'\nPartidos sincronizados: {exitosos}/{total}')

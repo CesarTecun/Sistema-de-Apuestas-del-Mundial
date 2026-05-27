@@ -197,12 +197,12 @@ def marcador_webhook(request):
 
         if update_fields:
             partido.save(update_fields=update_fields)
-            print(f"✅ Webhook: Partido {id_partido} actualizado en Django: {update_fields}")
+            print(f"Webhook: Partido {id_partido} actualizado en Django: {update_fields}")
             print(f"   Goles: {partido.gol_local} - {partido.gol_visitante}")
             print(f"   Estado: {partido.estado_partido}")
             print(f"   Resultado: {partido.resultado}")
         else:
-            print(f"⚠️ Webhook: Partido {id_partido} recibido pero sin campos para actualizar")
+            print(f"Webhook: Partido {id_partido} recibido pero sin campos para actualizar")
     finally:
         set_sync_from_webhook(False)
 

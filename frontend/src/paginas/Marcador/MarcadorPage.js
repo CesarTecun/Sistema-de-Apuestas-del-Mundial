@@ -50,10 +50,10 @@ const Cronometro = ({ partido, onTick }) => {
         {formatoTiempo()}' {periodo}
       </div>
       {pausado && (
-        <div className="cronometro-status paused">⏸️ PAUSADO</div>
+        <div className="cronometro-status paused">Pausado</div>
       )}
       {!partido.partido_iniciado && partido.estado !== 'finalizado' && (
-        <div className="cronometro-status not-started">⏱️ NO INICIADO</div>
+        <div className="cronometro-status not-started">No iniciado</div>
       )}
     </div>
   );
@@ -149,18 +149,18 @@ const MarcadorPage = () => {
           <div className="marcador-content">
             {/* Header del Marcador */}
             <div className="marcador-header">
-              <h1>⚽ Marcador en Vivo</h1>
+              <h1>Marcador en Vivo</h1>
               <div className="health-status">
                 {healthStatus ? (
                   <>
                     <span className={healthStatus.success ? 'connected' : 'disconnected'}>
-                      {healthStatus.success ? '✅ Conectado' : '❌ Desconectado'}
+                      {healthStatus.success ? 'Conectado' : 'Desconectado'}
                     </span>
                     <button
                       onClick={() => cargarPartidosEnVivo()}
                       className="refresh-button"
                     >
-                      🔄 Recargar
+                      Recargar
                     </button>
                   </>
                 ) : (
@@ -212,7 +212,7 @@ const MarcadorPage = () => {
                   {/* Resultado final si está finalizado */}
                   {partido.estado === 'finalizado' && (
                     <div className="resultado-final">
-                      <h2>🏆 RESULTADO FINAL</h2>
+                      <h2>Resultado Final</h2>
                       <div className="resultado-marcador">
                         <div className="resultado-equipo">
                           <span className="equipo-nombre">{partido.equipo_local_detalle?.pais || 'Equipo Local'}</span>
@@ -241,7 +241,7 @@ const MarcadorPage = () => {
 
                       {/* Controles de marcador */}
                       <div className="controls-section">
-                        <h4>⚽ Goles</h4>
+                        <h4>Goles</h4>
                         <div className="controls-grid">
                           <button
                             onClick={() => handleActualizarMarcador(partido.id_partido, partido.gol_local + 1, partido.gol_visitante, partido.faltas_local, partido.faltas_visitante)}
@@ -260,7 +260,7 @@ const MarcadorPage = () => {
 
                       {/* Controles de faltas */}
                       <div className="controls-section">
-                        <h4>🟨 Faltas</h4>
+                        <h4>Faltas</h4>
                         <div className="faltas-container">
                           <div className="falta-control">
                             <span>Local: {partido.faltas_local || 0}</span>
@@ -285,14 +285,14 @@ const MarcadorPage = () => {
 
                       {/* Control del partido */}
                       <div className="controls-section">
-                        <h4>🎮 Control del Partido</h4>
+                        <h4>Control del Partido</h4>
                         <div className="controls-grid">
                           {!partido.partido_iniciado && (
                             <button
                               onClick={() => handleIniciarPartido(partido.id_partido)}
                               className="control-button control-button-blue"
                             >
-                              ▶️ Iniciar
+                              Iniciar
                             </button>
                           )}
                           {partido.partido_iniciado && (
@@ -301,13 +301,13 @@ const MarcadorPage = () => {
                                 onClick={() => handlePausarPartido(partido.id_partido, !partido.partido_pausado)}
                                 className="control-button control-button-orange"
                               >
-                                {partido.partido_pausado ? '▶️ Reanudar' : '⏸️ Pausar'}
+                                {partido.partido_pausado ? 'Reanudar' : 'Pausar'}
                               </button>
                               <button
                                 onClick={() => handleCambiarPeriodo(partido.id_partido, partido.periodo_actual === '1T' ? '2T' : '1T')}
                                 className="control-button control-button-purple"
                               >
-                                🔄 Cambiar Período
+                                Cambiar período
                               </button>
                               <button
                                 onClick={() => handleAgregarTiempoExtra(partido.id_partido, (partido.tiempo_extra_periodo || 0) + 3)}
@@ -319,7 +319,7 @@ const MarcadorPage = () => {
                                 onClick={() => handleFinalizarPartido(partido.id_partido)}
                                 className="control-button control-button-red"
                               >
-                                ⏹️ Finalizar
+                                Finalizar
                               </button>
                             </>
                           )}

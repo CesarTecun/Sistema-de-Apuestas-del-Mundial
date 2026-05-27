@@ -96,7 +96,7 @@ const PanelPrincipal = () => {
 
         >
 
-          🏆 Gestionar Ligas
+          Gestionar Ligas
 
         </button>
 
@@ -140,15 +140,15 @@ const PanelPrincipal = () => {
 
         <ul>
 
-          <li>✅ <strong>Ligas y torneos</strong> - Gestiona las ligas de apuestas</li>
+          <li><strong>Ligas y torneos</strong> - Gestiona las ligas de apuestas</li>
 
-          <li>🔄 Partidos y pronósticos (próximamente)</li>
+          <li>Partidos y pronósticos (próximamente)</li>
 
-          <li>📊 Tabla de posiciones (próximamente)</li>
+          <li>Tabla de posiciones (próximamente)</li>
 
-          <li>🏆 Premios y recompensas (próximamente)</li>
+          <li>Premios y recompensas (próximamente)</li>
 
-          <li>📈 Historial de ganadores (próximamente)</li>
+          <li>Historial de ganadores (próximamente)</li>
 
         </ul>
 

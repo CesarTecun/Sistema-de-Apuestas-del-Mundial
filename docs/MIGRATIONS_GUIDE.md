@@ -41,8 +41,8 @@ venv\Scripts\python.exe manage.py makemigrations
 venv\Scripts\python.exe manage.py migrate
 
 # Al hacer commit - SOLO código, NO migraciones
-git add backend/tuapp/models.py  # ✅
-git add backend/tuapp/migrations/  # ❌ NO!
+git add backend/tuapp/models.py
+git add backend/tuapp/migrations/  # No subir migraciones desde desarrollo
 ```
 
 #### 4. Reset de migraciones semanal/release

@@ -124,7 +124,7 @@ function renderLiveMatches() {
     if (matches.live.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">🔴</div>
+                <div class="empty-state-icon">EN VIVO</div>
                 <p>No hay partidos en vivo</p>
             </div>
         `;
@@ -140,7 +140,7 @@ function renderScheduledMatches() {
     if (matches.scheduled.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">📅</div>
+                <div class="empty-state-icon">PROGRAMADO</div>
                 <p>No hay partidos programados</p>
             </div>
         `;
@@ -156,7 +156,7 @@ function renderFinishedMatches() {
     if (matches.finished.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">✅</div>
+                <div class="empty-state-icon">FINALIZADO</div>
                 <p>No hay partidos finalizados</p>
             </div>
         `;
@@ -167,14 +167,14 @@ function renderFinishedMatches() {
 }
 
 function createMatchCard(match, isLive) {
-    const localTeam = match.seleccion_local || { pais: 'Equipo Local', bandera: '🏳️' };
-    const visitorTeam = match.seleccion_visitante || { pais: 'Equipo Visitante', bandera: '🏳️' };
+    const localTeam = match.seleccion_local || { pais: 'Equipo Local', bandera: 'N/A' };
+    const visitorTeam = match.seleccion_visitante || { pais: 'Equipo Visitante', bandera: 'N/A' };
     
     const statusClass = match.estado === 'en_juego' ? 'status-live' : 
                        match.estado === 'programado' ? 'status-scheduled' : 'status-finished';
     
-    const statusText = match.estado === 'en_juego' ? '🔴 EN VIVO' : 
-                      match.estado === 'programado' ? '📅 PROGRAMADO' : '✅ FINALIZADO';
+    const statusText = match.estado === 'en_juego' ? 'EN VIVO' : 
+                      match.estado === 'programado' ? 'PROGRAMADO' : 'FINALIZADO';
 
     const scoreInputs = isLive ? `
         <div class="match-score">
@@ -191,10 +191,10 @@ function createMatchCard(match, isLive) {
     `;
 
     const actionButtons = isLive ? `
-        <button class="btn btn-success" onclick="updateScore(${match.id})">💾 Actualizar</button>
-        <button class="btn btn-warning" onclick="finishMatch(${match.id})">🏁 Finalizar</button>
+        <button class="btn btn-success" onclick="updateScore(${match.id})">Actualizar</button>
+        <button class="btn btn-warning" onclick="finishMatch(${match.id})">Finalizar</button>
     ` : match.estado === 'programado' ? `
-        <button class="btn btn-primary" onclick="startMatch(${match.id})">▶️ Iniciar</button>
+        <button class="btn btn-primary" onclick="startMatch(${match.id})">Iniciar</button>
     ` : '';
 
     return `
@@ -205,18 +205,18 @@ function createMatchCard(match, isLive) {
             </div>
             <div class="match-teams">
                 <div class="team">
-                    <div class="team-flag">${localTeam.bandera || '🏳️'}</div>
+                    <div class="team-flag">${localTeam.bandera || 'N/A'}</div>
                     <div class="team-name">${localTeam.pais}</div>
                 </div>
                 ${scoreInputs}
                 <div class="team">
-                    <div class="team-flag">${visitorTeam.bandera || '🏳️'}</div>
+                    <div class="team-flag">${visitorTeam.bandera || 'N/A'}</div>
                     <div class="team-name">${visitorTeam.pais}</div>
                 </div>
             </div>
             <div class="match-actions">
                 ${actionButtons}
-                <button class="btn btn-danger" onclick="deleteMatch(${match.id})">🗑️ Eliminar</button>
+                <button class="btn btn-danger" onclick="deleteMatch(${match.id})">Eliminar</button>
             </div>
         </div>
     `;
@@ -229,7 +229,7 @@ function renderTeams() {
     if (teams.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">🏆</div>
+                <div class="empty-state-icon">SIN REGISTROS</div>
                 <p>No hay selecciones registradas</p>
             </div>
         `;
@@ -238,7 +238,7 @@ function renderTeams() {
 
     container.innerHTML = teams.map(team => `
         <div class="team-card">
-            <div class="team-flag-large">${team.bandera || '🏳️'}</div>
+            <div class="team-flag-large">${team.bandera || 'N/A'}</div>
             <div class="team-card-name">${team.pais}</div>
         </div>
     `).join('');

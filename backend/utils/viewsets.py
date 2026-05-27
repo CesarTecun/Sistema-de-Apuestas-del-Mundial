@@ -106,7 +106,7 @@ class SoftDeleteModelViewSet(viewsets.ModelViewSet):
     def hard_delete(self, request, pk=None):
         """
         Elimina físicamente un registro de la base de datos.
-        ⚠️ Usar con precaución. Requiere permisos de administrador.
+        Usar con precaución. Requiere permisos de administrador.
         """
         # Verificar si el usuario es administrador
         if not request.user.is_staff:

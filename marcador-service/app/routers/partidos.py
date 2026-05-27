@@ -89,7 +89,7 @@ def controlar_partido(id_partido: int, data: PartidoControlUpdate, db: Session =
     """
     Controla el partido en vivo: iniciar, pausar, cambiar tiempo, agregar tiempo extra
     """
-    print(f"🎮 Router controlar_partido: id_partido={id_partido}, data={data}")
+    print(f"Router controlar_partido: id_partido={id_partido}, data={data}")
     partido = partido_service.get_partido(db, id_partido)
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
