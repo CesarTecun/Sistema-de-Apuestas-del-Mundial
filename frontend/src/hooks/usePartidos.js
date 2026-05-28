@@ -11,6 +11,7 @@ export const usePartidos = () => {
   const [ligas, setLigas] = useState([]);
   const [sedes, setSedes] = useState([]);
   const [ligaSeleccionada, setLigaSeleccionada] = useState('');
+  const [estadoSeleccionado, setEstadoSeleccionado] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,7 +19,7 @@ export const usePartidos = () => {
   const cargarPartidos = useCallback(async () => {
     try {
       setLoading(true);
-      const result = await servicioPartidos.getPartidos(ligaSeleccionada);
+      const result = await servicioPartidos.getPartidos(ligaSeleccionada, estadoSeleccionado);
 
       if (result.success) {
         setPartidos(result.data);
@@ -32,7 +33,7 @@ export const usePartidos = () => {
     } finally {
       setLoading(false);
     }
-  }, [ligaSeleccionada]);
+  }, [ligaSeleccionada, estadoSeleccionado]);
 
   const cargarSelecciones = useCallback(async () => {
     try {
@@ -197,6 +198,8 @@ export const usePartidos = () => {
     puedeGestionarLigaSeleccionada,
     ligaSeleccionada,
     setLigaSeleccionada,
+    estadoSeleccionado,
+    setEstadoSeleccionado,
     loading,
     error,
     searchTerm,

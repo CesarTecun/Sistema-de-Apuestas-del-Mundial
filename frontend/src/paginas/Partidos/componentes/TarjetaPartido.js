@@ -16,21 +16,23 @@ const TarjetaPartido = ({ partido, selecciones, onEdit, onDelete, canManage }) =
   };
 
   const getEstadoClass = () => {
-    if (partido.estado_partido === 'finalizado' || partido.resultado) return 'jugado';
-    if (partido.estado_partido === 'en_juego') return 'en-curso';
-    const horario = new Date(partido.horario);
-    const ahora = new Date();
-    if (horario < ahora) return 'en-curso';
-    return 'pendiente';
+    const map = {
+      'finalizado': 'jugado',
+      'en_juego': 'en-curso',
+      'suspendido': 'suspendido',
+      'programado': 'pendiente',
+    };
+    return map[partido.estado_partido] || 'pendiente';
   };
 
   const getEstadoTexto = () => {
-    if (partido.estado_partido === 'finalizado' || partido.resultado) return 'Finalizado';
-    if (partido.estado_partido === 'en_juego') return 'En curso';
-    const horario = new Date(partido.horario);
-    const ahora = new Date();
-    if (horario < ahora) return 'En curso';
-    return 'Pendiente';
+    const map = {
+      'finalizado': 'Finalizado',
+      'en_juego': 'En curso',
+      'suspendido': 'Suspendido',
+      'programado': 'Pendiente',
+    };
+    return map[partido.estado_partido] || 'Pendiente';
   };
 
   const formatearFecha = (fechaStr) => {
@@ -111,11 +113,11 @@ const TarjetaPartido = ({ partido, selecciones, onEdit, onDelete, canManage }) =
 
       {canManage && (
         <div className="partido-acciones">
-          <button 
-            className={`accion-btn marcador-btn ${partido.estado_partido === 'finalizado' || partido.resultado ? 'disabled' : ''}`}
+          <button
+            className={`accion-btn marcador-btn ${partido.estado_partido === 'finalizado' ? 'disabled' : ''}`}
             onClick={handleIrMarcador}
-            title={partido.estado_partido === 'finalizado' || partido.resultado ? 'Partido finalizado' : 'Ir a Marcador en Vivo'}
-            disabled={partido.estado_partido === 'finalizado' || partido.resultado}
+            title={partido.estado_partido === 'finalizado' ? 'Partido finalizado' : 'Ir a Marcador en Vivo'}
+            disabled={partido.estado_partido === 'finalizado'}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>

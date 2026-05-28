@@ -66,6 +66,8 @@ const PartidosPage = () => {
     puedeGestionarLigaSeleccionada,
     ligaSeleccionada,
     setLigaSeleccionada,
+    estadoSeleccionado,
+    setEstadoSeleccionado,
     loading,
     error,
     searchTerm,
@@ -101,6 +103,10 @@ const PartidosPage = () => {
 
   const handleLigaChange = (value) => {
     setLigaSeleccionada(value);
+  };
+
+  const handleEstadoChange = (value) => {
+    setEstadoSeleccionado(value);
   };
 
   const handleFormSubmit = async (formData) => {
@@ -229,6 +235,8 @@ const PartidosPage = () => {
                 ligas={ligas}
                 selectedLigaId={ligaSeleccionada}
                 onLigaChange={handleLigaChange}
+                selectedEstado={estadoSeleccionado}
+                onEstadoChange={handleEstadoChange}
                 canManageSelectedLiga={puedeGestionarLigaSeleccionada}
                 requireAdminSelection={ligasAdministradas.length > 0}
               />

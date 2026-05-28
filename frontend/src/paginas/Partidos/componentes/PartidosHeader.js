@@ -1,33 +1,59 @@
 import React from 'react';
 import '../estilos/PartidosHeader.css';
 
-const PartidosHeader = ({ onCreateClick, ligas, selectedLigaId, onLigaChange, canManageSelectedLiga, requireAdminSelection }) => {
+const PartidosHeader = ({ onCreateClick, ligas, selectedLigaId, onLigaChange, selectedEstado, onEstadoChange, canManageSelectedLiga, requireAdminSelection }) => {
   const disabledCreate = !selectedLigaId || !canManageSelectedLiga;
+
+  const ESTADOS = [
+    { value: '', label: 'Todos los estados' },
+    { value: 'programado', label: 'Pendiente' },
+    { value: 'en_juego', label: 'En curso' },
+    { value: 'finalizado', label: 'Finalizado' },
+    { value: 'suspendido', label: 'Suspendido' },
+  ];
 
   return (
     <div className="partidos-header">
       <div className="header-content">
         <h1 className="page-title">Partidos del Mundial</h1>
         <p className="page-subtitle">Gestiona los partidos del torneo</p>
-        {ligas?.length > 0 && (
+        <div className="header-selectors-row">
+          {ligas?.length > 0 && (
+            <div className="header-selectors">
+              <label className="selector-label" htmlFor="filtro-liga">
+                Filtrar por liga
+              </label>
+              <select
+                id="filtro-liga"
+                value={selectedLigaId || ''}
+                onChange={(e) => onLigaChange(e.target.value)}
+              >
+                <option value="">Todas mis ligas</option>
+                {ligas.map((liga) => (
+                  <option key={liga.id_liga} value={liga.id_liga}>
+                    {liga.nombre_liga}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="header-selectors">
-            <label className="selector-label" htmlFor="filtro-liga">
-              Filtrar por liga
+            <label className="selector-label" htmlFor="filtro-estado">
+              Filtrar por estado
             </label>
             <select
-              id="filtro-liga"
-              value={selectedLigaId || ''}
-              onChange={(e) => onLigaChange(e.target.value)}
+              id="filtro-estado"
+              value={selectedEstado || ''}
+              onChange={(e) => onEstadoChange(e.target.value)}
             >
-              <option value="">Todas mis ligas</option>
-              {ligas.map((liga) => (
-                <option key={liga.id_liga} value={liga.id_liga}>
-                  {liga.nombre_liga}
+              {ESTADOS.map((estado) => (
+                <option key={estado.value} value={estado.value}>
+                  {estado.label}
                 </option>
               ))}
             </select>
           </div>
-        )}
+        </div>
       </div>
       
       <button 

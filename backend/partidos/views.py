@@ -56,22 +56,21 @@ class PartidoViewSet(SoftDeleteModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        """Filtrar partidos a las ligas permitidas y opcionalmente por liga específica."""
+        """Filtrar partidos a las ligas permitidas y opcionalmente por liga o estado."""
         from backend.ligas.models import PartidoLiga
         ligas_usuario = obtener_ligas_usuario_ids(self.request.user.id_usuario)
         if not ligas_usuario:
             return Partido.objects.none()
 
-        # Partidos cuyo fk_id_liga directo está en las ligas del usuario
-        partidos_directos = Partido.objects.filter(fk_id_liga__in=ligas_usuario)
-
-        # Partidos vinculados a ligas del usuario via tabla PartidoLiga
-        partidos_liga_ids = PartidoLiga.objects.filter(
+        # IDs de partidos vinculados a ligas del usuario via tabla PartidoLiga
+        partidos_liga_ids = list(PartidoLiga.objects.filter(
             fk_id_liga__in=ligas_usuario
-        ).values_list('fk_id_partido', flat=True)
-        partidos_via_liga = Partido.objects.filter(id_partido__in=partidos_liga_ids)
+        ).values_list('fk_id_partido', flat=True))
 
-        queryset = partidos_directos | partidos_via_liga
+        # Construir queryset base: partidos con fk_id_liga directo O vinculados via PartidoLiga
+        queryset = Partido.objects.filter(
+            Q(fk_id_liga__in=ligas_usuario) | Q(id_partido__in=partidos_liga_ids)
+        )
 
         liga_id = self.request.query_params.get('liga_id')
         if liga_id:
@@ -84,12 +83,20 @@ class PartidoViewSet(SoftDeleteModelViewSet):
                 raise PermissionDenied('No tienes permisos para consultar esta liga.')
 
             # Filtrar por liga: partidos con fk_id_liga directo O vinculados via PartidoLiga
-            partidos_liga_filtrados = PartidoLiga.objects.filter(
+            partidos_liga_filtrados = list(PartidoLiga.objects.filter(
                 fk_id_liga=liga_id_int
-            ).values_list('fk_id_partido', flat=True)
+            ).values_list('fk_id_partido', flat=True))
             queryset = queryset.filter(
                 Q(fk_id_liga=liga_id_int) | Q(id_partido__in=partidos_liga_filtrados)
             )
+
+        estado = self.request.query_params.get('estado')
+        if estado:
+            estado = estado.strip().lower()
+            if estado in ('programado', 'en_juego', 'finalizado', 'suspendido'):
+                queryset = queryset.filter(estado_partido=estado)
+            else:
+                raise ValidationError({'estado': 'Estado inválido. Valores válidos: programado, en_juego, finalizado, suspendido.'})
 
         return queryset.distinct()
     
