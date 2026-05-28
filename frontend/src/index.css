@@ -36,3 +36,22 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* ========================================
+   ESTILOS GLOBALES PARA OPCIONES DE SELECT
+   ======================================== */
+select option,
+.form-input option,
+.input-select option {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+select option:hover,
+select option:focus,
+.form-input option:hover,
+.form-input option:focus,
+.input-select option:hover,
+.input-select option:focus {
+  background: #333333 !important;
+}

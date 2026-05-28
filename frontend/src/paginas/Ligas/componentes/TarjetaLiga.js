@@ -27,7 +27,7 @@ const TarjetaLiga = ({ liga, onEdit, onDelete, onView, onVerTabla }) => {
           </svg>
         </div>
         <div className="liga-card-title-group">
-          <h3 className="liga-card-title">{liga.nombre_liga}</h3>
+          <h3 className="liga-card-title" title={liga.nombre_liga}>{liga.nombre_liga}</h3>
           <div className="liga-card-badges">
             {isApuesta ? (
               <span className="liga-badge liga-badge-apuesta">Apuesta</span>
@@ -63,22 +63,26 @@ const TarjetaLiga = ({ liga, onEdit, onDelete, onView, onVerTabla }) => {
       </div>
       
       <div className="liga-card-footer">
-        <div className="liga-card-position">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd700" strokeWidth="2">
-            <circle cx="12" cy="8" r="7"></circle>
-            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-          </svg>
-          <span>Posición: {posicion}° lugar</span>
+        <div className="liga-card-footer-left">
+          <div className="liga-card-position">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd700" strokeWidth="2">
+              <circle cx="12" cy="8" r="7"></circle>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+            </svg>
+            <span>Posición: {posicion}° lugar</span>
+          </div>
         </div>
-        <button 
-          className="liga-card-ver-tabla"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onVerTabla) onVerTabla(liga);
-          }}
-        >
-          Ver Tabla
-        </button>
+        <div className="liga-card-footer-right">
+          <button 
+            className="liga-card-ver-tabla"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onVerTabla) onVerTabla(liga);
+            }}
+          >
+            Ver Tabla
+          </button>
+        </div>
       </div>
       
       <div className="liga-card-actions">

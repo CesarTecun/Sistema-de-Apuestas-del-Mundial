@@ -4,7 +4,7 @@ export const servicioHistorial = {
   // Obtener historial completo de pronósticos del usuario autenticado
   getHistorialUsuario: async () => {
     try {
-      const response = await servicioApi.get('/pronosticos/api/pronosticos/mi-historial/');
+      const response = await servicioApi.get('/pronosticos/mi-historial/');
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al obtener historial:', error);

@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from django.utils import timezone
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, pagination
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,6 +11,12 @@ from .serializers import (
     SedeSerializer, FaseGrupoSerializer,
     BitacoraSerializer, AuditLogSerializer, ConfiguracionTorneoSerializer,
 )
+
+
+class AuditLogPagination(pagination.PageNumberPagination):
+    page_size = 15
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 
 class SedeViewSet(viewsets.ModelViewSet):
@@ -59,6 +65,7 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     """Lista entradas del log de auditoría. Solo administradores."""
     serializer_class = AuditLogSerializer
     permission_classes = [EsAdministrador]
+    pagination_class = AuditLogPagination
 
     def get_queryset(self):
         qs = AuditLog.objects.all()

@@ -90,6 +90,10 @@
   margin: 0 0 var(--spacing-sm) 0;
   line-height: var(--line-height-tight);
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .liga-card-badges {
@@ -144,6 +148,16 @@
   justify-content: space-between;
   padding-top: var(--spacing-md);
   border-top: var(--border-width-thin) solid var(--border-color-accent);
+  gap: var(--spacing-md);
+}
+
+.liga-card-footer-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.liga-card-footer-right {
+  flex-shrink: 0;
 }
 
 .liga-card-position {
@@ -153,6 +167,9 @@
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .liga-card-ver-tabla {
@@ -166,6 +183,8 @@
   cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: var(--shadow-accent);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .liga-card-ver-tabla:hover {
@@ -179,7 +198,7 @@
   right: var(--spacing-md);
   display: flex;
   gap: var(--spacing-xs);
-  opacity: 0;
+  opacity: 1;
   transition: opacity var(--transition-base);
   z-index: 10;
 }
@@ -265,12 +284,27 @@
     font-size: var(--font-size-sm);
   }
 
-  .liga-card-position {
-    font-size: var(--font-size-xs);
+  .liga-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .liga-card-footer-left {
+    width: 100%;
+  }
+
+  .liga-card-footer-right {
+    width: 100%;
   }
 
   .liga-card-ver-tabla {
-    padding: var(--spacing-xs) var(--spacing-md);
+    width: 100%;
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+
+  .liga-card-position {
     font-size: var(--font-size-xs);
   }
 

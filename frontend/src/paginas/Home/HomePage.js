@@ -113,7 +113,7 @@ const HomePage = () => {
           <p className="landing-subtitle">Vive la emoción del fútbol como nunca antes</p>
           <button 
             className="landing-cta-button"
-            onClick={() => navigate('/GestionLigas')}
+            onClick={() => navigate('/pronosticos')}
           >
             APUESTA AHORA
           </button>

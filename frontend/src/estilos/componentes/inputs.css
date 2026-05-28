@@ -166,8 +166,24 @@
 }
 
 .input-select option {
-  background: var(--color-gray-900);
-  color: var(--color-white);
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.input-select option:hover,
+.input-select option:focus {
+  background: #333333 !important;
+}
+
+/* Also apply to form-input class for consistency */
+.form-input option {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.form-input option:hover,
+.form-input option:focus {
+  background: #333333 !important;
 }
 
 /* ========================================

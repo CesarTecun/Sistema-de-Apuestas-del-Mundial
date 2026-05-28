@@ -14,6 +14,7 @@ import MarcadorPage from './paginas/Marcador';
 import CalendarioPage from './paginas/Calendario/CalendarioPage';
 import HistorialPage from './paginas/Historial';
 import AdminPage from './paginas/Admin/AdminPage';
+import PronosticosPage from './paginas/Pronosticos/PronosticosPage';
 import RutaProtegida from './componentes/RutaProtegida';
 import PageTransition from './componentes/PageTransition';
 import NotificacionesProvider from './componentes/NotificacionesProvider';
@@ -122,6 +123,11 @@ function ContenidoApp() {
       <Route path="/historial" element={
         <RutaProtegida>
           <HistorialPage />
+        </RutaProtegida>
+      } />
+      <Route path="/pronosticos" element={
+        <RutaProtegida>
+          <PronosticosPage />
         </RutaProtegida>
       } />
       <Route path="/admin" element={

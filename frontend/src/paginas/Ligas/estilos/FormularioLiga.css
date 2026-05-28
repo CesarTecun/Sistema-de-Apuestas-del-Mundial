@@ -67,12 +67,12 @@
 
 .input-icon {
   position: absolute;
-  left: 15px;
+  left: 12px !important;
   top: 50%;
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.8);
   pointer-events: none;
-  z-index: 2;
+  z-index: 10 !important;
 }
 
 /* ========================================
@@ -80,7 +80,7 @@
    ======================================== */
 .form-input {
   width: 100%;
-  padding: 14px 14px 14px 50px; /* Espacio para el icono */
+  padding: 14px 14px 14px 75px !important; /* Espacio para el icono */
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 15px;
   font-size: 15px;
@@ -105,12 +105,6 @@
 /* Estilo específico para selects */
 select.form-input {
   cursor: pointer;
-}
-
-select.form-input option {
-  background: #2a2a3e;
-  color: white;
-  padding: 8px;
 }
 
 /* Estado de error */

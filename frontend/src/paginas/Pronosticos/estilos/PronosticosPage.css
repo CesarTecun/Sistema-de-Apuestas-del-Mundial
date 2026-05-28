@@ -1,0 +1,466 @@
+@import '../../../estilos/variables.css';
+
+.pronosticos-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.pronosticos-background {
+  min-height: 100vh;
+  width: 100%;
+  background: 
+    linear-gradient(135deg, rgba(33, 33, 33, 0.65) 0%, rgba(66, 66, 66, 0.65) 100%),
+    url('https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+.pronosticos-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pronosticos-content {
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.pronosticos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(10, 25, 20, 0.4);
+  backdrop-filter: var(--backdrop-blur-xl);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.pronosticos-header h1 {
+  color: var(--color-white);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+.liga-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.liga-selector label {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.liga-selector select {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(255, 255, 255, 0.12);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+  border-radius: var(--border-radius-xl);
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-base);
+}
+
+.liga-selector select:hover {
+  border-color: rgba(212, 175, 55, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.liga-selector select:focus {
+  border-color: #EC4899;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+/* Error */
+.error-message {
+  background: rgba(239, 68, 68, 0.15);
+  border: var(--border-width-thin) solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-lg);
+  color: var(--color-error);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+
+.dismiss-error {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: none;
+  border: none;
+  color: var(--color-error);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-secondary);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-accent);
+  border-radius: var(--border-radius-full);
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Partidos List */
+.partidos-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+.partido-card {
+  background: rgba(10, 25, 20, 0.55);
+  backdrop-filter: var(--backdrop-blur-xl);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+  border-radius: var(--border-radius-2xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.partido-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-accent);
+  transform: scaleX(0);
+  transition: transform var(--transition-base);
+}
+
+.partido-card:hover::before {
+  transform: scaleX(1);
+}
+
+.partido-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-2xl);
+  border-color: rgba(212, 175, 55, 0.6);
+}
+
+.partido-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.equipos {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.bandera {
+  width: 32px;
+  height: 20px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.equipo-nombre {
+  color: var(--color-white);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vs {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+  margin: 0 var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.partido-estado {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Pronóstico Existente */
+.pronostico-existente {
+  background: rgba(16, 185, 129, 0.15);
+  border: var(--border-width-thin) solid rgba(16, 185, 129, 0.3);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pronostico-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+}
+
+.pronostico-info strong {
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+}
+
+.puntos-badge {
+  background: rgba(16, 185, 129, 0.3);
+  border: var(--border-width-thin) solid rgba(16, 185, 129, 0.5);
+  border-radius: var(--border-radius-full);
+  padding: var(--spacing-xs) var(--spacing-md);
+  color: #10b981;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+}
+
+.pronostico-acciones {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.btn-eliminar {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(239, 68, 68, 0.15);
+  border: var(--border-width-thin) solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--border-radius-lg);
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.btn-eliminar:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* Pronóstico Form */
+.pronostico-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.input-group label {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.input-group input {
+  padding: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.12);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+  border-radius: var(--border-radius-xl);
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  outline: none;
+  transition: all var(--transition-base);
+  min-width: 50px;
+  min-height: 40px;
+  width: 100%;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+
+.input-group input::-webkit-outer-spin-button,
+.input-group input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-group input[type='number'] {
+  appearance: none;
+  -moz-appearance: textfield;
+}
+
+.input-group input:hover {
+  border-color: rgba(212, 175, 55, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.input-group input:focus {
+  border-color: #EC4899;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+.btn-enviar {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--gradient-accent);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+  border-radius: var(--border-radius-xl);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-accent);
+}
+
+.btn-enviar:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2xl);
+}
+
+/* Pronóstico Cerrado */
+.pronostico-cerrado {
+  background: rgba(100, 100, 100, 0.15);
+  border: var(--border-width-thin) solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-md);
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-state h3 {
+  color: var(--color-white);
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .pronosticos-wrapper {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .pronosticos-background {
+    padding: var(--spacing-md);
+  }
+
+  .pronosticos-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+
+  .partidos-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .partido-info {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+  }
+
+  .equipos {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+
+  .pronostico-existente {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .pronosticos-background {
+    padding: var(--spacing-sm);
+  }
+
+  .partido-card {
+    padding: var(--spacing-md);
+  }
+}

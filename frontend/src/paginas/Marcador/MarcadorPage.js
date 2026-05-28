@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
 import { useMarcador } from '../../hooks/useMarcador';
-import TopBar from '../Partidos/componentes/TopBar';
+import servicioPartidos from '../../servicios/servicioPartidos';
+import TopBar from '../Ligas/componentes/TopBar';
 import '../../estilos/componentes/modals.css';
 import './estilos/MarcadorPage.css';
 
@@ -61,7 +62,6 @@ const MarcadorPage = () => {
     partidosEnVivo,
     loading,
     error,
-    healthStatus,
     cargarPartidosEnVivo,
     actualizarMarcador,
     controlarPartido,
@@ -70,6 +70,7 @@ const MarcadorPage = () => {
   const [selectedPartidoId, setSelectedPartidoId] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState(null);
+  const [selecciones, setSelecciones] = useState([]);
 
   useEffect(() => {
     // Si viene un partidoId desde la navegación, seleccionarlo
@@ -77,6 +78,15 @@ const MarcadorPage = () => {
       setSelectedPartidoId(location.state.partidoId);
     }
   }, [location.state]);
+
+  useEffect(() => {
+    // Cargar selecciones
+    servicioPartidos.getSelecciones().then(res => {
+      if (res.success) {
+        setSelecciones(res.data);
+      }
+    });
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -90,6 +100,16 @@ const MarcadorPage = () => {
     }, 10000);
     return () => clearInterval(interval);
   }, [cargarPartidosEnVivo]);
+
+  const getSeleccionNombre = (id) => {
+    const seleccion = selecciones.find((s) => s.id_seleccion === id);
+    return seleccion ? seleccion.pais : `Equipo ${id}`;
+  };
+
+  const getSeleccionBandera = (id) => {
+    const seleccion = selecciones.find((s) => s.id_seleccion === id);
+    return seleccion ? seleccion.bandera : null;
+  };
 
   const handleActualizarMarcador = async (idPartido, golLocal, golVisitante, faltasLocal, faltasVisitante) => {
     setActionLoading(true);
@@ -141,16 +161,6 @@ const MarcadorPage = () => {
     }
   };
 
-  const handleActualizarMinuto = async (idPartido, minuto) => {
-    setActionLoading(true);
-    setActionError(null);
-    const result = await controlarPartido(idPartido, { minuto_actual: minuto });
-    setActionLoading(false);
-    if (!result.success) {
-      setActionError(result.error || 'Error al actualizar minuto');
-    }
-  };
-
   const handleFinalizarPartido = async (idPartido) => {
     setActionLoading(true);
     setActionError(null);
@@ -188,23 +198,12 @@ const MarcadorPage = () => {
             {/* Header del Marcador */}
             <div className="marcador-header">
               <h1>Marcador en Vivo</h1>
-              <div className="health-status">
-                {healthStatus ? (
-                  <>
-                    <span className={healthStatus.success ? 'connected' : 'disconnected'}>
-                      {healthStatus.success ? 'Conectado' : 'Desconectado'}
-                    </span>
-                    <button
-                      onClick={() => cargarPartidosEnVivo()}
-                      className="refresh-button"
-                    >
-                      Recargar
-                    </button>
-                  </>
-                ) : (
-                  <span>Verificando...</span>
-                )}
-              </div>
+              <button
+                onClick={() => cargarPartidosEnVivo()}
+                className="refresh-button"
+              >
+                Recargar
+              </button>
             </div>
 
             {/* Error */}
@@ -242,10 +241,25 @@ const MarcadorPage = () => {
                   {/* Encabezado del partido */}
                   <div className="partido-header">
                     <div className="partido-teams">
-                      <h3>
-                        {partido.equipo_local_detalle?.pais || 'Equipo Local'} vs{' '}
-                        {partido.equipo_visitante_detalle?.pais || 'Equipo Visitante'}
-                      </h3>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {getSeleccionBandera(partido.equipo_local) && (
+                          <img
+                            src={getSeleccionBandera(partido.equipo_local)}
+                            alt=""
+                            style={{ width: '40px', height: '26px', borderRadius: '3px', objectFit: 'cover' }}
+                          />
+                        )}
+                        <h3>
+                          {getSeleccionNombre(partido.equipo_local)} vs {getSeleccionNombre(partido.equipo_visitante)}
+                        </h3>
+                        {getSeleccionBandera(partido.equipo_visitante) && (
+                          <img
+                            src={getSeleccionBandera(partido.equipo_visitante)}
+                            alt=""
+                            style={{ width: '40px', height: '26px', borderRadius: '3px', objectFit: 'cover' }}
+                          />
+                        )}
+                      </div>
                       <p>Estado: {partido.estado}</p>
                     </div>
                     <div className="partido-score">
@@ -259,13 +273,31 @@ const MarcadorPage = () => {
                       <h2>Resultado Final</h2>
                       <div className="resultado-marcador">
                         <div className="resultado-equipo">
-                          <span className="equipo-nombre">{partido.equipo_local_detalle?.pais || 'Equipo Local'}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {getSeleccionBandera(partido.equipo_local) && (
+                              <img
+                                src={getSeleccionBandera(partido.equipo_local)}
+                                alt=""
+                                style={{ width: '32px', height: '20px', borderRadius: '2px', objectFit: 'cover' }}
+                              />
+                            )}
+                            <span className="equipo-nombre">{getSeleccionNombre(partido.equipo_local)}</span>
+                          </div>
                           <span className="equipo-goles">{partido.gol_local}</span>
                         </div>
                         <div className="resultado-separador">-</div>
                         <div className="resultado-equipo">
                           <span className="equipo-goles">{partido.gol_visitante}</span>
-                          <span className="equipo-nombre">{partido.equipo_visitante_detalle?.pais || 'Equipo Visitante'}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span className="equipo-nombre">{getSeleccionNombre(partido.equipo_visitante)}</span>
+                            {getSeleccionBandera(partido.equipo_visitante) && (
+                              <img
+                                src={getSeleccionBandera(partido.equipo_visitante)}
+                                alt=""
+                                style={{ width: '32px', height: '20px', borderRadius: '2px', objectFit: 'cover' }}
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
                       {partido.resultado && (

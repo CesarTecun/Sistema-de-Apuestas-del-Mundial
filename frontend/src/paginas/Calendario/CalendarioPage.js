@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
 import servicioPartidos from '../../servicios/servicioPartidos';
-import TopBar from '../Partidos/componentes/TopBar';
+import TopBar from '../Ligas/componentes/TopBar';
 import './estilos/CalendarioPage.css';
 
 const formatearFechaCorta = (fecha) => {

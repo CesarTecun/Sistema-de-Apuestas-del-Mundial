@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
 import { servicioHistorial } from '../../servicios/servicioHistorial';
-import TopBar from '../Partidos/componentes/TopBar';
+import TopBar from '../Ligas/componentes/TopBar';
 import './estilos/HistorialPage.css';
 
 const HistorialPage = () => {

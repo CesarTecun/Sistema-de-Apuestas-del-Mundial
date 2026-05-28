@@ -7,8 +7,14 @@
 
 .historial-background {
   min-height: 100vh;
-  background: linear-gradient(135deg, rgba(168, 50, 121, 0.85) 0%, rgba(106, 76, 147, 0.85) 100%);
-  padding: 20px;
+  background: 
+    linear-gradient(135deg, rgba(33, 33, 33, 0.85) 0%, rgba(66, 66, 66, 0.85) 100%),
+    url('https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
 }
 
 .historial-wrapper {
@@ -66,32 +72,34 @@
 /* Tabs */
 .tabs-container {
   display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 8px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  border-bottom: var(--border-width-thin) solid rgba(212, 175, 55, 0.3);
+  padding-bottom: var(--spacing-sm);
 }
 
 .tab-button {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  padding: 10px 20px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-sm) var(--spacing-md);
   cursor: pointer;
-  border-radius: 8px 8px 0 0;
-  transition: all 0.2s;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  transition: all var(--transition-base);
+  position: relative;
 }
 
 .tab-button:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+  background: rgba(212, 175, 55, 0.1);
 }
 
 .tab-button.active {
-  color: white;
-  background: rgba(255, 255, 255, 0.2);
-  border-bottom: 2px solid #ffffff;
+  color: var(--color-white);
+  background: rgba(212, 175, 55, 0.15);
+  border-bottom: 2px solid #d4af37;
 }
 
 /* Filtros */
@@ -124,200 +132,248 @@
 .pronosticos-lista {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacing-md);
 }
 
 .pronostico-card {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
-  padding: 16px;
-  color: white;
+  background: rgba(10, 25, 20, 0.55);
+  backdrop-filter: var(--backdrop-blur-xl);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+  border-radius: var(--border-radius-2xl);
+  padding: var(--spacing-lg);
+  color: var(--color-white);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-base);
+}
+
+.pronostico-card:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  transform: translateY(-2px);
 }
 
 .pronostico-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
 }
 
 .equipos {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
+  gap: var(--spacing-md);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  flex: 1;
+  min-width: 0;
 }
 
 .equipo {
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .vs {
-  color: rgba(255,255,255,0.6);
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
 }
 
 .badge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
 }
 
 .badge-exacto {
-  background: #22c55e;
-  color: white;
+  background: rgba(16, 185, 129, 0.2);
+  border: var(--border-width-thin) solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
 }
 
 .badge-correcto {
-  background: #3b82f6;
-  color: white;
+  background: rgba(59, 130, 246, 0.2);
+  border: var(--border-width-thin) solid rgba(59, 130, 246, 0.4);
+  color: #3b82f6;
 }
 
 .badge-fallido {
-  background: #ef4444;
-  color: white;
+  background: rgba(239, 68, 68, 0.2);
+  border: var(--border-width-thin) solid rgba(239, 68, 68, 0.4);
+  color: #ef4444;
 }
 
 .badge-pendiente {
-  background: #f59e0b;
-  color: white;
+  background: rgba(245, 158, 11, 0.2);
+  border: var(--border-width-thin) solid rgba(245, 158, 11, 0.4);
+  color: #f59e0b;
 }
 
 .pronostico-marcadores {
   display: flex;
-  gap: 24px;
-  margin-bottom: 12px;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
 }
 
 .marcador-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
+  min-width: 0;
 }
 
 .marcador-row .label {
-  font-size: 13px;
-  color: rgba(255,255,255,0.7);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
 }
 
 .marcador-row .valor {
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
 }
 
 .marcador-row .real {
-  color: #22c55e;
+  color: #10b981;
 }
 
 .pronostico-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  padding-top: 10px;
+  border-top: var(--border-width-thin) solid rgba(255, 255, 255, 0.1);
+  padding-top: var(--spacing-sm);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
 }
 
 .puntos {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
   color: #fbbf24;
 }
 
 .estado {
-  font-size: 12px;
-  color: rgba(255,255,255,0.6);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
   text-transform: capitalize;
+  font-weight: var(--font-weight-medium);
 }
 
 /* Ligas */
 .ligas-lista {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--spacing-md);
 }
 
 .liga-card {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
-  padding: 16px;
-  color: white;
+  background: rgba(10, 25, 20, 0.55);
+  backdrop-filter: var(--backdrop-blur-xl);
+  border: var(--border-width-thin) solid var(--border-color-accent);
+  border-radius: var(--border-radius-2xl);
+  padding: var(--spacing-lg);
+  color: var(--color-white);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-base);
+}
+
+.liga-card:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  transform: translateY(-2px);
 }
 
 .liga-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
 }
 
 .liga-header h3 {
-  font-size: 18px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   margin: 0;
 }
 
 .estado-liga {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
 }
 
 .estado-ganada {
-  background: #22c55e;
-  color: white;
+  background: rgba(16, 185, 129, 0.2);
+  border: var(--border-width-thin) solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
 }
 
 .estado-posicion {
-  background: #3b82f6;
-  color: white;
+  background: rgba(59, 130, 246, 0.2);
+  border: var(--border-width-thin) solid rgba(59, 130, 246, 0.4);
+  color: #3b82f6;
 }
 
 .estado-sin-posicion {
-  background: #6b7280;
-  color: white;
+  background: rgba(107, 114, 128, 0.2);
+  border: var(--border-width-thin) solid rgba(107, 114, 128, 0.4);
+  color: #6b7280;
 }
 
 .liga-stats {
   display: flex;
-  gap: 16px;
+  gap: var(--spacing-md);
   flex-wrap: wrap;
-  margin-bottom: 14px;
+  margin-bottom: var(--spacing-md);
 }
 
 .stat {
   text-align: center;
   min-width: 70px;
+  flex: 1;
 }
 
 .stat-valor {
   display: block;
-  font-size: 22px;
-  font-weight: bold;
-  color: #ffffff;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
 }
 
 .stat-label {
   display: block;
-  font-size: 12px;
-  color: rgba(255,255,255,0.7);
-  margin-top: 2px;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+  font-weight: var(--font-weight-medium);
 }
 
 .liga-barra {
   display: flex;
   height: 8px;
-  border-radius: 4px;
+  border-radius: var(--border-radius-full);
   overflow: hidden;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .barra-exacto {
-  background: #22c55e;
+  background: #10b981;
   height: 100%;
 }
 
@@ -400,23 +456,70 @@
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  .historial-background {
+    padding: var(--spacing-md);
+  }
+
+  .historial-resumen {
+    gap: var(--spacing-sm);
+  }
+
+  .resumen-card {
+    min-width: 100px;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .resumen-valor {
+    font-size: var(--font-size-2xl);
+  }
+
+  .tabs-container {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .tab-button {
+    width: 100%;
+    text-align: center;
+  }
+
   .pronostico-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: var(--spacing-sm);
   }
 
   .pronostico-marcadores {
     flex-direction: column;
-    gap: 8px;
+    gap: var(--spacing-sm);
+  }
+
+  .liga-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
   }
 
   .liga-stats {
-    gap: 10px;
+    gap: var(--spacing-sm);
   }
 
   .stat {
     min-width: 55px;
+  }
+}
+
+@media (max-width: 480px) {
+  .historial-header h1 {
+    font-size: var(--font-size-xl);
+  }
+
+  .resumen-valor {
+    font-size: var(--font-size-xl);
+  }
+
+  .resumen-label {
+    font-size: var(--font-size-xs);
   }
 }
