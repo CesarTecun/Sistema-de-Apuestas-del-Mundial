@@ -75,12 +75,25 @@ class PronosticoViewSet(SoftDeleteModelViewSet):
         if not Partido.objects.filter(id_partido=partido_id, fk_id_liga=liga_id).exists():
             raise ValidationError({'fk_id_partido': 'El partido no pertenece a la liga seleccionada.'})
 
-        if Pronostico.objects.filter(
+        # Buscar pronóstico existente incluyendo eliminados lógicamente
+        pronostico_existente = Pronostico.all_objects.filter(
             fk_id_usuario=usuario_id,
             fk_id_partido=partido_id,
             fk_id_liga=liga_id
-        ).exists():
-            raise ValidationError({'detail': 'Ya registraste un pronóstico para este partido en esta liga.'})
+        ).first()
+
+        if pronostico_existente:
+            if pronostico_existente.status:
+                raise ValidationError({'detail': 'Ya registraste un pronóstico para este partido en esta liga.'})
+            # Reactivar el pronóstico eliminado con los nuevos valores
+            pronostico_existente.gol_local = serializer.validated_data.get('gol_local')
+            pronostico_existente.gol_visitante = serializer.validated_data.get('gol_visitante')
+            pronostico_existente.puntos_obtenidos = 0
+            pronostico_existente.status = True
+            pronostico_existente.deleted_at = None
+            pronostico_existente.save()
+            serializer.instance = pronostico_existente
+            return
 
         _validar_ventana_pronostico(partido_id)
 

@@ -61,12 +61,12 @@ const CalendarioPage = () => {
     try {
       setLoading(true);
       const [partidosRes, seleccionesRes] = await Promise.all([
-        servicioPartidos.getPartidos(),
+        servicioPartidos.getPartidos(undefined, undefined, 1, 100),
         servicioPartidos.getSelecciones(),
       ]);
 
       if (partidosRes.success) {
-        setPartidos(partidosRes.data);
+        setPartidos(partidosRes.data.results ?? []);
       } else {
         setError(partidosRes.error || 'Error al cargar partidos');
       }
@@ -95,8 +95,8 @@ const CalendarioPage = () => {
 
     const interval = setInterval(() => {
       setRefreshing(true);
-      servicioPartidos.getPartidos().then((res) => {
-        if (res.success) setPartidos(res.data);
+      servicioPartidos.getPartidos(undefined, undefined, 1, 100).then((res) => {
+        if (res.success) setPartidos(res.data.results ?? []);
         setRefreshing(false);
       });
     }, 30000);

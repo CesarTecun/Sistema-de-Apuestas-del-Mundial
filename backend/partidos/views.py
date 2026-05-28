@@ -1,5 +1,5 @@
 from rest_framework import permissions, status, pagination
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from django.db.models import Q
@@ -62,6 +62,25 @@ class PartidoViewSet(SoftDeleteModelViewSet):
     serializer_class = PartidoSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = PartidoPagination
+
+    @action(detail=False, methods=['get'], url_path='por-liga')
+    def por_liga(self, request):
+        """Obtener partidos de una liga específica"""
+        liga_id = request.query_params.get('liga_id')
+        if not liga_id:
+            return Response({'error': 'Se requiere el ID de la liga'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            liga_id_int = int(liga_id)
+        except ValueError:
+            return Response({'error': 'liga_id debe ser numérico'}, status=status.HTTP_400_BAD_REQUEST)
+
+        ligas_usuario = obtener_ligas_usuario_ids(request.user.id_usuario)
+        if liga_id_int not in ligas_usuario:
+            raise PermissionDenied('No tienes permisos para consultar esta liga.')
+
+        partidos = Partido.objects.filter(fk_id_liga=liga_id_int)
+        serializer = PartidoSerializer(partidos, many=True)
+        return Response(serializer.data)
 
     def get_queryset(self):
         """Filtrar partidos a las ligas permitidas y opcionalmente por liga o estado."""
@@ -161,27 +180,6 @@ class PartidoViewSet(SoftDeleteModelViewSet):
             return Response({'message': 'Partido eliminado correctamente'}, status=status.HTTP_200_OK)
         except Partido.DoesNotExist:
             return Response({'error': 'Partido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
-
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def partidos_por_liga(request):
-    """Obtener partidos de una liga específica"""
-    liga_id = request.query_params.get('liga_id')
-    if not liga_id:
-        return Response({'error': 'Se requiere el ID de la liga'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    try:
-        liga_id_int = int(liga_id)
-    except ValueError:
-        return Response({'error': 'liga_id debe ser numérico'}, status=status.HTTP_400_BAD_REQUEST)
-
-    ligas_usuario = obtener_ligas_usuario_ids(request.user.id_usuario)
-    if liga_id_int not in ligas_usuario:
-        raise PermissionDenied('No tienes permisos para consultar esta liga.')
-
-    partidos = Partido.objects.filter(fk_id_liga=liga_id_int)
-    serializer = PartidoSerializer(partidos, many=True)
-    return Response(serializer.data)
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])

@@ -53,10 +53,9 @@ const PronosticosPage = () => {
   };
 
   const cargarPartidosDeLiga = async (ligaId) => {
-    const result = await servicioPartidos.getPartidos();
+    const result = await servicioPartidos.getPartidosPorLiga(ligaId);
     if (result.success) {
-      const partidosFiltrados = result.data.filter(p => p.fk_id_liga === ligaId);
-      setPartidos(partidosFiltrados);
+      setPartidos(result.data);
     }
   };
 

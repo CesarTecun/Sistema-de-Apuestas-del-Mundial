@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     PartidoViewSet, JugadorViewSet, SeleccionViewSet,
-    partidos_por_liga, partidos_por_equipo, actualizar_resultado,
+    partidos_por_equipo, actualizar_resultado,
     bracket_eliminatoria, generar_bracket
 )
 from . import marcador_views
@@ -14,7 +14,6 @@ router.register(r'selecciones', SeleccionViewSet, basename='seleccion')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('por-liga/', partidos_por_liga, name='partidos_por_liga'),
     path('por-equipo/', partidos_por_equipo, name='partidos_por_equipo'),
     path('<int:pk>/actualizar-resultado/', actualizar_resultado, name='actualizar_resultado'),
     path('marcador/webhook/', marcador_views.marcador_webhook, name='marcador_webhook'),
