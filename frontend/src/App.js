@@ -12,9 +12,10 @@ import JugadoresSeleccionPage from './paginas/Selecciones/JugadoresSeleccionPage
 import HomePage from './paginas/Home/HomePage';
 import MarcadorPage from './paginas/Marcador';
 import CalendarioPage from './paginas/Calendario/CalendarioPage';
-import HistorialPage from './paginas/Historial';
+import PerfilUsuarioPage from './paginas/Perfil/PerfilUsuarioPage';
 import AdminPage from './paginas/Admin/AdminPage';
 import PronosticosPage from './paginas/Pronosticos/PronosticosPage';
+import InvitacionPage from './paginas/Invitacion/InvitacionPage';
 import RutaProtegida from './componentes/RutaProtegida';
 import PageTransition from './componentes/PageTransition';
 import NotificacionesProvider from './componentes/NotificacionesProvider';
@@ -120,10 +121,13 @@ function ContenidoApp() {
           <CalendarioPage />
         </RutaProtegida>
       } />
-      <Route path="/historial" element={
+      <Route path="/perfil" element={
         <RutaProtegida>
-          <HistorialPage />
+          <PerfilUsuarioPage />
         </RutaProtegida>
+      } />
+      <Route path="/historial" element={
+        <Navigate to="/perfil" replace />
       } />
       <Route path="/pronosticos" element={
         <RutaProtegida>
@@ -135,6 +139,7 @@ function ContenidoApp() {
           <AdminPage />
         </RutaProtegida>
       } />
+      <Route path="/invitacion/:codigo" element={<InvitacionPage />} />
       <Route
         path="/"
         element={<Navigate to={isAuthenticated ? "/home" : "/login"} replace />}

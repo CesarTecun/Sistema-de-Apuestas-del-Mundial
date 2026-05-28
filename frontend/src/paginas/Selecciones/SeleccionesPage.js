@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
 import TarjetaSeleccion from './componentes/TarjetaSeleccion';
 import FormularioSeleccion from './componentes/FormularioSeleccion';
-import TopBar from './componentes/TopBar';
+import TopBar from '../../componentes/TopBar';
 import SeleccionesHeader from './componentes/SeleccionesHeader';
 import SearchBar from '../Ligas/componentes/SearchBar';
 import useNotificaciones from '../../hooks/useNotificaciones';
@@ -99,7 +99,6 @@ const SeleccionesPage = () => {
     if (result.success) {
       setShowForm(false);
       setEditingSeleccion(null);
-      success(editingSeleccion ? '¡Selección actualizada exitosamente!' : '¡Selección creada exitosamente!');
     } else {
       mostrarError(result.error || 'Error al procesar la operación');
     }
@@ -145,7 +144,7 @@ const SeleccionesPage = () => {
     } else {
       const result = await deleteSeleccion(alertaConfirmacion.seleccionId);
       if (result.success) {
-        success('Selección eliminada exitosamente');
+        // Selección eliminada exitosamente
       } else {
         mostrarError(result.error || 'Error al eliminar selección');
       }
@@ -195,7 +194,7 @@ const SeleccionesPage = () => {
       <div className="selecciones-background">
         <div className="selecciones-wrapper">
           <div className="main-sticky-container">
-            <TopBar user={user} onLogout={handleLogout} />
+            <TopBar user={user} onLogout={handleLogout} showBackButton={true} />
 
             <div className="sticky-controls">
               <SeleccionesHeader onCreateClick={handleCreateClick} />

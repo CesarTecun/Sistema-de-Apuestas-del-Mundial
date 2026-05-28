@@ -1,0 +1,224 @@
+@import '../../../estilos/variables.css';
+
+/* ========================================
+   BUZÓN DE INVITACIONES - GLASSMORPHISM DESIGN
+   ======================================== */
+.buzon-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.buzon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.buzon-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--color-white);
+  font-weight: var(--font-weight-bold);
+}
+
+.invitaciones-count {
+  background: linear-gradient(135deg, #a83279 0%, #6a4c93 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.buzon-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.buzon-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--color-error);
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.buzon-vacio {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.buzon-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.buzon-vacio h3 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  color: var(--color-white);
+}
+
+.buzon-vacio p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.invitaciones-lista {
+  display: grid;
+  gap: 15px;
+}
+
+.invitacion-card {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 20px;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.invitacion-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.invitacion-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+
+.invitacion-liga,
+.invitacion-mensaje,
+.invitacion-fecha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 24px;
+}
+
+.invitacion-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 600;
+  min-width: 75px;
+  flex-shrink: 0;
+}
+
+.invitacion-valor {
+  font-size: 14px;
+  color: #ffffff !important;
+  font-weight: 500;
+  flex: 1;
+  word-break: break-word;
+}
+
+.invitacion-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.btn-aceptar,
+.btn-rechazar {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.btn-aceptar {
+  background: linear-gradient(135deg, #a83279 0%, #6a4c93 100%);
+  color: white;
+}
+
+.btn-aceptar:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(168, 50, 121, 0.4);
+}
+
+.btn-aceptar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-rechazar {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-rechazar:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+
+.btn-rechazar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .invitacion-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .invitacion-acciones {
+    flex-direction: column;
+  }
+
+  .btn-aceptar,
+  .btn-rechazar {
+    width: 100%;
+  }
+}

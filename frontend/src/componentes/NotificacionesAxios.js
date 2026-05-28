@@ -59,8 +59,8 @@ function manejarError({ status, data, url }, { error, warning }) {
     message = 'Error del servidor. Intenta más tarde o contacta al administrador.';
     error(message);
   } else {
-    message = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
-    error(message);
+    // No mostrar error para solicitudes canceladas o sin estado
+    return;
   }
 }
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
 import useNotificaciones from '../../hooks/useNotificaciones';
 import NotificacionesContainer from '../../componentes/NotificacionesContainer';
+import TopBar from '../../componentes/TopBar';
 import servicioApi from '../../servicios/servicioApi';
 import './estilos/AdminPage.css';
 
@@ -38,51 +39,6 @@ const fmtDatetime = (d) => d ? new Date(d).toLocaleString('es-GT') : '—';
 
 // ── TOP BAR ──────────────────────────────────────────────────────────────────
 
-const AdminTopBar = ({ user, onBack, onLogout }) => (
-  <div className="top-bar">
-    <div className="top-bar-left">
-      <button 
-        className="back-button"
-        onClick={onBack}
-        aria-label="Volver"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-        <span>Volver</span>
-      </button>
-    </div>
-
-    <div className="user-info">
-      <div className="user-avatar">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-      </div>
-      <div className="user-details">
-        <span className="user-name">
-          {user?.primer_nombre} {user?.primer_apellido}
-        </span>
-        <span className="user-email">{user?.email}</span>
-      </div>
-    </div>
-    
-    <div className="top-bar-actions">
-      <button 
-        className="logout-button"
-        onClick={onLogout}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-          <polyline points="16 17 21 12 16 7"></polyline>
-          <line x1="21" y1="12" x2="9" y2="12"></line>
-        </svg>
-        Cerrar Sesión
-      </button>
-    </div>
-  </div>
-);
 
 // ── DASHBOARD ────────────────────────────────────────────────────────────────
 
@@ -164,6 +120,8 @@ const Dashboard = () => {
           label="Públicas" value={fmt(data?.ligas?.publicas)} />
         <StatCard iconClass="gold" icon={<MultiPathIcon paths={[icons.config]} size={22} />}
           label="Competitivas" value={fmt(data?.ligas?.competitivas)} />
+        <StatCard iconClass="red" icon={<MultiPathIcon paths={[icons.x]} size={22} />}
+          label="Rechazadas" value={fmt(data?.ligas?.rechazadas || 0)} />
       </div>
 
       <p className="stats-section-title">Partidos</p>
@@ -234,7 +192,7 @@ const GestionUsuarios = ({ notif }) => {
     setAccionando(id);
     try {
       await servicioApi.post(`/usuarios/${id}/activar/`);
-      notif.success('Usuario activado correctamente');
+      // notif.success('Usuario activado correctamente');
       cargar();
     } catch {
       notif.error('Error al activar usuario');
@@ -251,7 +209,7 @@ const GestionUsuarios = ({ notif }) => {
     setAccionando(id);
     try {
       await servicioApi.post(`/usuarios/${id}/desactivar/`);
-      notif.success('Usuario desactivado correctamente');
+      // notif.success('Usuario desactivado correctamente');
       cargar();
     } catch {
       notif.error('Error al desactivar usuario');
@@ -385,7 +343,7 @@ const ConfiguracionTorneo = ({ notif }) => {
     setSaving(true);
     try {
       await servicioApi.put('/core/configuracion/', config);
-      notif.success('Configuración guardada correctamente');
+      // notif.success('Configuración guardada correctamente');
     } catch {
       notif.error('Error al guardar la configuración');
     } finally {
@@ -771,7 +729,7 @@ const AdminPage = () => {
   return (
     <div className="admin-container">
       <div className="admin-background">
-        <AdminTopBar user={user} onBack={() => navigate('/home')} onLogout={handleLogout} />
+        <TopBar user={user} onLogout={handleLogout} showBackButton={true} />
 
         <div className="admin-layout">
           <nav className="admin-sidebar">

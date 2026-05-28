@@ -59,6 +59,8 @@
   align-items: center;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
+  padding-right: 140px;
+  position: relative;
 }
 
 .liga-card-icon {
@@ -239,6 +241,11 @@
 .delete-button:hover {
   background: rgba(239, 68, 68, 0.3);
   border-color: rgba(239, 68, 68, 0.5);
+}
+
+.invite-button:hover {
+  background: rgba(76, 175, 80, 0.3);
+  border-color: rgba(76, 175, 80, 0.5);
 }
 
 /* ========================================

@@ -16,10 +16,12 @@
 .admin-background {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, 
-    rgba(33, 33, 33, 0.95) 0%, 
-    rgba(66, 66, 66, 0.95) 100%
-  );
+  background: 
+    linear-gradient(135deg, rgba(33, 33, 33, 0.55) 0%, rgba(66, 66, 66, 0.55) 100%),
+    url('https://images.unsplash.com/photo-1777715329434-fe4379703852?q=80&w=1168&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
   display: flex;
   flex-direction: column;
   padding: var(--spacing-lg);

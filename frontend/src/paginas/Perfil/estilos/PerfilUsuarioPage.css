@@ -1,0 +1,874 @@
+/* Importar variables CSS del sistema de diseño */
+@import '../../../estilos/variables.css';
+
+/* ========================================
+   PERFIL PAGE - LAYOUT PRINCIPAL
+   ======================================== */
+
+/* ========================================
+   CONTENEDOR PRINCIPAL DE PERFIL
+   ======================================== */
+.perfil-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* ========================================
+   FONDO CON IMAGEN DE ESTADIO
+   ======================================== */
+.perfil-background {
+  min-height: 100vh;
+  width: 100%;
+  background: 
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.8) 100%),
+    url('https://images.unsplash.com/photo-1620841148393-1a4d67150505?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+.perfil-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.perfil-wrapper .top-bar {
+  width: 100%;
+}
+
+.perfil-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+  pointer-events: none;
+}
+
+/* ========================================
+   CONTENEDOR PRINCIPAL STICKY
+   ======================================== */
+.main-sticky-container {
+  position: sticky;
+  top: var(--spacing-md);
+  z-index: var(--z-sticky);
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+}
+
+/* ========================================
+   CONTROLES STICKY
+   ======================================== */
+.sticky-controls {
+  background: none;
+  backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.sticky-controls:hover {
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ========================================
+   CONTENIDO DE PERFIL CON SCROLL
+   ======================================== */
+.perfil-content {
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.perfil-content.no-animation {
+  animation: none;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   ESTADOS DE CARGA Y ERROR
+   ======================================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-secondary);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  color: var(--color-error);
+  text-align: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.retry-button {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: background 0.3s;
+}
+
+.retry-button:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ========================================
+   ESTADO VACÍO
+   ======================================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  text-align: center;
+  color: var(--text-secondary);
+  min-height: 80vh;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 769px) {
+  .empty-state {
+    max-width: 600px;
+  }
+}
+
+.empty-icon {
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  color: var(--color-white);
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-xl);
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+}
+
+/* ========================================
+   MIS LIGAS SECTION
+   ======================================== */
+.mis-ligas-section {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 10px 0;
+  transition: all 0.3s ease;
+}
+
+.section-header:hover {
+  opacity: 0.8;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
+.chevron-icon {
+  transition: transform 0.3s ease;
+  color: white;
+}
+
+.chevron-icon.expanded {
+  transform: rotate(180deg);
+  color: white;
+}
+
+.section-content {
+  overflow: hidden;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+.section-title {
+  color: var(--color-white);
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.ligas-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+  width: 100%;
+}
+
+.liga-compact-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.liga-compact-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.liga-compact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.liga-compact-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.liga-compact-status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.liga-compact-status.estado-ganada {
+  background: #28a745;
+  color: white;
+}
+
+.liga-compact-status.estado-posicion {
+  background: #17a2b8;
+  color: white;
+}
+
+.liga-compact-status.estado-sin-posicion {
+  background: #6c757d;
+  color: white;
+}
+
+.liga-compact-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.compact-stat {
+  text-align: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.compact-stat-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.compact-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+  display: block;
+}
+
+.empty-state-compact {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state-compact .empty-icon {
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state-compact p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* ========================================
+   STATS GRID
+   ======================================== */
+.perfil-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.perfil-stat-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.perfil-stat-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.stat-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ========================================
+   TABS
+   ======================================== */
+.perfil-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 15px;
+  width: 100%;
+}
+
+.perfil-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 10px;
+}
+
+.perfil-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+}
+
+.perfil-tab.active {
+  background: linear-gradient(135deg, #a83279 0%, #6a4c93 100%);
+  color: white;
+}
+
+.perfil-tab svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ========================================
+   TAB CONTENT
+   ======================================== */
+.perfil-tab-content {
+  margin-top: 20px;
+  width: 100%;
+}
+
+/* ========================================
+   FILTERS
+   ======================================== */
+.perfil-filters {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  width: 100%;
+}
+
+.perfil-filters label {
+  font-weight: 600;
+  color: var(--color-white);
+  font-size: 14px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.filter-btn.active {
+  background: linear-gradient(135deg, #a83279 0%, #6a4c93 100%);
+  border-color: transparent;
+  color: white;
+}
+
+/* ========================================
+   PRONÓSTICOS GRID
+   ======================================== */
+.pronosticos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.pronostico-card-new {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 25px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.pronostico-card-new:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.pronostico-match {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.team-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-white);
+  text-align: center;
+}
+
+.match-vs {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+}
+
+.pronostico-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.detail-value.actual {
+  color: var(--color-primary);
+}
+
+.pronostico-footer-new {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.badge-new {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.badge-new.badge-exacto {
+  background: #28a745;
+  color: white;
+}
+
+.badge-new.badge-correcto {
+  background: #17a2b8;
+  color: white;
+}
+
+.badge-new.badge-fallido {
+  background: #dc3545;
+  color: white;
+}
+
+.badge-new.badge-pendiente {
+  background: #ffc107;
+  color: #333;
+}
+
+.points-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.points {
+  font-size: 20px;
+  font-weight: 700;
+  color: #28a745;
+}
+
+.status {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ========================================
+   LIGAS GRID
+   ======================================== */
+.ligas-grid-new {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 25px;
+  width: 100%;
+}
+
+.liga-card-new {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 25px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  overflow: hidden;
+}
+
+.liga-card-new:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.liga-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.liga-card-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.liga-status {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.liga-status.estado-ganada {
+  background: #28a745;
+  color: white;
+}
+
+.liga-status.estado-posicion {
+  background: #17a2b8;
+  color: white;
+}
+
+.liga-status.estado-sin-posicion {
+  background: #6c757d;
+  color: white;
+}
+
+.liga-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mini-stat {
+  text-align: center;
+  padding: 10px 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.mini-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.mini-stat-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  line-height: 1.1;
+}
+
+.liga-progress-bar {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+}
+
+.progress-segment {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.progress-segment.exacto {
+  background: #28a745;
+}
+
+.progress-segment.correcto {
+  background: #17a2b8;
+}
+
+.progress-segment.fallido {
+  background: #dc3545;
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE FIRST
+   ======================================== */
+@media (max-width: 768px) {
+  .perfil-background {
+    background-attachment: scroll;
+    padding: var(--spacing-md);
+  }
+
+  .perfil-wrapper {
+    width: 100%;
+  }
+
+  .main-sticky-container {
+    position: static;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .perfil-content {
+    padding: 0 var(--spacing-md);
+  }
+
+  .perfil-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .pronosticos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ligas-grid-new {
+    grid-template-columns: 1fr;
+  }
+
+  .liga-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .perfil-tabs {
+    flex-direction: column;
+  }
+
+  .perfil-tab {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filter-buttons {
+    width: 100%;
+  }
+
+  .filter-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .perfil-background {
+    padding: var(--spacing-sm);
+  }
+
+  .perfil-content {
+    padding: 0 var(--spacing-sm);
+  }
+}
+
+/* ========================================
+   NO ANIMATION CLASS
+   ======================================== */
+.no-animation .perfil-content,
+.no-animation .pronostico-card-new,
+.no-animation .liga-card-new,
+.no-animation .perfil-header {
+  animation: none !important;
+}
+
+.no-animation .pronostico-card-new,
+.no-animation .liga-card-new {
+  transform: none !important;
+}

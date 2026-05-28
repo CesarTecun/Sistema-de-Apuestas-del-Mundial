@@ -1,7 +1,9 @@
 import React from 'react';
+import { useAuth } from '../../../contextos/ContextoAutenticacion';
 import './LigasGrid.css';
 
-const TarjetaLiga = ({ liga, onEdit, onDelete, onView, onVerTabla }) => {
+const TarjetaLiga = ({ liga, onEdit, onDelete, onView, onVerTabla, onInvitarPersona }) => {
+  const { user } = useAuth();
   const formatearMonto = (monto) => {
     return new Intl.NumberFormat('es-GT', {
       style: 'currency',
@@ -12,6 +14,7 @@ const TarjetaLiga = ({ liga, onEdit, onDelete, onView, onVerTabla }) => {
   const isApuesta = liga.tipo_liga?.toLowerCase() === 'apuesta' || liga.tipo_liga?.toLowerCase() === 'dinero' || liga.tipo_liga?.toLowerCase() === 'competitiva';
   const participantes = liga.numero_participantes || liga.participantes || 0;
   const posicion = liga.posicion_usuario || 1;
+  const esAdministrador = user?.id_usuario === liga.fk_administrador;
 
   return (
     <div className="liga-card-modern">
@@ -96,6 +99,21 @@ const TarjetaLiga = ({ liga, onEdit, onDelete, onView, onVerTabla }) => {
             <circle cx="12" cy="12" r="3"></circle>
           </svg>
         </button>
+        
+        {esAdministrador && onInvitarPersona && (
+          <button 
+            className="action-button invite-button"
+            onClick={() => onInvitarPersona(liga)}
+            title="Invitar persona"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="20" y1="8" x2="20" y2="14"></line>
+              <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+          </button>
+        )}
         
         <button 
           className="action-button edit-button"

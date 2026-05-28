@@ -1,0 +1,56 @@
+@import '../../../estilos/variables.css';
+
+/* ========================================
+   PERFIL HEADER - ENCABEZADO DE LA PÁGINA
+   ======================================== */
+.perfil-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: rgba(168, 50, 121, 0.1);
+  backdrop-filter: var(--backdrop-blur-lg);
+  border: var(--border-width-thin) solid rgba(168, 50, 121, 0.3);
+  border-radius: var(--border-radius-2xl);
+  gap: var(--spacing-lg);
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  color: var(--color-white);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-xs) 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.page-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+  margin: 0;
+}
+
+/* ========================================
+   RESPONSIVE - PERFIL HEADER
+   ======================================== */
+@media (max-width: 768px) {
+  .perfil-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  .header-content {
+    text-align: center;
+    width: 100%;
+  }
+
+  .page-title {
+    font-size: var(--font-size-2xl);
+  }
+}

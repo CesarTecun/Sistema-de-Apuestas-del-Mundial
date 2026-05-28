@@ -4,7 +4,7 @@ import { useAuth } from '../../contextos/ContextoAutenticacion';
 import servicioPronosticos from '../../servicios/servicioPronosticos';
 import servicioLigas from '../../servicios/servicioLigas';
 import servicioPartidos from '../../servicios/servicioPartidos';
-import TopBar from '../Ligas/componentes/TopBar';
+import TopBar from '../../componentes/TopBar';
 import './estilos/PronosticosPage.css';
 
 const PronosticosPage = () => {
@@ -17,6 +17,7 @@ const PronosticosPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selecciones, setSelecciones] = useState([]);
+  const [filtroPronostico, setFiltroPronostico] = useState('todos');
 
   useEffect(() => {
     cargarLigas();
@@ -80,6 +81,14 @@ const PronosticosPage = () => {
     return pronosticos.find(p => p.fk_id_partido === partidoId && p.fk_id_usuario === user?.id_usuario);
   };
 
+  const partidosFiltrados = partidos.filter((partido) => {
+    const pronostico = getPronosticoUsuario(partido.id_partido);
+    if (filtroPronostico === 'todos') return true;
+    if (filtroPronostico === 'pronosticados') return !!pronostico;
+    if (filtroPronostico === 'no-pronosticados') return !pronostico;
+    return true;
+  });
+
   const handleCrearPronostico = async (partidoId, golLocal, golVisitante) => {
     if (!selectedLiga) return;
     
@@ -117,7 +126,7 @@ const PronosticosPage = () => {
       <div className="pronosticos-container">
         <div className="pronosticos-background">
           <div className="pronosticos-wrapper">
-            <TopBar user={user} onLogout={handleLogout} />
+            <TopBar user={user} onLogout={handleLogout} showBackButton={true} />
             <div className="loading-container">
               <div className="loading-spinner"></div>
               <p>Cargando pronósticos...</p>
@@ -132,7 +141,7 @@ const PronosticosPage = () => {
     <div className="pronosticos-container">
       <div className="pronosticos-background">
         <div className="pronosticos-wrapper">
-          <TopBar user={user} onLogout={handleLogout} />
+          <TopBar user={user} onLogout={handleLogout} showBackButton={true} />
 
           <div className="pronosticos-content">
             {/* Header */}
@@ -150,6 +159,15 @@ const PronosticosPage = () => {
                     </option>
                   ))}
                 </select>
+                <label>Filtrar por:</label>
+                <select
+                  value={filtroPronostico}
+                  onChange={(e) => setFiltroPronostico(e.target.value)}
+                >
+                  <option value="todos">Todos</option>
+                  <option value="pronosticados">Pronosticados</option>
+                  <option value="no-pronosticados">No pronosticados</option>
+                </select>
               </div>
             </div>
 
@@ -163,13 +181,13 @@ const PronosticosPage = () => {
 
             {/* Lista de partidos */}
             <div className="partidos-list">
-              {partidos.length === 0 ? (
+              {partidosFiltrados.length === 0 ? (
                 <div className="empty-state">
                   <h3>No hay partidos disponibles</h3>
                   <p>Selecciona una liga para ver los partidos disponibles.</p>
                 </div>
               ) : (
-                partidos.map((partido) => {
+                partidosFiltrados.map((partido) => {
                   const pronostico = getPronosticoUsuario(partido.id_partido);
                   const puedePronosticar = !pronostico && partido.estado_partido !== 'finalizado';
                   

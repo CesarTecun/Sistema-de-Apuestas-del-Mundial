@@ -1,9 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../estilos/TopBar.css';
+import servicioLigas from '../servicios/servicioLigas';
+import './TopBar.css';
 
-const TopBar = ({ user, onLogout, invitationCount = 0 }) => {
+const TopBar = ({ user, onLogout, showBackButton = false }) => {
   const navigate = useNavigate();
+  const [invitaciones, setInvitaciones] = useState([]);
+  const [invitacionesLoading, setInvitacionesLoading] = useState(false);
+
+  const cargarInvitaciones = async () => {
+    setInvitacionesLoading(true);
+    try {
+      const result = await servicioLigas.getInvitaciones();
+      if (result.success) {
+        setInvitaciones(result.data.results || result.data);
+      }
+    } catch (error) {
+      console.error('Error al cargar invitaciones:', error);
+    } finally {
+      setInvitacionesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarInvitaciones();
+  }, []);
 
   const handleBack = () => {
     navigate(-1);
@@ -13,20 +34,24 @@ const TopBar = ({ user, onLogout, invitationCount = 0 }) => {
     navigate('/perfil');
   };
 
+  const invitationCount = invitacionesLoading ? 0 : invitaciones.filter(inv => inv.estado_invitacion === 'Pendiente').length;
+
   return (
-    <div className="partidos-top-bar">
-      <div className="top-bar-left">
-        <button 
-          className="back-button"
-          onClick={handleBack}
-          aria-label="Volver"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          <span>Volver</span>
-        </button>
-      </div>
+    <div className="top-bar">
+      {showBackButton && (
+        <div className="top-bar-left">
+          <button 
+            className="back-button"
+            onClick={handleBack}
+            aria-label="Volver"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>Volver</span>
+          </button>
+        </div>
+      )}
 
       <div className="user-info" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
         <div className="user-avatar">

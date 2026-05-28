@@ -432,6 +432,21 @@
     text-align: center;
   }
 
+  .liga-selector {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    width: 100%;
+  }
+
+  .liga-selector label {
+    font-size: var(--font-size-sm);
+  }
+
+  .liga-selector select {
+    width: 100%;
+    font-size: var(--font-size-sm);
+  }
+
   .partidos-list {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -452,6 +467,28 @@
     flex-direction: column;
     gap: var(--spacing-sm);
     text-align: center;
+  }
+
+  .pronostico-form {
+    gap: var(--spacing-sm);
+  }
+
+  .input-group {
+    gap: var(--spacing-xs);
+  }
+
+  .input-group label {
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .input-group input {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    min-width: 50px;
+    min-height: 40px;
   }
 }
 

@@ -12,10 +12,10 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'', LigaViewSet, basename='liga')
 router.register(r'invitaciones', InvitacionViewSet, basename='invitacion')
 router.register(r'participantes', ParticipanteLigaViewSet, basename='participante')
 router.register(r'solicitudes', SolicitudParticipacionViewSet, basename='solicitud-participacion')
+router.register(r'', LigaViewSet, basename='liga')
 
 urlpatterns = [
     path('publicas/', LigasPublicasView.as_view(), name='ligas_publicas'),

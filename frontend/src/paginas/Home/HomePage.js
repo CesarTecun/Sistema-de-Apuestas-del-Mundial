@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
+import servicioLigas from '../../servicios/servicioLigas';
 import './estilos/HomePage.css';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [invitaciones, setInvitaciones] = useState([]);
+  const [invitacionesLoading, setInvitacionesLoading] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -18,6 +21,24 @@ const HomePage = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    cargarInvitaciones();
+  }, []);
+
+  const cargarInvitaciones = async () => {
+    setInvitacionesLoading(true);
+    try {
+      const result = await servicioLigas.getInvitaciones();
+      if (result.success) {
+        setInvitaciones(result.data.results || result.data);
+      }
+    } catch (error) {
+      console.error('Error al cargar invitaciones:', error);
+    } finally {
+      setInvitacionesLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -32,21 +53,21 @@ const HomePage = () => {
     <div className="landing-page">
       {/* Navbar */}
       <nav className="landing-navbar">
-        <div className="landing-logo">
+        <button 
+          className="landing-logo"
+          onClick={() => navigate('/perfil')}
+          aria-label="Perfil"
+        >
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            <path d="M2 12h20"></path>
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
           </svg>
-        </div>
+          {!invitacionesLoading && invitaciones.filter(inv => inv.estado_invitacion === 'Pendiente').length > 0 && (
+            <span className="notification-badge">{invitaciones.filter(inv => inv.estado_invitacion === 'Pendiente').length}</span>
+          )}
+        </button>
         
         <div className="landing-nav-right">
-          <button 
-            className="landing-logout-button"
-            onClick={handleLogout}
-          >
-            Cerrar Sesión
-          </button>
           <div className="landing-social-icons">
             <a href="#facebook" className="social-icon" aria-label="Facebook">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -89,11 +110,34 @@ const HomePage = () => {
           </button>
           <span className="landing-language">ES</span>
         </div>
+          <button 
+            className="landing-logout-button"
+            onClick={handleLogout}
+            aria-label="Cerrar Sesión"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
       </nav>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="landing-mobile-menu">
+          {user?.fk_rol === 1 && (
+            <button
+              className="landing-mobile-menu-item"
+              onClick={() => {
+                navigate('/admin');
+                setMobileMenuOpen(false);
+              }}
+              style={{ background: 'linear-gradient(135deg, #a83279 0%, #6a4c93 100%)', color: 'white' }}
+            >
+              ADMIN
+            </button>
+          )}
           <button 
             className="landing-mobile-menu-item"
             onClick={() => {
@@ -210,30 +254,6 @@ const HomePage = () => {
               }}
             >
               Ver Selecciones →
-            </a>
-          </div>
-
-          <div className="landing-card">
-            <div className="landing-card-image">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-            </div>
-            <h3 className="landing-card-title">Historial</h3>
-            <p className="landing-card-text">Revisa tus pronósticos acertados, puntos y ligas ganadas</p>
-            <a
-              href="#historial"
-              className="landing-card-link"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/historial');
-              }}
-            >
-              Ver Historial →
             </a>
           </div>
         </div>

@@ -8,8 +8,8 @@
 .historial-background {
   min-height: 100vh;
   background: 
-    linear-gradient(135deg, rgba(33, 33, 33, 0.85) 0%, rgba(66, 66, 66, 0.85) 100%),
-    url('https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
+    linear-gradient(135deg, rgba(33, 33, 33, 0.65) 0%, rgba(66, 66, 66, 0.55) 100%),
+    url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
   background-attachment: fixed;
   background-size: cover;
   background-position: center;

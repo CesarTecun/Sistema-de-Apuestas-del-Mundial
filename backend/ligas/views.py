@@ -329,15 +329,63 @@ class SolicitudParticipacionViewSet(viewsets.ReadOnlyModelViewSet):
         })
 
 
-class ParticipanteLigaViewSet(SoftDeleteModelViewSet):
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def participantes_por_liga(request):
+    """Obtener participantes de una liga específica"""
+    try:
+        liga_id = request.query_params.get('fk_id_liga')
+        print(f"[participantes_por_liga] liga_id: {liga_id}")
+        
+        if not liga_id:
+            return Response({'error': 'Se requiere el parámetro fk_id_liga'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        participantes = ParticipanteLiga.objects.filter(fk_id_liga=liga_id)
+        print(f"[participantes_por_liga] Participantes encontrados: {participantes.count()}")
+        
+        serializer = ParticipanteLigaSerializer(participantes, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        print(f"[participantes_por_liga] Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ParticipanteLigaViewSet(viewsets.ModelViewSet):
     """
     API endpoint para gestionar participantes de ligas.
-    Implementa soft delete - al "eliminar" solo cambia status a False.
     """
-    queryset = ParticipanteLiga.objects.all()
     serializer_class = ParticipanteLigaSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id_participante'
+
+    def get_queryset(self):
+        """Filtrar participantes por liga si se proporciona el parámetro"""
+        try:
+            queryset = ParticipanteLiga.objects.all()
+            liga_id = self.request.query_params.get('fk_id_liga')
+            print(f"[ParticipanteLigaViewSet] liga_id from query params: {liga_id}")
+            if liga_id:
+                queryset = queryset.filter(fk_id_liga=liga_id)
+            print(f"[ParticipanteLigaViewSet] Queryset count: {queryset.count()}")
+            return queryset
+        except Exception as e:
+            print(f"[ParticipanteLigaViewSet] Error in get_queryset: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            raise
+
+    def list(self, request, *args, **kwargs):
+        """Override list to add error handling"""
+        try:
+            print(f"[ParticipanteLigaViewSet] list called with query params: {request.query_params}")
+            return super().list(request, *args, **kwargs)
+        except Exception as e:
+            print(f"[ParticipanteLigaViewSet] Error in list: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class InvitacionViewSet(SoftDeleteModelViewSet):
@@ -357,7 +405,7 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
         )
     
     @action(detail=True, methods=['post'], url_path='aceptar')
-    def aceptar(self, request, pk=None):
+    def aceptar(self, request, id_invitacion=None):
         """Aceptar una invitación y unirse a la liga"""
         try:
             invitacion = self.get_object()
@@ -395,7 +443,7 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
         }, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'], url_path='rechazar')
-    def rechazar(self, request, pk=None):
+    def rechazar(self, request, id_invitacion=None):
         """Rechazar una invitación"""
         try:
             invitacion = self.get_object()
@@ -591,15 +639,24 @@ class InvitacionPublicaView(APIView):
         return Liga.objects.filter(id_liga=invitacion.fk_id_liga, status=True).first()
 
     def get(self, request, codigo):
-        invitacion = self._get_invitacion(codigo)
-        liga = self._get_liga(invitacion)
-        liga_data = LigaSerializer(liga).data if liga else None
-        return Response({
-            'id_invitacion': invitacion.id_invitacion,
-            'estado': invitacion.estado_invitacion,
-            'email_invitado': invitacion.email_invitado,
-            'liga': liga_data,
-        })
+        try:
+            print(f"[InvitacionPublicaView] GET called with codigo: {codigo}")
+            invitacion = self._get_invitacion(codigo)
+            print(f"[InvitacionPublicaView] Invitacion found: {invitacion.id_invitacion}")
+            liga = self._get_liga(invitacion)
+            print(f"[InvitacionPublicaView] Liga found: {liga}")
+            liga_data = LigaSerializer(liga).data if liga else None
+            return Response({
+                'id_invitacion': invitacion.id_invitacion,
+                'estado': invitacion.estado_invitacion,
+                'email_invitado': invitacion.email_invitado,
+                'liga': liga_data,
+            })
+        except Exception as e:
+            print(f"[InvitacionPublicaView] Error in GET: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return Response({'error': str(e)}, status=400)
 
     def post(self, request, codigo):
         invitacion = self._get_invitacion(codigo)

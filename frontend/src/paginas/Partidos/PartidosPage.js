@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
 import TarjetaPartido from './componentes/TarjetaPartido';
 import FormularioPartido from './componentes/FormularioPartido';
-import TopBar from './componentes/TopBar';
+import TopBar from '../../componentes/TopBar';
 import PartidosHeader from './componentes/PartidosHeader';
 import SearchBar from '../Ligas/componentes/SearchBar';
 import useNotificaciones from '../../hooks/useNotificaciones';
@@ -111,7 +111,6 @@ const PartidosPage = () => {
     if (result.success) {
       setShowForm(false);
       setEditingPartido(null);
-      success(editingPartido ? '¡Partido actualizado exitosamente!' : '¡Partido creado exitosamente!');
     } else {
       mostrarError(result.error || 'Error al procesar la operación');
     }
@@ -168,7 +167,7 @@ const PartidosPage = () => {
     } else {
       const result = await deletePartido(alertaConfirmacion.partidoId);
       if (result.success) {
-        success('Partido eliminado exitosamente');
+        // Partido eliminado exitosamente
       } else {
         mostrarError(result.error || 'Error al eliminar partido');
       }
@@ -222,7 +221,7 @@ const PartidosPage = () => {
       <div className="partidos-background">
         <div className="partidos-wrapper">
           <div className="main-sticky-container">
-            <TopBar user={user} onLogout={handleLogout} />
+            <TopBar user={user} onLogout={handleLogout} showBackButton={true} />
 
             <div className="sticky-controls">
               <PartidosHeader

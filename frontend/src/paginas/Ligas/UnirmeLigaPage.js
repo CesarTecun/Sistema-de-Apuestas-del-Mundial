@@ -41,6 +41,7 @@ const UnirmeLigaPage = () => {
 
     const fetchPublicLeagues = async () => {
       try {
+        console.log('[UnirmeLigaPage] Fetching public leagues from:', API_ENDPOINTS.LIGAS_PUBLICAS);
         setPublicLoading(true);
         const response = await axios.get(API_ENDPOINTS.LIGAS_PUBLICAS, {
           params: {
@@ -49,10 +50,13 @@ const UnirmeLigaPage = () => {
           },
           signal: controller.signal,
         });
+        console.log('[UnirmeLigaPage] Public leagues response:', response.data);
         setPublicLeagues(response.data?.results || []);
       } catch (error) {
         if (!axios.isCancel(error)) {
-          console.error('Error al cargar ligas públicas', error);
+          console.error('[UnirmeLigaPage] Error al cargar ligas públicas', error);
+          console.error('[UnirmeLigaPage] Error response:', error.response);
+          console.error('[UnirmeLigaPage] Error message:', error.message);
           mostrarError('No pudimos cargar las ligas públicas en este momento.');
         }
       } finally {
@@ -79,7 +83,7 @@ const UnirmeLigaPage = () => {
         [liga.id_liga]: response.data?.aprobacion_requerida ? 'pendiente' : 'aceptado',
       }));
 
-      success(response.data?.message || 'Solicitud enviada correctamente.');
+      // success(response.data?.message || 'Solicitud enviada correctamente.');
       if (!response.data?.aprobacion_requerida) {
         navigate('/GestionLigas');
       }
@@ -115,7 +119,7 @@ const UnirmeLigaPage = () => {
 
       setCodigo('');
       setCodigoFeedback({ status: 'success', message: 'Invitación aceptada. Ya formas parte de la liga.' });
-      success('Invitación aceptada correctamente.');
+      // success('Invitación aceptada correctamente.');
       navigate('/GestionLigas');
     } catch (error) {
       const message =

@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
 import TarjetaLiga from './componentes/TarjetaLiga';
 import FormularioLiga from './componentes/FormularioLiga';
-import TopBar from './componentes/TopBar';
+import TopBar from '../../componentes/TopBar';
 import LigasHeader from './componentes/LigasHeader';
 import SearchBar from './componentes/SearchBar';
 import LigasModal from './componentes/LigasModal';
+import TablaParticipantes from './componentes/TablaParticipantes';
+import InvitarPersona from './componentes/InvitarPersona';
 import useNotificaciones from '../../hooks/useNotificaciones';
 import { useLigas } from '../../hooks/useLigas';
 import NotificacionesContainer from '../../componentes/NotificacionesContainer';
@@ -38,6 +40,8 @@ const LigasPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingLiga, setEditingLiga] = useState(null);
   const [viewingLiga, setViewingLiga] = useState(null);
+  const [showTablaParticipantes, setShowTablaParticipantes] = useState(null);
+  const [showInvitarPersona, setShowInvitarPersona] = useState(null);
   const [alertaConfirmacion, setAlertaConfirmacion] = useState({
     mostrar: false,
     paso: 1,
@@ -67,7 +71,6 @@ const LigasPage = () => {
     if (result.success) {
       setShowForm(false);
       setEditingLiga(null);
-      success(editingLiga ? '¡Liga actualizada exitosamente!' : '¡Liga creada exitosamente!');
     } else {
       mostrarError(result.error || 'Error al procesar la operación');
     }
@@ -110,7 +113,7 @@ const LigasPage = () => {
     } else {
       const result = await deleteLiga(alertaConfirmacion.ligaId);
       if (result.success) {
-        success('Liga eliminada exitosamente');
+        // Liga eliminada exitosamente
       } else {
         mostrarError(result.error || 'Error al eliminar liga');
       }
@@ -127,7 +130,15 @@ const LigasPage = () => {
   };
 
   const handleVerTabla = (liga) => {
-    console.log('Navegando a tabla de posiciones para liga:', liga.id_liga);
+    setShowTablaParticipantes(liga);
+  };
+
+  const handleInvitarPersona = (liga) => {
+    setShowInvitarPersona(liga);
+  };
+
+  const handleInvitarSuccess = (message) => {
+    // success(message);
   };
 
   const getEstadoColor = (estado) => {
@@ -181,7 +192,7 @@ const LigasPage = () => {
       <div className="ligas-background">
         <div className="ligas-wrapper">
           <div className="main-sticky-container">
-            <TopBar user={user} onLogout={handleLogout} />
+            <TopBar user={user} onLogout={handleLogout} showBackButton={true} />
             
             <div className="sticky-controls">
               <LigasHeader onCreateClick={handleCreateClick} />
@@ -231,6 +242,7 @@ const LigasPage = () => {
                       onDelete={handleDeleteLiga}
                       onView={handleViewLiga}
                       onVerTabla={handleVerTabla}
+                      onInvitarPersona={handleInvitarPersona}
                     />
                   ))}
                 </div>
@@ -242,6 +254,21 @@ const LigasPage = () => {
               onClose={() => setViewingLiga(null)}
               getEstadoColor={getEstadoColor}
             />
+
+            {showTablaParticipantes && (
+              <TablaParticipantes
+                liga={showTablaParticipantes}
+                onClose={() => setShowTablaParticipantes(null)}
+              />
+            )}
+
+            {showInvitarPersona && (
+              <InvitarPersona
+                liga={showInvitarPersona}
+                onClose={() => setShowInvitarPersona(null)}
+                onSuccess={handleInvitarSuccess}
+              />
+            )}
 
           </div>
         </div>

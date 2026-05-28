@@ -3,7 +3,7 @@ import servicioApi from './servicioApi';
 const servicioPronosticos = {
   async getPronosticos() {
     try {
-      const response = await servicioApi.get('/pronosticos/');
+      const response = await servicioApi.get('/pronosticos/pronosticos/');
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al obtener pronósticos:', error);
@@ -14,7 +14,7 @@ const servicioPronosticos = {
 
   async getPronostico(id) {
     try {
-      const response = await servicioApi.get(`/pronosticos/${id}/`);
+      const response = await servicioApi.get(`/pronosticos/pronosticos/${id}/`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al obtener pronóstico:', error);
@@ -25,7 +25,7 @@ const servicioPronosticos = {
 
   async crearPronostico(data) {
     try {
-      const response = await servicioApi.post('/pronosticos/', data);
+      const response = await servicioApi.post('/pronosticos/pronosticos/', data);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al crear pronóstico:', error);
@@ -36,7 +36,7 @@ const servicioPronosticos = {
 
   async actualizarPronostico(id, data) {
     try {
-      const response = await servicioApi.put(`/pronosticos/${id}/`, data);
+      const response = await servicioApi.put(`/pronosticos/pronosticos/${id}/`, data);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al actualizar pronóstico:', error);
@@ -47,7 +47,7 @@ const servicioPronosticos = {
 
   async eliminarPronostico(id) {
     try {
-      const response = await servicioApi.delete(`/pronosticos/${id}/`);
+      const response = await servicioApi.delete(`/pronosticos/pronosticos/${id}/`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al eliminar pronóstico:', error);

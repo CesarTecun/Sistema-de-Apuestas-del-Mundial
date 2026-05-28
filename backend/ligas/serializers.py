@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import Liga, Invitacion, ParticipanteLiga, SolicitudParticipacion
+from backend.usuarios.models import Usuario
 
 
 class LigaSerializer(serializers.ModelSerializer):
@@ -33,6 +34,8 @@ class LigaSerializer(serializers.ModelSerializer):
 
 class ParticipanteLigaSerializer(serializers.ModelSerializer):
     """Serializer para gestionar participantes de ligas"""
+    usuario_nombre = serializers.SerializerMethodField()
+    usuario_email = serializers.SerializerMethodField()
 
     class Meta:
         model = ParticipanteLiga
@@ -40,15 +43,31 @@ class ParticipanteLigaSerializer(serializers.ModelSerializer):
             'id_participante',
             'fk_id_liga',
             'fk_id_usuario',
+            'usuario_nombre',
+            'usuario_email',
             'fecha_union',
-            'estado_participacion',
-            'status'
+            'estado_participacion'
         ]
         read_only_fields = ['id_participante', 'fecha_union']
+
+    def get_usuario_nombre(self, obj):
+        try:
+            usuario = Usuario.objects.get(id_usuario=obj.fk_id_usuario)
+            return f"{usuario.primer_nombre} {usuario.primer_apellido}"
+        except Usuario.DoesNotExist:
+            return "Usuario no encontrado"
+
+    def get_usuario_email(self, obj):
+        try:
+            usuario = Usuario.objects.get(id_usuario=obj.fk_id_usuario)
+            return usuario.email
+        except Usuario.DoesNotExist:
+            return None
 
 
 class InvitacionSerializer(serializers.ModelSerializer):
     """Serializer para crear y gestionar invitaciones"""
+    liga_nombre = serializers.SerializerMethodField()
 
     class Meta:
         model = Invitacion
@@ -61,9 +80,17 @@ class InvitacionSerializer(serializers.ModelSerializer):
             'email_invitado',
             'mensaje_invitacion',
             'estado_invitacion',
-            'fecha_invitacion'
+            'fecha_invitacion',
+            'liga_nombre'
         ]
         read_only_fields = ['id_invitacion', 'codigo_invitacion', 'fecha_invitacion', 'estado_invitacion']
+
+    def get_liga_nombre(self, obj):
+        try:
+            liga = Liga.objects.get(id_liga=obj.fk_id_liga)
+            return liga.nombre_liga
+        except Liga.DoesNotExist:
+            return "Liga no encontrada"
 
     def validate(self, attrs):
         email = attrs.get('email_invitado')

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contextos/ContextoAutenticacion';
 import servicioPartidos from '../../servicios/servicioPartidos';
-import TopBar from '../Ligas/componentes/TopBar';
+import TopBar from '../../componentes/TopBar';
 import './estilos/CalendarioPage.css';
 
 const formatearFechaCorta = (fecha) => {
@@ -205,7 +205,7 @@ const CalendarioPage = () => {
     <div className="calendario-container">
       <div className="calendario-background">
         <div className="calendario-wrapper">
-          <TopBar user={user} onLogout={handleLogout} />
+          <TopBar user={user} onLogout={handleLogout} showBackButton={true} />
 
           <div className="calendario-header">
             <h1 className="calendario-title">

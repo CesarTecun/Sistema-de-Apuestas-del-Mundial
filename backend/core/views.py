@@ -107,7 +107,7 @@ class ConfiguracionTorneoView(APIView):
 def reporte_resumen(request):
     """Resumen global del sistema para el dashboard administrativo."""
     from backend.usuarios.models import Usuario
-    from backend.ligas.models import Liga, ParticipanteLiga
+    from backend.ligas.models import Liga, ParticipanteLiga, Invitacion, SolicitudParticipacion
     from backend.partidos.models import Partido
     from backend.pronosticos.models import Pronostico
     from backend.autenticacion.models import SesionUsuario
@@ -128,6 +128,8 @@ def reporte_resumen(request):
             'activas': Liga.objects.count(),
             'publicas': Liga.objects.filter(es_publica=True).count(),
             'competitivas': Liga.objects.filter(tipo_liga='Competitiva').count(),
+            'rechazadas': Invitacion.objects.filter(estado_invitacion='Rechazada').count() + 
+                         SolicitudParticipacion.objects.filter(estado='Rechazada').count(),
         },
         'partidos': {
             'total': Partido.all_objects.count(),
