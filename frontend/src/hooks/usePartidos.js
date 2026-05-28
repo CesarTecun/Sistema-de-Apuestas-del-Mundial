@@ -22,7 +22,7 @@ export const usePartidos = () => {
   const cargarPartidos = useCallback(async () => {
     try {
       setLoading(true);
-      const result = await servicioPartidos.getPartidos(ligaSeleccionada, estadoSeleccionado, pagina, POR_PAGINA);
+      const result = await servicioPartidos.getPartidos(ligaSeleccionada, estadoSeleccionado, pagina, POR_PAGINA, searchTerm);
 
       if (result.success) {
         setPartidos(result.data.results ?? []);
@@ -37,7 +37,7 @@ export const usePartidos = () => {
     } finally {
       setLoading(false);
     }
-  }, [ligaSeleccionada, estadoSeleccionado, pagina]);
+  }, [ligaSeleccionada, estadoSeleccionado, pagina, searchTerm]);
 
   const cargarSelecciones = useCallback(async () => {
     try {
@@ -83,10 +83,10 @@ export const usePartidos = () => {
     cargarSedes();
   }, [cargarSelecciones, cargarLigas, cargarSedes]);
 
-  // Resetear a página 1 cuando cambian filtros
+  // Resetear a página 1 cuando cambian filtros o búsqueda
   useEffect(() => {
     setPagina(1);
-  }, [ligaSeleccionada, estadoSeleccionado]);
+  }, [ligaSeleccionada, estadoSeleccionado, searchTerm]);
 
   const createPartido = async (partidoData) => {
     try {
@@ -181,20 +181,7 @@ export const usePartidos = () => {
     return puedeGestionarLiga(ligaSeleccionada);
   }, [ligaSeleccionada, puedeGestionarLiga]);
 
-  const filteredPartidos = partidos.filter(partido => {
-    const searchLower = searchTerm.toLowerCase();
-    // Buscar por IDs de equipos (que corresponden a selecciones)
-    const equipoLocal = selecciones.find(s => s.id_seleccion === partido.equipo_local);
-    const equipoVisitante = selecciones.find(s => s.id_seleccion === partido.equipo_visitante);
-    
-    const nombreLocal = equipoLocal?.pais?.toLowerCase() || '';
-    const nombreVisitante = equipoVisitante?.pais?.toLowerCase() || '';
-    
-    return nombreLocal.includes(searchLower) || 
-           nombreVisitante.includes(searchLower) ||
-           partido.tipo_partido?.toLowerCase().includes(searchLower) ||
-           partido.resultado?.toLowerCase().includes(searchLower);
-  });
+  const filteredPartidos = partidos;
 
   return {
     partidos,

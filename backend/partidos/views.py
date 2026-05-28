@@ -125,6 +125,19 @@ class PartidoViewSet(SoftDeleteModelViewSet):
             else:
                 raise ValidationError({'estado': 'Estado inválido. Valores válidos: programado, en_juego, finalizado, suspendido.'})
 
+        search = self.request.query_params.get('search')
+        if search:
+            search = search.strip()
+            seleccion_ids = list(Seleccion.objects.filter(
+                pais__icontains=search
+            ).values_list('id_seleccion', flat=True))
+            queryset = queryset.filter(
+                Q(equipo_local__in=seleccion_ids) |
+                Q(equipo_visitante__in=seleccion_ids) |
+                Q(tipo_partido__icontains=search) |
+                Q(resultado__icontains=search)
+            )
+
         return queryset.distinct()
     
     def create(self, request, *args, **kwargs):
