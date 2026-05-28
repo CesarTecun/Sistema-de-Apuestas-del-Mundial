@@ -72,7 +72,7 @@ def sync_partido_to_marcador(sender, instance, created, **kwargs):
         "ganador_penales": instance.ganador_penales,
         "tipo_partido": instance.tipo_partido,
         "resultado": instance.resultado,
-        "estado": getattr(instance, "estado", "programado"),
+        "estado": instance.estado_partido,
         "status": instance.status,
     }
     try:
@@ -93,6 +93,53 @@ def delete_partido_from_marcador(sender, instance, **kwargs):
         logger.info(f"Partido {instance.id_partido} eliminado del marcador.")
     except MarcadorClientError as exc:
         logger.error(f"Error eliminando partido {instance.id_partido} del marcador: {exc}")
+
+
+# ------------------------------------------------------------------
+# Cálculo automático de puntos de pronósticos al actualizar resultado
+# ------------------------------------------------------------------
+
+@receiver(post_save, sender=Partido)
+def calcular_puntos_pronosticos_partido(sender, instance, created, **kwargs):
+    """
+    Cuando un partido tiene goles definidos (resultado real), calcula automáticamente
+    los puntos de todos los pronósticos activos para ese partido y actualiza el ranking.
+    Reglas: 3 pts marcador exacto, 1 pt resultado correcto, 0 pts incorrecto.
+    """
+    # Ignorar creación de partido nuevo (aún no tiene resultado)
+    if created:
+        return
+
+    # Solo actuar si ambos goles están definidos (partido con resultado real)
+    # gol_local/gol_visitante tienen default=0, así que validamos con update_fields o estado
+    if instance.estado_partido not in ('en_juego', 'finalizado'):
+        return
+
+    try:
+        from backend.pronosticos.models import Pronostico
+        from backend.pronosticos.utils import calcular_puntos_pronostico, actualizar_ranking_por_liga
+
+        pronosticos = Pronostico.objects.filter(fk_id_partido=instance.id_partido, status=True)
+        for pronostico in pronosticos:
+            puntos = calcular_puntos_pronostico(
+                pronostico.gol_local,
+                pronostico.gol_visitante,
+                instance.gol_local,
+                instance.gol_visitante,
+            )
+            if pronostico.puntos_obtenidos != puntos:
+                diferencia = puntos - pronostico.puntos_obtenidos
+                pronostico.puntos_obtenidos = puntos
+                pronostico.save(update_fields=['puntos_obtenidos'])
+                actualizar_ranking_por_liga(
+                    pronostico.fk_id_usuario,
+                    pronostico.fk_id_liga,
+                    diferencia,
+                )
+        if pronosticos:
+            logger.info(f"Puntos de pronósticos calculados para partido {instance.id_partido}.")
+    except Exception as exc:
+        logger.error(f"Error calculando puntos de pronósticos partido {instance.id_partido}: {exc}")
 
 
 # ------------------------------------------------------------------

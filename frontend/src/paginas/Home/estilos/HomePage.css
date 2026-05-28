@@ -363,6 +363,10 @@ html, body {
   animation-delay: 0.7s;
 }
 
+.landing-card:nth-child(4) {
+  animation-delay: 0.9s;
+}
+
 .landing-card:hover {
   transform: translateY(-10px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);

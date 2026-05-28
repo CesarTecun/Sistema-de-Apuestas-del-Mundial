@@ -1,0 +1,522 @@
+/* Importar variables CSS del sistema de diseño */
+@import '../../../estilos/variables.css';
+
+/* ========================================
+   MARCADOR PAGE - LAYOUT PRINCIPAL
+   ======================================== */
+
+.marcador-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.marcador-background {
+  min-height: 100vh;
+  width: 100%;
+  background: 
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.8) 100%),
+    url('https://images.unsplash.com/photo-1522778034537-20a2486be803?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+.marcador-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.marcador-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+  pointer-events: none;
+}
+
+.marcador-content {
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Partido Selector */
+.partido-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--border-radius-lg);
+}
+
+.partido-selector label {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.partido-selector select {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.1);
+  border: var(--border-width-thin) solid var(--border-color-medium);
+  border-radius: var(--border-radius-md);
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+.partido-selector select:hover {
+  border-color: var(--border-color-light);
+}
+
+/* Resultado Final */
+.resultado-final {
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(168, 50, 121, 0.2) 100%);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius-2xl);
+  text-align: center;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.resultado-final h2 {
+  color: var(--color-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-lg);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.resultado-marcador {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.resultado-equipo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.resultado-equipo .equipo-nombre {
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.resultado-equipo .equipo-goles {
+  color: var(--color-primary);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.resultado-separador {
+  color: var(--text-secondary);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.resultado-texto {
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+  font-style: italic;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-secondary);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  color: var(--color-error);
+  text-align: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  text-align: center;
+  color: var(--text-secondary);
+  min-height: 80vh;
+}
+
+.empty-icon {
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  color: var(--color-white);
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-xl);
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+}
+
+/* ========================================
+   TARJETA DE PARTIDO
+   ======================================== */
+.partido-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-white);
+}
+
+.partido-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.partido-teams {
+  flex: 1;
+}
+
+.partido-teams h3 {
+  font-size: var(--font-size-lg);
+  margin: 0 0 var(--spacing-xs) 0;
+  color: var(--color-white);
+}
+
+.partido-teams p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.partido-score {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+/* ========================================
+   CRONÓMETRO
+   ======================================== */
+.cronometro-container {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.cronometro-time {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.cronometro-status {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+}
+
+.cronometro-status.paused {
+  color: #f59e0b;
+}
+
+.cronometro-status.not-started {
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   CONTROLES
+   ======================================== */
+.controls-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.controls-section h4 {
+  font-size: var(--font-size-md);
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--color-white);
+}
+
+.controls-grid {
+  display: grid;
+  gap: var(--spacing-sm);
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.control-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: white;
+}
+
+.control-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.control-button:active {
+  transform: translateY(0);
+}
+
+.control-button-green {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.control-button-yellow {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.control-button-blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.control-button-purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.control-button-indigo {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+}
+
+.control-button-orange {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.control-button-red {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.faltas-container {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.falta-control {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.05);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+}
+
+/* ========================================
+   INFORMACIÓN DEL PARTIDO
+   ======================================== */
+.partido-info {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.partido-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.partido-info-grid > div {
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   HEADER DEL MARCADOR
+   ======================================== */
+.marcador-header {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.marcador-header h1 {
+  font-size: var(--font-size-2xl);
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-white);
+}
+
+.health-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.health-status.connected {
+  color: #10b981;
+}
+
+.health-status.disconnected {
+  color: #ef4444;
+}
+
+.refresh-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  border-radius: var(--border-radius-md);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.refresh-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .marcador-background {
+    background-attachment: scroll;
+    padding: var(--spacing-md);
+  }
+
+  .marcador-wrapper {
+    width: 100%;
+  }
+
+  .marcador-content {
+    padding: 0 var(--spacing-md);
+  }
+
+  .partido-header {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-md);
+  }
+
+  .partido-score {
+    font-size: 2.5rem;
+  }
+
+  .cronometro-time {
+    font-size: 2rem;
+  }
+
+  .controls-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .marcador-background {
+    padding: var(--spacing-sm);
+  }
+
+  .marcador-content {
+    padding: 0 var(--spacing-sm);
+  }
+
+  .partido-card {
+    padding: var(--spacing-md);
+  }
+
+  .partido-score {
+    font-size: 2rem;
+  }
+
+  .cronometro-time {
+    font-size: 1.5rem;
+  }
+
+  .controls-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -17,12 +17,32 @@ router = APIRouter(prefix="/sync", tags=["Sincronización"])
 def sync_seleccion(data: dict, db: Session = Depends(get_db)):
     """
     Upsert de selección desde Django.
-    Busca por codigo_iso; si no existe, la crea (respetando id_seleccion si viene).
+    Busca primero por id_seleccion, si no existe busca por codigo_iso.
+    Si no existe ninguna, la crea con el id_seleccion especificado.
     """
+    id_seleccion = data.get("id_seleccion")
     codigo_iso = data.get("codigo_iso")
+    
     if not codigo_iso:
         raise HTTPException(status_code=400, detail="codigo_iso es requerido")
 
+    # Primero buscar por id_seleccion (prioridad para mantener IDs de Django)
+    if id_seleccion:
+        seleccion = (
+            db.query(Seleccion)
+            .filter(Seleccion.id_seleccion == id_seleccion)
+            .first()
+        )
+        if seleccion:
+            seleccion.pais = data.get("pais", seleccion.pais)
+            seleccion.bandera = data.get("bandera", seleccion.bandera)
+            seleccion.fk_id_fase_inicial = data.get("fk_id_fase_inicial", seleccion.fk_id_fase_inicial)
+            seleccion.status = data.get("status", seleccion.status)
+            db.commit()
+            db.refresh(seleccion)
+            return {"action": "updated", "seleccion": seleccion.id_seleccion}
+
+    # Si no encontró por id_seleccion, buscar por codigo_iso
     seleccion = (
         db.query(Seleccion)
         .filter(Seleccion.codigo_iso == codigo_iso)
@@ -30,6 +50,8 @@ def sync_seleccion(data: dict, db: Session = Depends(get_db)):
     )
 
     if seleccion:
+        # Actualizar incluyendo el id_seleccion si es diferente
+        seleccion.id_seleccion = id_seleccion or seleccion.id_seleccion
         seleccion.pais = data.get("pais", seleccion.pais)
         seleccion.bandera = data.get("bandera", seleccion.bandera)
         seleccion.fk_id_fase_inicial = data.get("fk_id_fase_inicial", seleccion.fk_id_fase_inicial)
@@ -38,8 +60,9 @@ def sync_seleccion(data: dict, db: Session = Depends(get_db)):
         db.refresh(seleccion)
         return {"action": "updated", "seleccion": seleccion.id_seleccion}
 
+    # Crear nueva selección
     nueva = Seleccion(
-        id_seleccion=data.get("id_seleccion"),
+        id_seleccion=id_seleccion,
         pais=data["pais"],
         bandera=data.get("bandera"),
         fk_id_fase_inicial=data.get("fk_id_fase_inicial"),

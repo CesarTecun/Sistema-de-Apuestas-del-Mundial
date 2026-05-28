@@ -25,7 +25,12 @@ SECRET_KEY = "django-insecure-+&#w*5583p*pr=$1%&4_%yg^n0&)&hxm!di49i$0o0^6)ezspc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver', 'host.docker.internal']
+
+# Idioma y localización
+LANGUAGE_CODE = 'es'
+USE_I18N = True
+USE_L10N = True
 
 
 # Application definition
@@ -39,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'rest_framework',
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
     'backend.autenticacion',  # App de autenticación
     'backend.usuarios',       # App de usuarios
     'backend.ligas',          # App de ligas
@@ -48,6 +54,7 @@ INSTALLED_APPS = [
     'backend.premios',        # App de premios
     'backend.historialganador',  # App de historial de ganadores
     'backend.core',           # App para modelos de tablas sin modelo previo
+    'backend.seguridad',      # App de seguridad OWASP
 ]
 
 MIDDLEWARE = [
@@ -67,7 +74,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / 'backend' / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -88,7 +95,9 @@ WSGI_APPLICATION = "backend.wsgi.application"
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+# Cargar variables desde config/.env (ubicado en la raíz del proyecto)
+ENV_PATH = Path(__file__).resolve().parent.parent / "config" / ".env"
+load_dotenv(dotenv_path=ENV_PATH)
 
 # PostgreSQL para producción con Docker
 DATABASES = {
@@ -99,8 +108,13 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_PASSWORD", "PASSWORD"),
         "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5432"),
+        "OPTIONS": {
+            "sslmode": os.getenv("DB_SSLMODE", "prefer"),
+        } if os.getenv("DB_SSLMODE") else {},
     }
 }
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 
 # Password validation
@@ -170,6 +184,8 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
+    ] if DEBUG else [
+        'rest_framework.renderers.JSONRenderer',
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
@@ -177,7 +193,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'backend.autenticacion.authentication.SesionJWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -205,8 +221,8 @@ from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': False,
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
@@ -248,7 +264,21 @@ SERVER_EMAIL = 'quinielachechas@gmail.com'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # =============================================================================
-# CONFIGURACION DEL MICROSERVICIO MARCADOR
+# CONFIGURACIÓN DEL MICROSERVICIO MARCADOR
 # =============================================================================
-MARCADOR_SERVICE_URL = os.getenv("MARCADOR_SERVICE_URL", "http://localhost:8001")
-MARCADOR_SERVICE_TIMEOUT = int(os.getenv("MARCADOR_SERVICE_TIMEOUT", "5"))
+MARCADOR_SERVICE_URL = os.getenv('MARCADOR_SERVICE_URL', 'http://localhost:8001')
+MARCADOR_SERVICE_TIMEOUT = int(os.getenv('MARCADOR_SERVICE_TIMEOUT', '5'))
+
+# =============================================================================
+# CONFIGURACIÓN DE SEGURIDAD HTTPS/HSTS/COOKIES (OWASP A03)
+# =============================================================================
+# Estas opciones se activan automáticamente cuando DEBUG=False (producción)
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG

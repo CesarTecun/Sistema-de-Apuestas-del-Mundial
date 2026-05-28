@@ -99,3 +99,41 @@ class Sede(models.Model):
         managed = True
 
 
+class ConfiguracionTorneo(models.Model):
+    """Configuración global del torneo (singleton, siempre pk=1)."""
+    porcentaje_plataforma = models.DecimalField(
+        max_digits=5, decimal_places=2, default=5.0,
+        help_text='Porcentaje que retiene la plataforma al cerrar una liga.'
+    )
+    puntos_exacto = models.IntegerField(
+        default=3,
+        help_text='Puntos por pronóstico exacto (marcador correcto).'
+    )
+    puntos_ganador = models.IntegerField(
+        default=1,
+        help_text='Puntos por acertar ganador o empate sin marcador exacto.'
+    )
+    fecha_inicio_torneo = models.DateField(null=True, blank=True)
+    fecha_fin_torneo = models.DateField(null=True, blank=True)
+    permite_registro_abierto = models.BooleanField(
+        default=True,
+        help_text='Permitir registro público de nuevos usuarios.'
+    )
+    max_ligas_por_usuario = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text='Máximo de ligas que puede administrar un usuario (null = sin límite).'
+    )
+
+    class Meta:
+        db_table = 'configuracion_torneo'
+        managed = True
+
+    def __str__(self):
+        return 'Configuración del Torneo'
+
+    @classmethod
+    def get_config(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+

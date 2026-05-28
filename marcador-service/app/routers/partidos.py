@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas.partido import (
     MarcadorUpdate,
+    PartidoControlUpdate,
     PartidoCreate,
     PartidoMarcadorResponse,
     PartidoResponse,
@@ -26,6 +27,13 @@ def listar_partidos(
 @router.get("/en-vivo", response_model=list[PartidoMarcadorResponse])
 def partidos_en_vivo(db: Session = Depends(get_db)):
     partidos = partido_service.list_partidos(db, estado="en_juego")
+    return [partido_service.enrich_marcador(db, p) for p in partidos]
+
+
+@router.get("/todos", response_model=list[PartidoMarcadorResponse])
+def todos_partidos(db: Session = Depends(get_db)):
+    """Obtiene todos los partidos para el marcador (sin filtrar por estado)"""
+    partidos = partido_service.list_partidos(db)
     return [partido_service.enrich_marcador(db, p) for p in partidos]
 
 
@@ -74,3 +82,16 @@ def eliminar_partido(id_partido: int, db: Session = Depends(get_db)):
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
     partido_service.delete_partido(db, partido)
+
+
+@router.patch("/{id_partido}/control", response_model=PartidoMarcadorResponse)
+def controlar_partido(id_partido: int, data: PartidoControlUpdate, db: Session = Depends(get_db)):
+    """
+    Controla el partido en vivo: iniciar, pausar, cambiar tiempo, agregar tiempo extra
+    """
+    print(f"🎮 Router controlar_partido: id_partido={id_partido}, data={data}")
+    partido = partido_service.get_partido(db, id_partido)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+    partido = partido_service.controlar_partido(db, partido, data)
+    return partido_service.enrich_marcador(db, partido)

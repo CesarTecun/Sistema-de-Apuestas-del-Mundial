@@ -34,6 +34,29 @@
   gap: var(--spacing-md);
 }
 
+.join-button {
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  color: #d4af37;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(10px);
+}
+
+.join-button:hover {
+  background: rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+}
+
 .page-title {
   color: white;
   font-size: 36px;
@@ -133,6 +156,11 @@
     margin-left: 0;
   }
 
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
   .page-title {
     font-size: var(--font-size-2xl);
     letter-spacing: var(--letter-spacing-normal);
@@ -147,6 +175,12 @@
     width: 100%;
     justify-content: center;
     padding: var(--spacing-md) var(--spacing-lg);
+  }
+
+  .partidos-button,
+  .join-button {
+    width: 100%;
+    justify-content: center;
   }
 }
 

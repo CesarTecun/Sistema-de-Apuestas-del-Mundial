@@ -10,6 +10,13 @@ const servicioApi = axios.create({
   },
 });
 
+// Helper para emitir eventos de notificación
+const emitApiEvent = (type, detail) => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(type, { detail }));
+  }
+};
+
 // Interceptor para incluir token JWT
 servicioApi.interceptors.request.use(
   (config) => {
@@ -24,15 +31,33 @@ servicioApi.interceptors.request.use(
   }
 );
 
-// Interceptor para manejar errores de autenticación
+// Interceptor para manejar errores de autenticación y notificaciones
 servicioApi.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    emitApiEvent('api-success', {
+      status: response.status,
+      method: response.config?.method,
+      url: response.config?.url,
+    });
+    return response;
+  },
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    const url = error.config?.url || '';
+
+    emitApiEvent('api-error', {
+      status,
+      data,
+      url,
+    });
+
+    if (status === 401) {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );

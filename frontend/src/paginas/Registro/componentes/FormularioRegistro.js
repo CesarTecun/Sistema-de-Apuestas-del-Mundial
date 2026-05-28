@@ -25,17 +25,8 @@ const FormularioRegistro = ({ onSubmit, error, loading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Validar que las contraseñas coincidan
-    if (formData.password !== formData.password2) {
-      onSubmit({ error: 'Las contraseñas no coinciden' });
-      return;
-    }
-    
-    // Eliminar password2 del formData antes de enviar
-    const { password2, ...dataToSend } = formData;
-    console.log('Datos que se enviarán desde el formulario:', dataToSend);
-    onSubmit(dataToSend);
+    // Enviar todo el formulario incluyendo password2 para que el backend valide
+    onSubmit(formData);
   };
 
   const togglePasswordVisibility = () => {

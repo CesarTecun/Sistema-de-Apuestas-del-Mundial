@@ -1,5 +1,8 @@
+import datetime
+
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 from backend.utils.models import SoftDeleteModel
 
 class Pronostico(SoftDeleteModel):
@@ -9,6 +12,7 @@ class Pronostico(SoftDeleteModel):
     fk_id_liga = models.IntegerField(db_index=True)
     gol_local = models.IntegerField()
     gol_visitante = models.IntegerField()
+    puntos_obtenidos = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'pronostico'
@@ -41,14 +45,18 @@ class Pronostico(SoftDeleteModel):
             raise ValidationError({'gol_local': 'Los goles del equipo local no pueden ser negativos'})
         if self.gol_visitante < 0:
             raise ValidationError({'gol_visitante': 'Los goles del equipo visitante no pueden ser negativos'})
-        
-        # Validar que el partido exista y pertenezca a la liga
-        if self.fk_id_partido and self.fk_id_liga:
+
+        # Validar que el partido exista y que la ventana de pronóstico esté abierta
+        if self.fk_id_partido:
             try:
                 from backend.partidos.models import Partido
                 partido = Partido.objects.get(id_partido=self.fk_id_partido)
-                # Aquí podríamos agregar la validación de que el partido pertenezca a la liga
-                # cuando tengamos la relación entre partidos y ligas
+                if partido.horario:
+                    cierre = partido.horario - datetime.timedelta(minutes=15)
+                    if timezone.now() >= cierre:
+                        raise ValidationError(
+                            'El registro de pronósticos para este partido ha cerrado (15 min antes del inicio).'
+                        )
             except Partido.DoesNotExist:
                 raise ValidationError({'fk_id_partido': 'El partido especificado no existe'})
     

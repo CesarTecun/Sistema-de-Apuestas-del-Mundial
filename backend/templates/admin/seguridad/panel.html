@@ -1,0 +1,101 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+<style>
+  .owasp-panel { max-width: 900px; margin: 20px auto; }
+  .owasp-card { background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+  .owasp-card h3 { margin-top: 0; font-size: 1.1rem; }
+  .owasp-card .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: .85rem; font-weight: 600; color: #fff; }
+  .badge-a01 { background: #c0392b; }
+  .badge-a02 { background: #d35400; }
+  .badge-a03 { background: #e67e22; }
+  .badge-a04 { background: #f39c12; }
+  .badge-a05 { background: #e74c3c; }
+  .badge-a06 { background: #e67e22; }
+  .badge-a07 { background: #f1c40f; color: #333; }
+  .badge-a08 { background: #9b59b6; }
+  .badge-a09 { background: #34495e; }
+  .badge-a10 { background: #2ecc71; }
+  .btn-run { display: inline-block; margin-top: 8px; padding: 6px 12px; background: #417690; color: #fff; text-decoration: none; border-radius: 4px; }
+  .btn-run:hover { background: #205067; }
+  .hint { font-size: .9rem; color: #555; margin-top: 6px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="owasp-panel">
+  <h1>Panel OWASP - Top 10 Vulnerabilidades</h1>
+  <p>Desde aqui puedes ejecutar las herramientas de auditoria de todas las categorias OWASP #1 a #10.</p>
+
+  <div class="owasp-card">
+    <h3><span class="badge badge-a01">A01</span> Inyeccion</h3>
+    <p>Detecta puntos de entrada potenciales para SQL, NoSQL, OS y LDAP injection en endpoints de la API.</p>
+    <a class="btn-run" href="/api/seguridad/escanear/inyeccion/" target="_blank">Ejecutar escaneo (POST)</a>
+    <div class="hint">Revisa los resultados en <strong>Vulnerabilidades Inyeccion (A01)</strong> del admin.</div>
+  </div>
+
+  <div class="owasp-card">
+    <h3><span class="badge badge-a02">A02</span> Autenticacion interrumpida</h3>
+    <p>Audita configuraciones de autenticacion: limites de intentos, expiracion de sesiones, complejidad de password, MFA.</p>
+    <a class="btn-run" href="/api/seguridad/auditar/autenticacion/" target="_blank">Auditar autenticacion (POST)</a>
+    <div class="hint">Revisa los resultados en <strong>Fallas Autenticacion (A02)</strong> del admin.</div>
+  </div>
+
+  <div class="owasp-card">
+    <h3><span class="badge badge-a03">A03</span> Exposicion de datos confidenciales</h3>
+    <p>Detecta posibles exposiciones de datos sensibles: SECRET_KEY en codigo, campos password en APIs, PII en logs, tracebacks en DEBUG.</p>
+    <a class="btn-run" href="/api/seguridad/auditar/exposicion-datos/" target="_blank">Auditar exposicion (POST)</a>
+    <div class="hint">Revisa los resultados en <strong>Exposiciones Datos (A03)</strong> del admin.</div>
+  </div>
+
+  <div class="owasp-card">
+    <h3><span class="badge badge-a04">A04</span> Entidades externas XML (XXE)</h3>
+    <p>Detecta parsers XML potencialmente vulnerables a XXE revisando configuraciones de DTD y entities.</p>
+    <a class="btn-run" href="/api/seguridad/escanear/xxe/" target="_blank">Escanear XXE (POST)</a>
+    <div class="hint">Revisa los resultados en <strong>Vulnerabilidades XXE (A04)</strong> del admin.</div>
+  </div>
+
+  <div class="owasp-card">
+    <h3><span class="badge badge-a05">A05</span> Control de Acceso Roto</h3>
+    <p>Escanea las URLs del proyecto para detectar endpoints que podrian carecer de autenticacion o autorizacion.</p>
+    <a class="btn-run" href="/api/seguridad/escanear/acceso/" target="_blank">Ejecutar escaneo (POST)</a>
+    <div class="hint">Revisa los resultados en <strong>Auditorias de Acceso (A05)</strong> del admin.</div>
+  </div>
+
+  <div class="owasp-card">
+    <h3><span class="badge badge-a06">A06</span> Configuraciones Incorrectas de Seguridad</h3>
+    <p>Verifica settings criticos de Django (DEBUG, HSTS, cookies seguras, etc.).</p>
+    <a class="btn-run" href="/api/seguridad/verificar/configuracion/" target="_blank">Verificar configuracion (POST)</a>
+    <div class="hint">Revisa los resultados en <strong>Configuraciones Seguridad (A06)</strong> del admin.</div>
+  </div>
+
+  <div class="owasp-card">
+    <h3><span class="badge badge-a07">A07</span> XSS (Scripting entre sitios)</h3>
+    <p>Registra vectores XSS tipicos para revision manual de reflexion en respuestas.</p>
+    <a class="btn-run" href="/api/seguridad/probar/xss/" target="_blank">Probar vectores XSS (POST)</a>
+    <div class="hint">Revisa los resultados en <strong>Vulnerabilidades XSS (A07)</strong> del admin.</div>
+  </div>
+
+  <div class="owasp-card">
+    <h3><span class="badge badge-a08">A08</span> Desserializacion Insegura</h3>
+    <p>Audita el uso de deserializadores potencialmente peligrosos (pickle, yaml, xml).</p>
+    <a class="btn-run" href="/api/seguridad/auditar/deserializacion/" target="_blank">Auditar deserializacion (POST)</a>
+    <div class="hint">Revisa los resultados en <strong>Intentos Deserializacion (A08)</strong> del admin.</div>
+  </div>
+
+  <div class="owasp-card">
+    <h3><span class="badge badge-a09">A09</span> Componentes con Vulnerabilidades Conocidas</h3>
+    <p>Lista las dependencias de Python instaladas y detecta versiones con CVEs conocidos.</p>
+    <a class="btn-run" href="/api/seguridad/escanear/componentes/" target="_blank">Escanear componentes (POST)</a>
+    <div class="hint">Revisa los resultados en <strong>Componentes Vulnerables (A09)</strong> del admin.</div>
+  </div>
+
+  <div class="owasp-card">
+    <h3><span class="badge badge-a10">A10</span> Registro y Monitoreo Insuficientes</h3>
+    <p>Verifica que existan registros de eventos criticos y alertas de monitoreo.</p>
+    <a class="btn-run" href="/api/seguridad/verificar/monitoreo/" target="_blank">Verificar monitoreo (POST)</a>
+    <div class="hint">Revisa los resultados en <strong>Registros Monitoreo (A10)</strong> del admin.</div>
+  </div>
+</div>
+{% endblock %}

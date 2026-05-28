@@ -36,9 +36,17 @@ class RankingViewSet(ReadOnlySoftDeleteModelViewSet):
         liga_id = self.request.query_params.get('liga_id')
         
         if usuario_id:
-            queryset = queryset.filter(fk_id_usuario=usuario_id)
+            try:
+                usuario_id = int(usuario_id)
+                queryset = queryset.filter(fk_id_usuario=usuario_id)
+            except ValueError:
+                return queryset.none()
         if liga_id:
-            queryset = queryset.filter(fk_id_liga=liga_id)
+            try:
+                liga_id = int(liga_id)
+                queryset = queryset.filter(fk_id_liga=liga_id)
+            except ValueError:
+                return queryset.none()
             
         # Ordenar por puntos descendente
         return queryset.order_by('-puntos')
@@ -61,10 +69,18 @@ def ranking_por_liga(request):
         )
     
     try:
-        ranking = obtener_ranking_con_posicion(liga_id)
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        ranking = obtener_ranking_con_posicion(liga_id_int)
         serializer = RankingConPosicionSerializer(ranking, many=True)
         return Response({
-            'liga_id': liga_id,
+            'liga_id': liga_id_int,
             'total_participantes': len(ranking),
             'ranking': serializer.data
         })
@@ -95,7 +111,16 @@ def posicion_usuario(request):
         )
     
     try:
-        datos = calcular_posicion_usuario(int(usuario_id), int(liga_id))
+        usuario_id_int = int(usuario_id)
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'Los IDs deben ser numéricos'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        datos = calcular_posicion_usuario(usuario_id_int, liga_id_int)
         serializer = PosicionUsuarioSerializer(datos)
         return Response(serializer.data)
     except Exception as e:
@@ -126,7 +151,16 @@ def actualizar_ranking(request):
         )
     
     try:
-        ranking = actualizar_ranking_usuario(int(usuario_id), int(liga_id))
+        usuario_id_int = int(usuario_id)
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'Los IDs deben ser numéricos'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        ranking = actualizar_ranking_usuario(usuario_id_int, liga_id_int)
         serializer = RankingSerializer(ranking)
         return Response({
             'mensaje': 'Ranking actualizado correctamente',
@@ -157,7 +191,15 @@ def recalcular_ranking_liga(request):
         )
     
     try:
-        rankings = calcular_todas_las_posiciones(int(liga_id))
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        rankings = calcular_todas_las_posiciones(liga_id_int)
         serializer = RankingSerializer(rankings, many=True)
         return Response({
             'mensaje': f'Ranking recalculado para {len(rankings)} usuarios',
@@ -192,11 +234,19 @@ def mi_ranking(request):
     usuario_id = request.user.id_usuario
     
     try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
         # Actualizar primero
-        actualizar_ranking_usuario(usuario_id, int(liga_id))
+        actualizar_ranking_usuario(usuario_id, liga_id_int)
         
         # Obtener el ranking completo para calcular la posición
-        ranking_completo = obtener_ranking_con_posicion(int(liga_id))
+        ranking_completo = obtener_ranking_con_posicion(liga_id_int)
         
         # Buscar la posición del usuario
         mi_posicion = None
@@ -240,15 +290,23 @@ def tabla_equipos_por_liga(request):
         )
 
     try:
-        tabla = obtener_tabla_equipos(int(liga_id))
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        tabla = obtener_tabla_equipos(liga_id_int)
         if not tabla.exists():
             # Si no hay datos, recalcular desde los partidos finalizados
-            recalcular_tabla_equipos(int(liga_id))
-            tabla = obtener_tabla_equipos(int(liga_id))
+            recalcular_tabla_equipos(liga_id_int)
+            tabla = obtener_tabla_equipos(liga_id_int)
 
         serializer = TablaPosicionEquipoSerializer(tabla, many=True)
         return Response({
-            'liga_id': liga_id,
+            'liga_id': liga_id_int,
             'total_equipos': len(serializer.data),
             'tabla': serializer.data
         })

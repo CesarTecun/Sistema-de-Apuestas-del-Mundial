@@ -10,6 +10,8 @@ from backend.ligas.utils import (
     obtener_ligas_usuario_ids,
     obtener_ligas_administradas_ids,
 )
+from backend.pronosticos.models import Pronostico
+from backend.pronosticos.utils import calcular_puntos_pronostico, actualizar_ranking_por_liga
 
 class JugadorViewSet(SoftDeleteModelViewSet):
     """
@@ -20,6 +22,17 @@ class JugadorViewSet(SoftDeleteModelViewSet):
     serializer_class = JugadorSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id_jugador'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        seleccion_id = self.request.query_params.get('fk_id_seleccion')
+        if seleccion_id is not None:
+            try:
+                seleccion_id = int(seleccion_id)
+                queryset = queryset.filter(fk_id_seleccion=seleccion_id)
+            except ValueError:
+                return queryset.none()
+        return queryset
 
 
 class SeleccionViewSet(SoftDeleteModelViewSet):
@@ -44,11 +57,21 @@ class PartidoViewSet(SoftDeleteModelViewSet):
     
     def get_queryset(self):
         """Filtrar partidos a las ligas permitidas y opcionalmente por liga específica."""
+        from backend.ligas.models import PartidoLiga
         ligas_usuario = obtener_ligas_usuario_ids(self.request.user.id_usuario)
         if not ligas_usuario:
             return Partido.objects.none()
 
-        queryset = Partido.objects.filter(fk_id_liga__in=ligas_usuario)
+        # Partidos cuyo fk_id_liga directo está en las ligas del usuario
+        partidos_directos = Partido.objects.filter(fk_id_liga__in=ligas_usuario)
+
+        # Partidos vinculados a ligas del usuario via tabla PartidoLiga
+        partidos_liga_ids = PartidoLiga.objects.filter(
+            fk_id_liga__in=ligas_usuario
+        ).values_list('fk_id_partido', flat=True)
+        partidos_via_liga = Partido.objects.filter(id_partido__in=partidos_liga_ids)
+
+        queryset = partidos_directos | partidos_via_liga
 
         liga_id = self.request.query_params.get('liga_id')
         if liga_id:
@@ -60,9 +83,15 @@ class PartidoViewSet(SoftDeleteModelViewSet):
             if liga_id_int not in ligas_usuario:
                 raise PermissionDenied('No tienes permisos para consultar esta liga.')
 
-            queryset = queryset.filter(fk_id_liga=liga_id_int)
+            # Filtrar por liga: partidos con fk_id_liga directo O vinculados via PartidoLiga
+            partidos_liga_filtrados = PartidoLiga.objects.filter(
+                fk_id_liga=liga_id_int
+            ).values_list('fk_id_partido', flat=True)
+            queryset = queryset.filter(
+                Q(fk_id_liga=liga_id_int) | Q(id_partido__in=partidos_liga_filtrados)
+            )
 
-        return queryset
+        return queryset.distinct()
     
     def create(self, request, *args, **kwargs):
         """Crear un nuevo partido"""
@@ -177,18 +206,47 @@ def actualizar_resultado(request, pk):
         resultado = request.data.get('resultado')
 
         if gol_local is not None:
-            partido.gol_local = int(gol_local)
+            try:
+                partido.gol_local = int(gol_local)
+            except ValueError:
+                return Response({'error': 'gol_local debe ser un número entero'}, status=status.HTTP_400_BAD_REQUEST)
         if gol_visitante is not None:
-            partido.gol_visitante = int(gol_visitante)
+            try:
+                partido.gol_visitante = int(gol_visitante)
+            except ValueError:
+                return Response({'error': 'gol_visitante debe ser un número entero'}, status=status.HTTP_400_BAD_REQUEST)
         if resultado is not None:
             partido.resultado = resultado
-            
+
         partido.save()
-        
+
+        # Calcular puntos de pronósticos si ambos goles están definidos
+        if partido.gol_local is not None and partido.gol_visitante is not None:
+            pronosticos = Pronostico.objects.filter(fk_id_partido=partido.id_partido, status=True)
+            for pronostico in pronosticos:
+                puntos = calcular_puntos_pronostico(
+                    pronostico.gol_local,
+                    pronostico.gol_visitante,
+                    partido.gol_local,
+                    partido.gol_visitante,
+                )
+                # Solo actualizar si cambió el puntaje o si aún no fue calculado
+                if pronostico.puntos_obtenidos != puntos:
+                    diferencia = puntos - pronostico.puntos_obtenidos
+                    pronostico.puntos_obtenidos = puntos
+                    pronostico.save(update_fields=['puntos_obtenidos'])
+                    actualizar_ranking_por_liga(
+                        pronostico.fk_id_usuario,
+                        pronostico.fk_id_liga,
+                        diferencia,
+                    )
+
         serializer = PartidoSerializer(partido)
         return Response(serializer.data)
     except Partido.DoesNotExist:
         return Response({'error': 'Partido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 # ------------------------------------------------------------------
@@ -279,7 +337,15 @@ def generar_bracket(request):
         if 'horario' in item and isinstance(item['horario'], str):
             item['horario'] = parse_datetime(item['horario'])
 
-    resultado = generar_cruces_eliminatoria(int(liga_id), octavos_data)
+    try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    resultado = generar_cruces_eliminatoria(liga_id_int, octavos_data)
     if 'error' in resultado:
         return Response(resultado, status=status.HTTP_400_BAD_REQUEST)
 

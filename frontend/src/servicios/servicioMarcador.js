@@ -40,7 +40,7 @@ export const servicioMarcador = {
   // Obtener partidos en vivo (en juego) del microservicio marcador
   getPartidosEnVivo: async () => {
     try {
-      const response = await servicioApi.get('/partidos/marcador/partidos/en-vivo/');
+      const response = await servicioApi.get('/partidos/marcador/partidos/todos/');
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al obtener partidos en vivo:', error);
@@ -95,7 +95,7 @@ export const servicioMarcador = {
   },
 
   // Actualizar marcador de un partido en el microservicio marcador
-  actualizarMarcador: async (id, golLocal, golVisitante, estado, resultado, ganadorPenales) => {
+  actualizarMarcador: async (id, golLocal, golVisitante, estado, resultado, ganadorPenales, faltasLocal, faltasVisitante) => {
     try {
       const payload = {};
       if (golLocal !== undefined && golLocal !== null) payload.gol_local = golLocal;
@@ -103,12 +103,25 @@ export const servicioMarcador = {
       if (estado !== undefined && estado !== null) payload.estado = estado;
       if (resultado !== undefined && resultado !== null) payload.resultado = resultado;
       if (ganadorPenales !== undefined && ganadorPenales !== null) payload.ganador_penales = ganadorPenales;
+      if (faltasLocal !== undefined && faltasLocal !== null) payload.faltas_local = faltasLocal;
+      if (faltasVisitante !== undefined && faltasVisitante !== null) payload.faltas_visitante = faltasVisitante;
 
       const response = await servicioApi.post(`/partidos/marcador/partidos/${id}/actualizar-marcador/`, payload);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al actualizar marcador:', error);
       return { success: false, error: error.response?.data?.detail || 'Error al actualizar marcador' };
+    }
+  },
+
+  // Controlar partido (iniciar, pausar, cambiar tiempo, etc.)
+  controlarPartido: async (id, controlData) => {
+    try {
+      const response = await servicioApi.patch(`/partidos/marcador/partidos/${id}/control/`, controlData);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Error al controlar partido:', error);
+      return { success: false, error: error.response?.data?.detail || 'Error al controlar partido' };
     }
   },
 

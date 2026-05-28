@@ -1,5 +1,19 @@
 from django.contrib import admin
-from .models import Partido
+from .models import Partido, Jugador, Seleccion
+
+
+@admin.register(Seleccion)
+class SeleccionAdmin(admin.ModelAdmin):
+    list_display = ('id_seleccion', 'pais', 'codigo_iso')
+    search_fields = ('pais',)
+
+
+@admin.register(Jugador)
+class JugadorAdmin(admin.ModelAdmin):
+    list_display = ('id_jugador', 'primer_nombre', 'dorsal', 'posicion', 'fk_id_seleccion')
+    search_fields = ('primer_nombre', 'dorsal')
+    list_filter = ('posicion',)
+
 
 @admin.register(Partido)
 class PartidoAdmin(admin.ModelAdmin):

@@ -1,0 +1,275 @@
+@import '../../../estilos/variables.css';
+
+/* ========================================
+   JUGADORES SELECCION PAGE - LAYOUT
+   ======================================== */
+.jugadores-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.jugadores-background {
+  min-height: 100vh;
+  width: 100%;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.8) 100%),
+    url('https://images.unsplash.com/photo-1522778034537-20a2486be803?q=80&w=1170&auto=format&fit=crop') center/cover no-repeat;
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+.jugadores-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.jugadores-content {
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   BOTON VOLVER
+   ======================================== */
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: var(--border-width-thin) solid var(--border-color-medium);
+  border-radius: var(--border-radius-lg);
+  color: var(--text-secondary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-lg);
+  align-self: flex-start;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-color-light);
+  color: var(--color-white);
+}
+
+/* ========================================
+   HEADER DE SELECCION
+   ======================================== */
+.seleccion-header-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--spacing-2xl);
+  gap: var(--spacing-md);
+  text-align: center;
+  width: 100%;
+}
+
+.seleccion-bandera-detail {
+  width: 120px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+}
+
+.seleccion-titulo {
+  color: var(--color-white);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.seleccion-subtitulo {
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+  margin: 0;
+}
+
+/* ========================================
+   GRID DE JUGADORES
+   ======================================== */
+.jugadores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+.jugador-card {
+  background: var(--bg-card);
+  backdrop-filter: var(--backdrop-blur-xl);
+  border: var(--border-width-thin) solid var(--border-color-medium);
+  border-radius: var(--border-radius-2xl);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-lg);
+}
+
+.jugador-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--border-color-light);
+}
+
+.jugador-avatar {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.jugador-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.jugador-nombre {
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-xs) 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jugador-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.jugador-meta > span {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  padding: 2px var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius-md);
+}
+
+.jugador-meta svg {
+  flex-shrink: 0;
+}
+
+.jugador-nombre-completo {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  margin: 0;
+}
+
+/* ========================================
+   ESTADOS DE CARGA Y VACIO
+   ======================================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-secondary);
+  min-height: 50vh;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  text-align: center;
+  color: var(--text-secondary);
+  min-height: 50vh;
+  width: 100%;
+}
+
+.empty-state h3 {
+  color: var(--color-white);
+  margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-xl);
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .jugadores-background {
+    background-attachment: scroll;
+    padding: var(--spacing-md);
+  }
+
+  .jugadores-content {
+    padding: 0 var(--spacing-md);
+  }
+
+  .jugadores-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .seleccion-titulo {
+    font-size: var(--font-size-2xl);
+  }
+
+  .jugador-card {
+    padding: var(--spacing-md);
+  }
+}

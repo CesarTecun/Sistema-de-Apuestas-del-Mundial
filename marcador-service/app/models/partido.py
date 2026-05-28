@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Integer, String
+from sqlalchemy import DateTime, Integer, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -28,6 +28,15 @@ class Partido(SoftDeleteMixin, Base):
     tipo_partido: Mapped[str] = mapped_column(String(50), default="Regular", nullable=False)
     resultado: Mapped[str | None] = mapped_column(String(50), nullable=True)
     estado: Mapped[str] = mapped_column(String(20), default="programado", nullable=False)
+    
+    # Campos para control de partido en vivo
+    minuto_actual: Mapped[int] = mapped_column(Integer, default=0, nullable=True)
+    periodo_actual: Mapped[str] = mapped_column(String(20), default="1T", nullable=True)  # 1T, 2T, ET1, ET2
+    tiempo_extra_periodo: Mapped[int] = mapped_column(Integer, default=0, nullable=True)
+    partido_iniciado: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
+    partido_pausado: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
+    faltas_local: Mapped[int] = mapped_column(Integer, default=0, nullable=True)
+    faltas_visitante: Mapped[int] = mapped_column(Integer, default=0, nullable=True)
 
     @property
     def resultado_display(self) -> str:

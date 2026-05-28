@@ -44,6 +44,18 @@ class MarcadorUpdate(BaseModel):
     resultado: str | None = Field(None, max_length=50)
     estado: str | None = Field(None, max_length=20)
     ganador_penales: int | None = None
+    faltas_local: int | None = None
+    faltas_visitante: int | None = None
+
+
+class PartidoControlUpdate(BaseModel):
+    """Schema para controlar el partido en vivo"""
+    estado: str | None = Field(None, max_length=20)  # programado, en_juego, finalizado
+    minuto_actual: int | None = None
+    periodo_actual: str | None = Field(None, max_length=20)  # 1T, 2T, ET1, ET2
+    tiempo_extra_periodo: int | None = None
+    partido_iniciado: bool | None = None
+    partido_pausado: bool | None = None
 
 
 class PartidoResponse(PartidoBase):
@@ -57,6 +69,14 @@ class PartidoResponse(PartidoBase):
     status: bool
     resultado_display: str
     ganador: int | None
+    # Campos de control del partido
+    minuto_actual: int | None = None
+    periodo_actual: str | None = None
+    tiempo_extra_periodo: int | None = None
+    partido_iniciado: bool | None = None
+    partido_pausado: bool | None = None
+    faltas_local: int | None = None
+    faltas_visitante: int | None = None
 
 
 class PartidoMarcadorResponse(PartidoResponse):

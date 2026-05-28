@@ -4,12 +4,18 @@ import { ProveedorAutenticacion, useAuth } from './contextos/ContextoAutenticaci
 import { ModulosColorProvider, useModulosColor } from './contextos/ContextoModulos';
 import PaginaLogin from './paginas/Login';
 import PaginaRegistro from './paginas/Registro';
-import { LigasPage } from './paginas/Ligas';
+import RecuperarContrasenaPage from './paginas/RecuperarContrasena';
+import { LigasPage, UnirmeLigaPage, LigasPublicasPage } from './paginas/Ligas';
 import { PartidosPage } from './paginas/Partidos';
 import SeleccionesPage from './paginas/Selecciones';
+import JugadoresSeleccionPage from './paginas/Selecciones/JugadoresSeleccionPage';
 import HomePage from './paginas/Home/HomePage';
+import MarcadorPage from './paginas/Marcador';
+import CalendarioPage from './paginas/Calendario/CalendarioPage';
+import AdminPage from './paginas/Admin/AdminPage';
 import RutaProtegida from './componentes/RutaProtegida';
 import PageTransition from './componentes/PageTransition';
+import NotificacionesProvider from './componentes/NotificacionesProvider';
 import './App.css';
 
 // Componente que aplica el tema automáticamente al cargar
@@ -25,7 +31,7 @@ const ThemeInitializer = () => {
 };
 
 function ContenidoApp() {
-  const { loading } = useAuth();
+  const { loading, isAuthenticated } = useAuth();
 
   if (loading) {
     return (
@@ -56,12 +62,30 @@ function ContenidoApp() {
 
   return (
     <Routes>
-      <Route path="/home" element={<HomePage />} />
+      <Route
+        path="/home"
+        element={
+          <RutaProtegida>
+            <HomePage />
+          </RutaProtegida>
+        }
+      />
       <Route path="/login" element={<PaginaLogin />} />
       <Route path="/registro" element={<PaginaRegistro />} />
+      <Route path="/recuperar-contrasena" element={<RecuperarContrasenaPage />} />
       <Route path="/GestionLigas" element={
         <RutaProtegida>
           <LigasPage />
+        </RutaProtegida>
+      } />
+      <Route path="/GestionLigas/unirme" element={
+        <RutaProtegida>
+          <UnirmeLigaPage />
+        </RutaProtegida>
+      } />
+      <Route path="/GestionLigas/publicas" element={
+        <RutaProtegida>
+          <LigasPublicasPage />
         </RutaProtegida>
       } />
       <Route path="/ligas" element={
@@ -79,7 +103,31 @@ function ContenidoApp() {
           <SeleccionesPage />
         </RutaProtegida>
       } />
-      <Route path="/" element={<Navigate to="/home" replace />} />
+      <Route path="/selecciones/:id_seleccion/jugadores" element={
+        <RutaProtegida>
+          <JugadoresSeleccionPage />
+        </RutaProtegida>
+      } />
+      <Route path="/marcador" element={
+        <RutaProtegida>
+          <MarcadorPage />
+        </RutaProtegida>
+      } />
+      <Route path="/calendario" element={
+        <RutaProtegida>
+          <CalendarioPage />
+        </RutaProtegida>
+      } />
+      <Route path="/admin" element={
+        <RutaProtegida>
+          <AdminPage />
+        </RutaProtegida>
+      } />
+      <Route
+        path="/"
+        element={<Navigate to={isAuthenticated ? "/home" : "/login"} replace />}
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
@@ -96,12 +144,14 @@ function App() {
   return (
     <ModulosColorProvider>
       <ProveedorAutenticacion>
-        <Router>
-          <div className="App">
-            <ThemeInitializer />
-            <AppWithRouter />
-          </div>
-        </Router>
+        <NotificacionesProvider>
+          <Router>
+            <div className="App">
+              <ThemeInitializer />
+              <AppWithRouter />
+            </div>
+          </Router>
+        </NotificacionesProvider>
       </ProveedorAutenticacion>
     </ModulosColorProvider>
   );

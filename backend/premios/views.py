@@ -36,7 +36,11 @@ class PremioViewSet(viewsets.ModelViewSet):
         liga_id = self.request.query_params.get('liga_id')
         
         if liga_id:
-            queryset = queryset.filter(fk_id_liga=liga_id)
+            try:
+                liga_id = int(liga_id)
+                queryset = queryset.filter(fk_id_liga=liga_id)
+            except ValueError:
+                return queryset.none()
             
         return queryset.order_by('posicion')
 
@@ -58,7 +62,15 @@ def premios_liga(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    resultado = calcular_premios_liga(int(liga_id))
+    try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    resultado = calcular_premios_liga(liga_id_int)
     
     if 'error' in resultado:
         return Response(resultado, status=status.HTTP_400_BAD_REQUEST)
@@ -82,8 +94,16 @@ def mi_premio(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
     usuario_id = request.user.id_usuario
-    resultado = obtener_premio_usuario(int(liga_id), usuario_id)
+    resultado = obtener_premio_usuario(liga_id_int, usuario_id)
     
     return Response(resultado)
 
@@ -104,10 +124,18 @@ def distribucion_liga(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    distribucion = obtener_distribucion_premios_liga(int(liga_id))
+    try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    distribucion = obtener_distribucion_premios_liga(liga_id_int)
     
     return Response({
-        'liga_id': int(liga_id),
+        'liga_id': liga_id_int,
         'distribucion': distribucion,
         'descripcion': {
             1: 'Primer lugar',
@@ -163,11 +191,11 @@ def configurar_premios(request):
             item['posicion']: item['porcentaje'] for item in distribucion_data
         }
         
-        premios = actualizar_distribucion_premios(int(liga_id), nueva_distribucion)
+        premios = actualizar_distribucion_premios(liga_id_int, nueva_distribucion)
         
         return Response({
             'mensaje': 'Distribución de premios actualizada correctamente',
-            'liga_id': liga_id,
+            'liga_id': liga_id_int,
             'total_posiciones': len(premios),
             'suma_porcentajes': float(total_porcentaje)
         })
@@ -197,7 +225,15 @@ def inicializar_premios_default(request):
         )
     
     try:
-        premios = inicializar_premios_liga(int(liga_id))
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        premios = inicializar_premios_liga(liga_id_int)
         
         return Response({
             'mensaje': 'Premios inicializados con distribución por defecto',
@@ -236,7 +272,16 @@ def premio_usuario_liga(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    resultado = obtener_premio_usuario(int(liga_id), int(usuario_id))
+    try:
+        liga_id_int = int(liga_id)
+        usuario_id_int = int(usuario_id)
+    except ValueError:
+        return Response(
+            {'error': 'Los IDs deben ser numéricos'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    resultado = obtener_premio_usuario(liga_id_int, usuario_id_int)
     
     return Response(resultado)
 
@@ -259,7 +304,15 @@ def ejecutar_cierre_liga(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    resultado = cerrar_liga(int(liga_id))
+    try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    resultado = cerrar_liga(liga_id_int)
 
     if 'error' in resultado:
         return Response(resultado, status=status.HTTP_400_BAD_REQUEST)
@@ -284,7 +337,15 @@ def simular_cierre_liga(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    premios_locales, resumen_local = calcular_premios_locales_con_empates(int(liga_id))
+    try:
+        liga_id_int = int(liga_id)
+    except ValueError:
+        return Response(
+            {'error': 'liga_id debe ser numérico'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    premios_locales, resumen_local = calcular_premios_locales_con_empates(liga_id_int)
 
     if premios_locales is None:
         return Response(resumen_local, status=status.HTTP_400_BAD_REQUEST)
@@ -292,11 +353,11 @@ def simular_cierre_liga(request):
     premios_individuales, premios_liga, resumen_global = calcular_premios_globales()
 
     # Filtrar solo los premios globales que afectan a esta liga
-    premios_globales_esta_liga = [p for p in premios_individuales if p['liga_id'] == int(liga_id)]
-    premios_globales_liga_esta = [p for p in premios_liga if p['liga_id'] == int(liga_id)]
+    premios_globales_esta_liga = [p for p in premios_individuales if p['liga_id'] == liga_id_int]
+    premios_globales_liga_esta = [p for p in premios_liga if p['liga_id'] == liga_id_int]
 
     return Response({
-        'liga_id': int(liga_id),
+        'liga_id': liga_id_int,
         'premios_locales': resumen_local,
         'premios_globales_individuales': [
             {k: float(v) if hasattr(v, 'quantize') else v for k, v in p.items()}

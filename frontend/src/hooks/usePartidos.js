@@ -148,7 +148,16 @@ export const usePartidos = () => {
     return ligas.filter(liga => liga.fk_administrador === user.id_usuario);
   }, [ligas, user]);
 
-  const ligasAdministradasIds = useMemo(() => new Set(ligasAdministradas.map(l => l.id_liga)), [ligasAdministradas]);
+  const ligasAdministradasIds = useMemo(() => {
+    const ids = new Set(ligasAdministradas.map(l => l.id_liga));
+    // Incluir ligas públicas sin administrador (ej. liga mundial)
+    ligas.forEach(liga => {
+      if (liga.es_publica && (liga.fk_administrador === null || liga.fk_administrador === undefined)) {
+        ids.add(Number(liga.id_liga));
+      }
+    });
+    return ids;
+  }, [ligasAdministradas, ligas]);
 
   const puedeGestionarLiga = useCallback(
     (ligaId) => {

@@ -5,7 +5,7 @@ como si fueran nativos del proyecto.
 """
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -46,9 +46,9 @@ def marcador_partidos(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def marcador_partidos_en_vivo(request):
-    """Proxy: obtener partidos en juego desde el microservicio marcador."""
+    """Proxy: obtener todos los partidos desde el microservicio marcador (sin filtrar por estado)"""
     try:
-        data = client.partidos_en_vivo()
+        data = client.listar_partidos()
         return Response(data)
     except MarcadorClientError as exc:
         return Response({"error": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
@@ -129,6 +129,17 @@ def marcador_eliminar_partido(request, id_partido):
         return Response({"error": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def marcador_controlar_partido(request, id_partido):
+    """Proxy: controlar partido (iniciar, pausar, cambiar tiempo, etc.) en el microservicio marcador."""
+    try:
+        data = client.controlar_partido(id_partido, request.data)
+        return Response(data)
+    except MarcadorClientError as exc:
+        return Response({"error": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def marcador_health(request):
@@ -144,6 +155,7 @@ def marcador_health(request):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def marcador_webhook(request):
     """
     Webhook que recibe notificaciones del microservicio marcador
@@ -174,8 +186,8 @@ def marcador_webhook(request):
             partido.gol_visitante = request.data["gol_visitante"]
             update_fields.append("gol_visitante")
         if "estado" in request.data:
-            partido.estado = request.data["estado"]
-            update_fields.append("estado")
+            partido.estado_partido = request.data["estado"]
+            update_fields.append("estado_partido")
         if "resultado" in request.data:
             partido.resultado = request.data["resultado"]
             update_fields.append("resultado")
@@ -185,6 +197,12 @@ def marcador_webhook(request):
 
         if update_fields:
             partido.save(update_fields=update_fields)
+            print(f"✅ Webhook: Partido {id_partido} actualizado en Django: {update_fields}")
+            print(f"   Goles: {partido.gol_local} - {partido.gol_visitante}")
+            print(f"   Estado: {partido.estado_partido}")
+            print(f"   Resultado: {partido.resultado}")
+        else:
+            print(f"⚠️ Webhook: Partido {id_partido} recibido pero sin campos para actualizar")
     finally:
         set_sync_from_webhook(False)
 

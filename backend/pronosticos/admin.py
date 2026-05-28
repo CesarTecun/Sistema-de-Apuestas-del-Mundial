@@ -3,18 +3,18 @@ from .models import Pronostico
 
 @admin.register(Pronostico)
 class PronosticoAdmin(admin.ModelAdmin):
-    list_display = ('id_pronostico', 'fk_id_usuario', 'fk_id_partido', 'fk_id_liga', 'gol_local', 'gol_visitante', 'ganador_pronostico')
-    list_filter = ('fk_id_liga', 'fk_id_usuario')
+    list_display = ('id_pronostico', 'fk_id_usuario', 'fk_id_partido', 'fk_id_liga', 'gol_local', 'gol_visitante', 'ganador_pronostico', 'puntos_obtenidos')
+    list_filter = ('fk_id_liga', 'fk_id_usuario', 'puntos_obtenidos')
     search_fields = ('fk_id_usuario', 'fk_id_partido', 'fk_id_liga')
-    readonly_fields = ('id_pronostico',)
+    readonly_fields = ('id_pronostico', 'puntos_obtenidos')
     ordering = ('-id_pronostico',)
-    
+
     fieldsets = (
         ('Información del Pronóstico', {
             'fields': ('fk_id_usuario', 'fk_id_partido', 'fk_id_liga')
         }),
         ('Resultado Pronosticado', {
-            'fields': ('gol_local', 'gol_visitante')
+            'fields': ('gol_local', 'gol_visitante', 'puntos_obtenidos')
         }),
     )
     

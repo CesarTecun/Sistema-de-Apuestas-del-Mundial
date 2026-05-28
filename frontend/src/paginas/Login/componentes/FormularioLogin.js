@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const FormularioLogin = ({ onSubmit, error, loading }) => {
   const [formData, setFormData] = useState({
@@ -8,6 +8,7 @@ const FormularioLogin = ({ onSubmit, error, loading }) => {
     rememberMe: false
   });
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -23,8 +24,7 @@ const FormularioLogin = ({ onSubmit, error, loading }) => {
   };
 
   const handleForgotPassword = () => {
-    // TODO: Implementar modal o navegación para recuperación de contraseña
-    console.log('Funcionalidad de recuperación de contraseña pendiente');
+    navigate('/recuperar-contrasena');
   };
 
   const togglePasswordVisibility = () => {
