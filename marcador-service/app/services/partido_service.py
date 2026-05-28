@@ -1,4 +1,5 @@
 import os
+import threading
 
 import requests
 from sqlalchemy.orm import Session
@@ -6,36 +7,40 @@ from sqlalchemy.orm import Session
 from app.models.partido import Partido
 from app.models.seleccion import Seleccion
 from app.schemas.partido import MarcadorUpdate, PartidoControlUpdate, PartidoCreate, PartidoMarcadorResponse, PartidoUpdate
+from app.schemas.seleccion import SeleccionResponse
 
 
 DJANGO_WEBHOOK_URL = os.getenv("DJANGO_WEBHOOK_URL", "http://localhost:8000/api/partidos/marcador/webhook/")
 
 
 def _notify_django(partido: Partido) -> None:
-    """Notifica a Django cuando cambia el marcador de un partido."""
+    """Notifica a Django cuando cambia el marcador de un partido (asíncrono)."""
     if not DJANGO_WEBHOOK_URL:
         return
-    try:
-        payload = {
-            "id_partido": partido.id_partido,
-            "gol_local": partido.gol_local,
-            "gol_visitante": partido.gol_visitante,
-            "estado": partido.estado,
-            "resultado": partido.resultado,
-            "ganador_penales": partido.ganador_penales,
-        }
-        print(f"[WEBHOOK] Enviando notificación a Django: {DJANGO_WEBHOOK_URL}")
-        print(f"[WEBHOOK] Payload: id_partido={partido.id_partido}, estado={partido.estado}, gol_local={partido.gol_local}, gol_visitante={partido.gol_visitante}")
-        response = requests.post(
-            DJANGO_WEBHOOK_URL,
-            json=payload,
-            timeout=3,
-        )
-        print(f"[WEBHOOK] Response status: {response.status_code}")
-        print(f"[WEBHOOK] Response body: {response.text}")
-    except Exception as e:
-        print(f"[WEBHOOK] Error: {e}")
-        pass  # No fallar si Django no está disponible
+
+    def _send():
+        try:
+            payload = {
+                "id_partido": partido.id_partido,
+                "gol_local": partido.gol_local,
+                "gol_visitante": partido.gol_visitante,
+                "estado": partido.estado,
+                "resultado": partido.resultado,
+                "ganador_penales": partido.ganador_penales,
+            }
+            print(f"[WEBHOOK] Enviando notificación a Django: {DJANGO_WEBHOOK_URL}")
+            print(f"[WEBHOOK] Payload: id_partido={partido.id_partido}, estado={partido.estado}, gol_local={partido.gol_local}, gol_visitante={partido.gol_visitante}")
+            response = requests.post(
+                DJANGO_WEBHOOK_URL,
+                json=payload,
+                timeout=5,
+            )
+            print(f"[WEBHOOK] Response status: {response.status_code}")
+            print(f"[WEBHOOK] Response body: {response.text}")
+        except Exception as e:
+            print(f"[WEBHOOK] Error: {e}")
+
+    threading.Thread(target=_send, daemon=True).start()
 
 
 def _ensure_seleccion_exists(db: Session, id_seleccion: int) -> bool:
@@ -126,11 +131,11 @@ def controlar_partido(db: Session, partido: Partido, data: PartidoControlUpdate)
     Controla el partido en vivo: iniciar, pausar, cambiar tiempo, agregar tiempo extra
     """
     payload = data.model_dump(exclude_unset=True)
-    print(f"🎮 controlar_partido recibido: id_partido={partido.id_partido}, payload={payload}")
+    print(f"controlar_partido recibido: id_partido={partido.id_partido}, payload={payload}")
     
     # Finalizar partido - manejar primero para asegurar que no se sobrescriba
     if payload.get("estado") == "finalizado":
-        print(f"✅ Finalizando partido {partido.id_partido}")
+        print(f"Finalizando partido {partido.id_partido}")
         partido.estado = "finalizado"
         partido.partido_pausado = True
         partido.partido_iniciado = False
@@ -149,18 +154,18 @@ def controlar_partido(db: Session, partido: Partido, data: PartidoControlUpdate)
     # Manejo especial para pausar partido
     if payload.get("partido_pausado") is not None:
         partido.partido_pausado = payload["partido_pausado"]
-    
-    # Actualizar otros campos (excepto estado que ya se manejó)
-    for field, value in payload.items():
-        if field not in ["partido_iniciado", "partido_pausado", "estado"]:
-            setattr(partido, field, value)
-    
-    # Cambio de período
+
+    # Cambio de período (antes del setattr general para poder reiniciar minuto)
     if payload.get("periodo_actual") and payload["periodo_actual"] != partido.periodo_actual:
         partido.periodo_actual = payload["periodo_actual"]
-        partido.minuto_actual = 0  # Reiniciar minuto al cambiar período
+        partido.minuto_actual = 0
         partido.tiempo_extra_periodo = 0
-    
+
+    # Actualizar otros campos (excepto estado, partido_iniciado, partido_pausado y periodo_actual que ya se manejaron)
+    for field, value in payload.items():
+        if field not in ["partido_iniciado", "partido_pausado", "estado", "periodo_actual"]:
+            setattr(partido, field, value)
+
     db.commit()
     db.refresh(partido)
     _notify_django(partido)
@@ -172,15 +177,29 @@ def delete_partido(db: Session, partido: Partido) -> None:
     db.commit()
 
 
-def enrich_marcador(db: Session, partido: Partido) -> PartidoMarcadorResponse:
-    local = get_seleccion_safe(db, partido.equipo_local)
-    visitante = get_seleccion_safe(db, partido.equipo_visitante)
-    
+def _build_seleccion_cache(db: Session, partidos: list[Partido]) -> dict[int, SeleccionResponse]:
+    from app.schemas.seleccion import SeleccionResponse
+
+    ids = {p.equipo_local for p in partidos} | {p.equipo_visitante for p in partidos}
+    if not ids:
+        return {}
+    rows = (
+        db.query(Seleccion)
+        .filter(Seleccion.id_seleccion.in_(ids), Seleccion.status.is_(True))
+        .all()
+    )
+    return {row.id_seleccion: SeleccionResponse.model_validate(row) for row in rows}
+
+
+def enrich_marcador(partido: Partido, cache: dict[int, SeleccionResponse]) -> PartidoMarcadorResponse:
+    local = cache.get(partido.equipo_local)
+    visitante = cache.get(partido.equipo_visitante)
+
     if not local:
-        print(f"⚠️ No se encontró selección local para partido {partido.id_partido}: equipo_local={partido.equipo_local}")
+        print(f"No se encontró selección local para partido {partido.id_partido}: equipo_local={partido.equipo_local}")
     if not visitante:
-        print(f"⚠️ No se encontró selección visitante para partido {partido.id_partido}: equipo_visitante={partido.equipo_visitante}")
-    
+        print(f"No se encontró selección visitante para partido {partido.id_partido}: equipo_visitante={partido.equipo_visitante}")
+
     base = PartidoMarcadorResponse.model_validate(partido)
     return base.model_copy(
         update={
@@ -188,6 +207,18 @@ def enrich_marcador(db: Session, partido: Partido) -> PartidoMarcadorResponse:
             "equipo_visitante_detalle": visitante,
         }
     )
+
+
+def enrich_marcador_single(db: Session, partido: Partido) -> PartidoMarcadorResponse:
+    """Enriquece un único partido construyendo el cache internamente."""
+    cache = _build_seleccion_cache(db, [partido])
+    return enrich_marcador(partido, cache)
+
+
+def enrich_marcador_list(db: Session, partidos: list[Partido]) -> list[PartidoMarcadorResponse]:
+    """Enriquece una lista de partidos construyendo el cache una sola vez."""
+    cache = _build_seleccion_cache(db, partidos)
+    return [enrich_marcador(p, cache) for p in partidos]
 
 
 def get_seleccion_safe(db: Session, id_seleccion: int):
@@ -201,5 +232,5 @@ def get_seleccion_safe(db: Session, id_seleccion: int):
     if row:
         return SeleccionResponse.model_validate(row)
     else:
-        print(f"⚠️ Selección no encontrada: id_seleccion={id_seleccion}")
+        print(f"Selección no encontrada: id_seleccion={id_seleccion}")
         return None

@@ -52,10 +52,10 @@ if __name__ == '__main__':
         exists = cursor.fetchone()[0]
         
         if not exists:
-            print("❌ La tabla django_migrations no existe. Ejecuta primero el init-django-tables.sql")
+            print("La tabla django_migrations no existe. Ejecuta primero el init-django-tables.sql")
             sys.exit(1)
         
-        print("✅ Marcando migraciones como aplicadas...")
+        print("Marcando migraciones como aplicadas...")
         
         for app, name in migrations:
             cursor.execute("""
@@ -65,6 +65,6 @@ if __name__ == '__main__':
             """, [app, name])
             print(f"  - {app}.{name}")
         
-        print(f"\n✅ {len(migrations)} migraciones marcadas como aplicadas")
+        print(f"\n{len(migrations)} migraciones marcadas como aplicadas")
         print("\nAhora puedes ejecutar el servidor Django:")
         print("  python manage.py runserver")

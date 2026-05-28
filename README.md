@@ -1,176 +1,168 @@
 # Sistema de Apuestas del Mundial 2026
 
-## Stack Tecnológico
-- **Backend**: Python + Django + Django REST Framework
-- **Frontend**: React + Node.js
-- **Base de Datos**: PostgreSQL (recomendado)
+Aplicación full-stack para administrar quinielas y marcadores del Mundial 2026:
 
-## 🐳 Configuración con Docker (Recomendado)
+- API REST con **Django 5.2 + DRF** para autenticación, ligas, pronósticos, posiciones y premios.
+- **Frontend React 18** para la experiencia de usuarios finales y administradores.
+- **Microservicio marcador (FastAPI + PostgreSQL)** independiente para sincronizar resultados en tiempo real.
 
-### Prerrequisitos
-- Docker y Docker Compose instalados
-- Python 3.11+
+---
 
-### Inicio Rápido
-```bash
-# 1. Iniciar contenedores Docker
-docker-compose -f infrastructure/docker-compose.yml up -d
+## Arquitectura
 
-# 2. Ejecutar script de configuración automatizada
-python scripts/docker_setup.py
+| Módulo | Descripción |
+| --- | --- |
+| `backend/` | Proyecto Django con apps para usuarios, ligas, partidos, pronósticos, posiciones, historial, premios y seguridad. Incluye JWT, tracking de sesiones, ratelimiting y servicios auxiliares. |
+| `frontend/` | SPA React con contextos, hooks personalizados y componentes reutilizables agrupados por páginas. |
+| `marcador-service/` | Microservicio FastAPI que expone endpoints para registrar marcadores y publica webhooks al backend. Usa su propio Postgres (puerto 5433). |
+| `infrastructure/` | Docker Compose, Dockerfile y configuración de nginx para despliegues. |
+| `database/` | Scripts para roles, backups y utilidades (p.ej. marcar migraciones como aplicadas). |
+| `scripts/` | Automatizaciones para levantar Docker, crear usuarios admin y validar migraciones. |
 
-# 3. Iniciar servidor de desarrollo
-python manage.py runserver
+Estructura general:
 
-# 4. Iniciar frontend (en otra terminal)
-cd frontend && npm start
-```
-
-### Scripts Automatizados
-- **Windows**: `scripts\docker_start.bat`
-- **Linux/Mac**: `./scripts/docker_start.sh`
-
-### ¿Qué hacen los scripts?
-1. ✅ Inician PostgreSQL en Docker
-2. ✅ Aplican todas las migraciones Django
-3. ✅ Crean superusuario (`admin/admin123`)
-4. ✅ Verifican conexión a la base de datos
-
-## Microservicio Marcador (independiente)
-
-Servicio de marcador en vivo con **PostgreSQL propio** (puerto 5433) y API FastAPI (puerto 8001).
-
-```bash
-cd marcador-service
-docker compose up -d --build
-```
-
-Documentación completa: [marcador-service/README.md](marcador-service/README.md)
-
-## Estructura del Proyecto
 ```
 Sistema de Apuestas del Mundial/
-|-- marcador-service/     # Microservicio marcador (FastAPI + Postgres)
-|-- backend/              # Proyecto Django
-|   |-- manage.py
-|   |-- backend/          # Configuración principal
-|   |-- autenticacion/    # App de autenticación
-|   |-- usuarios/         # App de usuarios
-|   |-- ligas/            # App de ligas
-|   |-- partidos/         # App de partidos
-|   |-- pronosticos/      # App de pronósticos
-|   |-- posiciones/       # App de rankings
-|   |-- premios/          # App de premios
-|   |-- historialganador/ # App de historial
-|   |-- core/             # App para tablas sin modelo previo
-|   `-- correos/          # App de correos (futuro)
-|-- frontend/             # Proyecto React
-|   |-- src/
-|   |   |-- config/       # Configuración centralizada
-|   |   |-- contextos/    # Contextos de React
-|   |   |-- hooks/        # Hooks personalizados
-|   |   |-- componentes/  # Componentes reutilizables
-|   |   |-- paginas/      # Páginas principales
-|   |   |-- servicios/    # Servicios de API
-|   |   `-- estilos/      # Estilos globales
-|   |-- public/
-|   `-- package.json
-|-- database/             # Scripts y archivos de base de datos
-|   |-- init-db.sql.backup # Backup del esquema original (referencia)
-|   |-- backups/          # Respaldos de BD
-|-- infrastructure/       # Configuración de infraestructura
-|   |-- docker-compose.yml # Configuración Docker
-|   |-- Dockerfile        # Imagen Docker
-|   `-- nginx/            # Configuración nginx (futuro)
-|-- config/               # Configuración centralizada
-|   `-- .env.example     # Ejemplo de variables de entorno
-|-- requirements.txt      # Dependencias Python
-`-- README.md
+├── backend/
+├── frontend/
+├── marcador-service/
+├── config/
+├── database/
+├── infrastructure/
+├── scripts/
+└── README.md
+```
 
-## Instalación para Desarrollo
+---
 
-### Prerrequisitos
-- Python 3.10+
+## Prerrequisitos
+
+- Python 3.11+
 - Node.js 18+
-- Git
+- PostgreSQL 14+ (local o remoto)
+- Docker y Docker Compose (opcional, para la configuración automatizada)
 
-### Pasos de Instalación
+---
 
-1. **Clonar el repositorio**
+## Configuración inicial
+
+1. **Clonar y entrar al directorio**
+   ```bash
+   git clone <url>
+   cd Sistema-de-Apuestas-del-Mundial
+   ```
+
+2. **Backend**
+   ```bash
+   python -m venv venv311
+   venv311\Scripts\activate  # o source venv311/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. **Frontend**
+   ```bash
+   cd frontend
+   npm install
+   cd ..
+   ```
+
+4. **Variables de entorno**
+   ```bash
+   copy config\.env.example .env   # Windows
+   # o
+   cp config/.env.example .env
+   ```
+   Ajusta los valores principales:
+   ```env
+   DEBUG=True
+   SECRET_KEY=tu-clave
+   ALLOWED_HOSTS=localhost,127.0.0.1
+   DB_NAME=quiniela
+   DB_USER=postgres
+   DB_PASSWORD=postgres
+   DB_HOST=localhost
+   DB_PORT=5432
+   FRONTEND_URL=http://localhost:3000
+   MARCADOR_SERVICE_URL=http://localhost:8001
+   ```
+
+5. **Base de datos**
+   - Crea la base `quiniela` en PostgreSQL.
+   - Ejecuta `python manage.py migrate` para generar el esquema (o usa los scripts de `database/` si restauras un dump existente y solo deseas "fijar" migraciones).
+
+---
+
+## Ejecución en desarrollo
+
+| Servicio | Comando | URL |
+| --- | --- | --- |
+| Backend | `python manage.py runserver` | http://localhost:8000 |
+| Frontend | `cd frontend && npm start` | http://localhost:3000 |
+| Microservicio marcador | `cd marcador-service && uvicorn app.main:app --reload --port 8001` | http://localhost:8001 |
+
+Para el microservicio asegúrate de tener su `.env` y Postgres (puerto 5433 por defecto) listos. Sus detalles están en `marcador-service/README.md`.
+
+---
+
+## Ejecución con Docker (opcional)
+
+1. Levanta la infraestructura base (PostgreSQL contenedorizado, etc.):
+   ```bash
+   docker-compose -f infrastructure/docker-compose.yml up -d
+   ```
+
+2. Corre el script de configuración para esperar la BD, aplicar migraciones y crear el superusuario `admin/admin123`:
+   ```bash
+   python scripts/docker_setup.py
+   ```
+
+3. Scripts de conveniencia:
+   - Windows: `scripts\docker_start.bat`
+   - Linux/Mac: `./scripts/docker_start.sh`
+
+---
+
+## Scripts relevantes
+
+| Script | Descripción |
+| --- | --- |
+| `scripts/check_migrations.py` | Detecta migraciones pendientes o sin commitear. |
+| `scripts/create_admin.py` | Crea un usuario admin en la base actual. |
+| `database/fake_migrations.py` | Marca migraciones como aplicadas cuando se restauró un dump. |
+| `scripts/docker_setup.py` | Automatiza la configuración del backend dentro de Docker. |
+
+---
+
+## Pruebas
+
 ```bash
-git clone <url-del-repositorio>
-cd "Sistema de Apuestas del Mundial"
+# Backend
+python manage.py test
+
+# Frontend
+npm run lint
+npm test
 ```
 
-2. **Instalar dependencias del Backend**
-```bash
-pip install -r requirements.txt
-```
+Hay pruebas adicionales para lógica de pronósticos en `test_cierre_pronosticos.py`.
 
-3. **Instalar dependencias del Frontend**
-```bash
-cd frontend
-npm install
-cd ..
-```
+---
 
-### Ejecutar en Desarrollo
+## Flujo de trabajo recomendado
 
-1. **Backend (Django)**
-```bash
-python manage.py migrate
-python manage.py runserver
-```
-El backend correrá en: http://localhost:8000
+1. Crear rama desde `main`: `git checkout -b feature/mi-cambio`.
+2. Realizar cambios y asegurarse de que backend/frontend compilen.
+3. Ejecutar `scripts/check_migrations.py` para prevenir migraciones accidentales.
+4. `git commit`, `git push` y abrir Pull Request.
 
-2. **Frontend (React)**
-```bash
-cd frontend
-npm start
-```
-El frontend correrá en: http://localhost:3000
+---
 
-## Configuración de Variables de Entorno
+## Recursos adicionales
 
-Crear archivo `.env` en la raíz del proyecto:
-```bash
-cp config/.env.example .env
-```
+- Documentación del microservicio marcador: [marcador-service/README.md](marcador-service/README.md)
+- Guías de migraciones: `docs/MIGRATIONS_GUIDE.md` y `docs/MIGRATIONS_SETUP.md`
+- Scripts y utilidades: revisar el directorio `scripts/`
 
-Editar el archivo `.env` con tus configuraciones:
-```
-DEBUG=True
-SECRET_KEY=tu-secret-key-aqui
-ALLOWED_HOSTS=localhost,127.0.0.1
-DB_NAME=quiniela
-DB_USER=postgres
-DB_PASSWORD=PASSWORD
-DB_HOST=localhost
-DB_PORT=5432
-```
+---
 
-## Ejecutar con Docker
-
-### Iniciar base de datos PostgreSQL
-```bash
-cd infrastructure
-docker-compose up -d
-```
-
-### Detener base de datos
-```bash
-cd infrastructure
-docker-compose down
-```
-
-## Flujo de Trabajo con Git
-
-1. Cada desarrollador crea su rama: `git checkout -b feature/nueva-funcionalidad`
-2. Realiza cambios y commitea: `git add . && git commit -m "Descripción del cambio"`
-3. Sube al repositorio: `git push origin feature/nueva-funcionalidad`
-4. Crea Pull Request para revisión
-
-## Notas Importantes
-- Este proyecto está diseñado para ser desarrollado por equipos
-- Mantener la estructura de carpetas tal como está
-- Seguir las convenciones de nomenclatura de Django y React
+¿Necesitas ayuda? Revisa los archivos mencionados o abre un issue describiendo el contexto. ¡Bienvenido al proyecto!

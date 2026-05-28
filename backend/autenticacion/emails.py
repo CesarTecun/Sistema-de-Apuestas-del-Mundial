@@ -7,13 +7,13 @@ def enviar_correo_recuperacion(usuario, token_plano):
     nombre = usuario.get_full_name() or usuario.email
     reset_link = f"{settings.FRONTEND_URL}/recuperar-contrasena?token={token_plano}"
 
-    asunto = "🔐 Recupera tu contraseña - Sistema de Apuestas"
+    asunto = "Recupera tu contraseña - Sistema de Apuestas"
     mensaje = f"""
 Hola {nombre},
 
 Recibimos una solicitud para restablecer la contraseña de tu cuenta.
 
-➡️ Para continuar, haz clic en el siguiente enlace (válido por 24 horas):
+Para continuar, haz clic en el siguiente enlace (válido por 24 horas):
 {reset_link}
 
 Si tú no solicitaste este cambio, ignora este mensaje. Tu contraseña seguirá siendo la misma.

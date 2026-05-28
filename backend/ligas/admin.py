@@ -92,21 +92,21 @@ class InvitacionAdmin(admin.ModelAdmin):
         if enviadas > 0:
             self.message_user(
                 request,
-                f'✅ {enviadas} invitación(es) enviada(s) exitosamente por correo.',
+                f'{enviadas} invitación(es) enviada(s) por correo.',
                 messages.SUCCESS
             )
         
         if errores > 0:
             self.message_user(
                 request,
-                f'⚠️ {errores} invitación(es) no pudieron ser enviadas.',
+                f'{errores} invitación(es) no pudieron ser enviadas.',
                 messages.WARNING
             )
         
         if enviadas == 0 and errores == 0:
             self.message_user(
                 request,
-                'ℹ️ No se encontraron invitaciones pendientes con email para enviar.',
+                'No se encontraron invitaciones pendientes con email para enviar.',
                 messages.INFO
             )
 
@@ -165,13 +165,13 @@ class InvitacionAdmin(admin.ModelAdmin):
             aceptadas += 1
 
         if aceptadas:
-            self.message_user(request, f'✅ {aceptadas} invitación(es) aceptada(s).', messages.SUCCESS)
+            self.message_user(request, f'{aceptadas} invitación(es) aceptada(s).', messages.SUCCESS)
         if sin_usuario:
-            self.message_user(request, f'⚠️ {sin_usuario} invitación(es) sin usuario asociado.', messages.WARNING)
+            self.message_user(request, f'{sin_usuario} invitación(es) sin usuario asociado.', messages.WARNING)
         if sin_cupo:
-            self.message_user(request, f'⚠️ {sin_cupo} invitación(es) sin cupo disponible.', messages.WARNING)
+            self.message_user(request, f'{sin_cupo} invitación(es) sin cupo disponible.', messages.WARNING)
         if ya_gestionadas:
-            self.message_user(request, f'ℹ️ {ya_gestionadas} ya estaban gestionadas.', messages.INFO)
+            self.message_user(request, f'{ya_gestionadas} ya estaban gestionadas.', messages.INFO)
 
 
 @admin.register(SolicitudParticipacion)
@@ -222,13 +222,13 @@ class SolicitudParticipacionAdmin(admin.ModelAdmin):
             aprobadas += 1
 
         if aprobadas:
-            self.message_user(request, f'✅ {aprobadas} solicitud(es) aprobada(s).', messages.SUCCESS)
+            self.message_user(request, f'{aprobadas} solicitud(es) aprobada(s).', messages.SUCCESS)
         if sin_cupo:
-            self.message_user(request, f'⚠️ {sin_cupo} sin cupo disponible.', messages.WARNING)
+            self.message_user(request, f'{sin_cupo} sin cupo disponible.', messages.WARNING)
         if sin_usuario:
-            self.message_user(request, f'⚠️ {sin_usuario} sin usuario asociado.', messages.WARNING)
+            self.message_user(request, f'{sin_usuario} sin usuario asociado.', messages.WARNING)
         if ya_gestionadas:
-            self.message_user(request, f'ℹ️ {ya_gestionadas} ya estaban gestionadas.', messages.INFO)
+            self.message_user(request, f'{ya_gestionadas} ya estaban gestionadas.', messages.INFO)
 
     @admin.action(description='Rechazar solicitudes seleccionadas')
     def rechazar_solicitudes(self, request, queryset):
@@ -248,6 +248,6 @@ class SolicitudParticipacionAdmin(admin.ModelAdmin):
             rechazadas += 1
 
         if rechazadas:
-            self.message_user(request, f'✅ {rechazadas} solicitud(es) rechazada(s).', messages.SUCCESS)
+            self.message_user(request, f'{rechazadas} solicitud(es) rechazada(s).', messages.SUCCESS)
         if ya_gestionadas:
-            self.message_user(request, f'ℹ️ {ya_gestionadas} ya estaban gestionadas.', messages.INFO)
+            self.message_user(request, f'{ya_gestionadas} ya estaban gestionadas.', messages.INFO)

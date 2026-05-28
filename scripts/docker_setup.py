@@ -31,18 +31,18 @@ def wait_for_postgres():
                 password='PASSWORD'
             )
             conn.close()
-            print("✅ PostgreSQL está listo")
+            print("PostgreSQL está listo")
             return True
         except psycopg2.OperationalError:
             print(f"   Intento {i+1}/{max_retries}...")
             time.sleep(retry_delay)
     
-    print("❌ Timeout esperando a PostgreSQL")
+    print("Error: se agotó el tiempo de espera para PostgreSQL")
     return False
 
 def setup_django_environment():
     """Configurar entorno Django para Docker"""
-    print("🔧 Configurando entorno Django...")
+    print("Configurando entorno Django...")
     
     # Configurar variables de entorno para Docker
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
@@ -59,39 +59,39 @@ def setup_django_environment():
         }
     
     django.setup()
-    print("✅ Entorno Django configurado")
+    print("Entorno Django configurado")
 
 def verify_database_schema():
     """Verificar conexión a la base de datos"""
-    print("🔍 Verificando conexión a base de datos...")
+    print("Verificando conexión a base de datos...")
     
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
-            print("✅ Conexión a base de datos exitosa")
+            print("Conexión a base de datos confirmada")
             return True
     except Exception as e:
-        print(f"❌ Error conectando a la base de datos: {e}")
+        print(f"Error conectando a la base de datos: {e}")
         return False
 
 def apply_migrations():
     """Aplicar migraciones de Django"""
-    print("🔄 Aplicando migraciones de Django...")
+    print("Aplicando migraciones de Django...")
     
     try:
         # Aplicar migraciones
         execute_from_command_line(['manage.py', 'migrate'])
         
-        print("✅ Migraciones aplicadas correctamente")
+        print("Migraciones aplicadas correctamente")
         return True
         
     except Exception as e:
-        print(f"❌ Error aplicando migraciones: {e}")
+        print(f"Error aplicando migraciones: {e}")
         return False
 
 def create_superuser():
     """Crear superusuario si no existe"""
-    print("👤 Verificando superusuario...")
+    print("Verificando superusuario...")
     
     try:
         from django.contrib.auth import get_user_model
@@ -103,24 +103,24 @@ def create_superuser():
                 email='admin@mundial.com',
                 password='admin123'
             )
-            print("✅ Superusuario creado (admin/admin123)")
+            print("Superusuario creado (admin/admin123)")
         else:
-            print("✅ Superusuario ya existe")
+            print("Superusuario ya existe")
         
         return True
         
     except Exception as e:
-        print(f"❌ Error con superusuario: {e}")
+        print(f"Error creando o verificando superusuario: {e}")
         return False
 
 def main():
     """Función principal"""
-    print("🐳 Configurando Django con Docker...")
+    print("Configurando Django con Docker...")
     print("=" * 60)
     
     # 1. Esperar a PostgreSQL
     if not wait_for_postgres():
-        print("❌ No se pudo conectar a PostgreSQL")
+        print("No se pudo conectar a PostgreSQL")
         return False
     
     # 2. Configurar Django
@@ -128,7 +128,7 @@ def main():
     
     # 3. Verificar conexión a BD
     if not verify_database_schema():
-        print("❌ No se pudo conectar a la base de datos")
+        print("No se pudo conectar a la base de datos")
         return False
     
     # 4. Aplicar migraciones
@@ -140,15 +140,15 @@ def main():
         return False
     
     print("\n" + "=" * 60)
-    print("🎉 ¡Configuración Docker completada!")
-    print("\n📝 Resumen:")
-    print("   ✅ PostgreSQL listo")
-    print("   ✅ Base de datos lista")
-    print("   ✅ Migraciones aplicadas")
-    print("   ✅ Superusuario creado")
-    print("\n🚀 Ahora puedes ejecutar:")
+    print("Configuración Docker completada")
+    print("\nResumen:")
+    print("   - PostgreSQL listo")
+    print("   - Base de datos lista")
+    print("   - Migraciones aplicadas")
+    print("   - Superusuario creado")
+    print("\nAhora puedes ejecutar:")
     print("   python manage.py runserver")
-    print("\n🌐 Acceso a la aplicación:")
+    print("\nAcceso a la aplicación:")
     print("   Frontend: http://localhost:3000")
     print("   Admin: http://localhost:8000/admin (admin/admin123)")
     

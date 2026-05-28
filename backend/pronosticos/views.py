@@ -249,3 +249,123 @@ def verificar_pronostico_disponible(request):
         'disponible': not existe,
         'mensaje': 'Pronóstico disponible' if not existe else 'Ya existe un pronóstico para este partido'
     })
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def historial_usuario(request):
+    """
+    Historial completo del usuario autenticado:
+    - Pronósticos con detalle de partidos, puntos y aciertos
+    - Resumen por liga (puntos, posición, partidos jugados, aciertos)
+    """
+    from backend.partidos.models import Partido, Seleccion
+    from backend.posiciones.models import Ranking
+    from backend.ligas.models import Liga
+
+    try:
+        usuario_id = request.user.id_usuario
+        pronosticos = Pronostico.objects.filter(fk_id_usuario=usuario_id, status=True)
+
+        detalle_pronosticos = []
+        partido_ids = {p.fk_id_partido for p in pronosticos}
+        partidos = {p.id_partido: p for p in Partido.objects.filter(id_partido__in=partido_ids)}
+        selecciones = {s.id_seleccion: s for s in Seleccion.objects.all()}
+
+        for pronostico in pronosticos:
+            partido = partidos.get(pronostico.fk_id_partido)
+            if not partido:
+                continue
+
+            # Datos del partido
+            local = selecciones.get(partido.equipo_local)
+            visitante = selecciones.get(partido.equipo_visitante)
+            resultado_real = f"{partido.gol_local} - {partido.gol_visitante}" if partido.gol_local is not None else "Pendiente"
+            resultado_pronosticado = f"{pronostico.gol_local} - {pronostico.gol_visitante}"
+
+            # Determinar tipo de acierto
+            puntos = pronostico.puntos_obtenidos
+            if puntos == 3:
+                tipo_acierto = "Marcador exacto"
+            elif puntos == 1:
+                tipo_acierto = "Resultado correcto"
+            elif partido.estado_partido == 'finalizado':
+                tipo_acierto = "Fallido"
+            else:
+                tipo_acierto = "Pendiente"
+
+            detalle_pronosticos.append({
+                "id_pronostico": pronostico.id_pronostico,
+                "fk_id_partido": pronostico.fk_id_partido,
+                "fk_id_liga": pronostico.fk_id_liga,
+                "equipo_local": local.pais if local else "Desconocido",
+                "equipo_visitante": visitante.pais if visitante else "Desconocido",
+                "gol_local_pronostico": pronostico.gol_local,
+                "gol_visitante_pronostico": pronostico.gol_visitante,
+                "gol_local_real": partido.gol_local,
+                "gol_visitante_real": partido.gol_visitante,
+                "resultado_real": resultado_real,
+                "resultado_pronosticado": resultado_pronosticado,
+                "puntos_obtenidos": puntos,
+                "tipo_acierto": tipo_acierto,
+                "estado_partido": partido.estado_partido,
+                "horario": partido.horario.isoformat() if partido.horario else None,
+            })
+
+        # Ordenar: más recientes primero
+        detalle_pronosticos.sort(key=lambda x: x["horario"] or "", reverse=True)
+
+        # Resumen por liga
+        ligas_ids = {p.fk_id_liga for p in pronosticos}
+        ligas = {l.id_liga: l for l in Liga.objects.filter(id_liga__in=ligas_ids)}
+        rankings = {r.fk_id_liga: r for r in Ranking.objects.filter(fk_id_usuario=usuario_id, fk_id_liga__in=ligas_ids)}
+
+        resumen_ligas = []
+        for liga_id in ligas_ids:
+            pronosticos_liga = [p for p in pronosticos if p.fk_id_liga == liga_id]
+            liga = ligas.get(liga_id)
+            ranking = rankings.get(liga_id)
+
+            partidos_jugados = len(pronosticos_liga)
+            puntos_totales = sum(p.puntos_obtenidos for p in pronosticos_liga)
+            marcadores_exactos = sum(1 for p in pronosticos_liga if p.puntos_obtenidos == 3)
+            resultados_correctos = sum(1 for p in pronosticos_liga if p.puntos_obtenidos == 1)
+            fallidos = sum(1 for p in pronosticos_liga if p.puntos_obtenidos == 0 and p.fk_id_partido in partidos and partidos[p.fk_id_partido].estado_partido == 'finalizado')
+
+            # ¿Ganó o perdió la liga? (si hay ranking y posición = 1 => ganó)
+            if ranking and ranking.posicion == 1:
+                estado_liga = "Ganada"
+            elif ranking and ranking.posicion is not None:
+                estado_liga = f"Posición {ranking.posicion}"
+            else:
+                estado_liga = "Sin posición"
+
+            resumen_ligas.append({
+                "liga_id": liga_id,
+                "liga_nombre": liga.nombre_liga if liga else f"Liga {liga_id}",
+                "puntos_totales": puntos_totales,
+                "partidos_jugados": partidos_jugados,
+                "marcadores_exactos": marcadores_exactos,
+                "resultados_correctos": resultados_correctos,
+                "fallidos": fallidos,
+                "posicion": ranking.posicion if ranking else None,
+                "estado_liga": estado_liga,
+            })
+
+        # Ordenar ligas por puntos descendente
+        resumen_ligas.sort(key=lambda x: x["puntos_totales"], reverse=True)
+
+        return Response({
+            "usuario_id": usuario_id,
+            "total_pronosticos": len(pronosticos),
+            "puntos_totales": sum(p.puntos_obtenidos for p in pronosticos),
+            "pronosticos": detalle_pronosticos,
+            "resumen_ligas": resumen_ligas,
+        })
+    except Exception as exc:
+        import traceback
+        traceback.print_exc()
+        return Response(
+            {"error": str(exc), "detail": "Error interno al generar el historial"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

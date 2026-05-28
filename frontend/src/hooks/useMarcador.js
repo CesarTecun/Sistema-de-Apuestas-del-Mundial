@@ -27,8 +27,21 @@ export const useMarcador = () => {
     setLoading(false);
   }, []);
 
-  // Actualizar marcador de un partido
+  // Actualizar marcador de un partido (optimistic update)
   const actualizarMarcador = useCallback(async (idPartido, golLocal, golVisitante, estado, faltasLocal, faltasVisitante) => {
+    // Optimistic: actualizar UI inmediatamente
+    setPartidosEnVivo(prev => prev.map(p => {
+      if (p.id_partido !== idPartido) return p;
+      return {
+        ...p,
+        gol_local: golLocal !== undefined ? golLocal : p.gol_local,
+        gol_visitante: golVisitante !== undefined ? golVisitante : p.gol_visitante,
+        faltas_local: faltasLocal !== undefined ? faltasLocal : p.faltas_local,
+        faltas_visitante: faltasVisitante !== undefined ? faltasVisitante : p.faltas_visitante,
+        estado: estado !== undefined ? estado : p.estado,
+      };
+    }));
+
     const result = await servicioMarcador.actualizarMarcador(
       idPartido,
       golLocal,
@@ -39,18 +52,31 @@ export const useMarcador = () => {
       faltasLocal,
       faltasVisitante
     );
-    if (result.success) {
-      // Recargar partidos en vivo después de actualizar
-      await cargarPartidosEnVivo();
+    if (result.success && result.data) {
+      // Sincronizar con respuesta del servidor
+      setPartidosEnVivo(prev => prev.map(p => p.id_partido === idPartido ? result.data : p));
+    } else if (!result.success) {
+      // Revertir si falló
+      cargarPartidosEnVivo();
     }
     return result;
   }, [cargarPartidosEnVivo]);
 
-  // Controlar partido (iniciar, pausar, cambiar tiempo, etc.)
+  // Controlar partido (iniciar, pausar, cambiar tiempo, etc.) – optimistic update
   const controlarPartido = useCallback(async (idPartido, controlData) => {
+    // Optimistic: actualizar UI inmediatamente
+    setPartidosEnVivo(prev => prev.map(p => {
+      if (p.id_partido !== idPartido) return p;
+      return { ...p, ...controlData };
+    }));
+
     const result = await servicioMarcador.controlarPartido(idPartido, controlData);
-    if (result.success) {
-      await cargarPartidosEnVivo();
+    if (result.success && result.data) {
+      // Sincronizar con respuesta del servidor
+      setPartidosEnVivo(prev => prev.map(p => p.id_partido === idPartido ? result.data : p));
+    } else if (!result.success) {
+      // Revertir si falló
+      cargarPartidosEnVivo();
     }
     return result;
   }, [cargarPartidosEnVivo]);

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 
-INVITACION_SUBJECT = '🏆 Has sido invitado a una Liga de la Copa Mundial FIFA 2026'
+INVITACION_SUBJECT = 'Invitación a una liga de la Copa Mundial FIFA 2026'
 
 
 def render_mensaje_invitacion(invitacion):
@@ -13,15 +13,15 @@ def render_mensaje_invitacion(invitacion):
 
 Has sido invitado a unirte a una liga en nuestro sistema de pronósticos para la Copa Mundial FIFA 2026.
 
-📋 Detalles de la invitación:
+Detalles de la invitación:
 • ID de Liga: {invitacion.fk_id_liga}
 • Código de invitación: {invitacion.codigo_invitacion}
 • Estado: {invitacion.estado_invitacion}
 
-💬 Mensaje del administrador:
+Mensaje del administrador:
 {mensaje_admin}
 
-� ¿Cómo unirme?
+Pasos para unirte:
 1. Ingresa a {login_url}
 2. Si no tienes cuenta todavía, créala desde esa pantalla.
 3. Dentro del módulo "Ligas" presiona el botón "Unirme" y escribe tu código de invitación.

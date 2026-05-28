@@ -37,12 +37,12 @@ def create_admin_user():
         )
         usuario.save()
         
-        print(f"✅ Usuario admin creado exitosamente:")
+        print("Usuario admin creado exitosamente:")
         print(f"   Email: {email}")
         print(f"   Contraseña: {password}")
         
     except Exception as e:
-        print(f"❌ Error al crear usuario admin: {e}")
+        print(f"Error al crear usuario admin: {e}")
 
 if __name__ == '__main__':
     create_admin_user()

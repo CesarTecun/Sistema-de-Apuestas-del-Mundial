@@ -267,7 +267,7 @@ SERVER_EMAIL = 'quinielachechas@gmail.com'
 # CONFIGURACIÓN DEL MICROSERVICIO MARCADOR
 # =============================================================================
 MARCADOR_SERVICE_URL = os.getenv('MARCADOR_SERVICE_URL', 'http://localhost:8001')
-MARCADOR_SERVICE_TIMEOUT = int(os.getenv('MARCADOR_SERVICE_TIMEOUT', '5'))
+MARCADOR_SERVICE_TIMEOUT = int(os.getenv('MARCADOR_SERVICE_TIMEOUT', '30'))
 
 # =============================================================================
 # CONFIGURACIÓN DE SEGURIDAD HTTPS/HSTS/COOKIES (OWASP A03)
