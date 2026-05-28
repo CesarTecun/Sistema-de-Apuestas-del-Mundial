@@ -12,13 +12,66 @@ const Cronometro = ({ partido }) => {
   const [periodo, setPeriodo] = useState(partido.periodo_actual || '1T');
   const [tiempoExtra, setTiempoExtra] = useState(partido.tiempo_extra_periodo || 0);
   const [pausado, setPausado] = useState(partido.partido_pausado || false);
+  const [loadedFromStorage, setLoadedFromStorage] = useState(false);
 
+  // Clave para localStorage
+  const storageKey = `cronometro_${partido.id_partido}`;
+
+  // Cargar estado desde localStorage al montar
   useEffect(() => {
-    setMinuto(partido.minuto_actual || 0);
-    setPeriodo(partido.periodo_actual || '1T');
-    setTiempoExtra(partido.tiempo_extra_periodo || 0);
-    setPausado(partido.partido_pausado || false);
-  }, [partido]);
+    console.log('[Cronometro] Cargando desde localStorage:', storageKey);
+    console.log('[Cronometro] Estado del partido:', partido.partido_iniciado, partido.estado);
+    try {
+      const saved = localStorage.getItem(storageKey);
+      console.log('[Cronometro] Datos guardados:', saved);
+      if (saved) {
+        const data = JSON.parse(saved);
+        console.log('[Cronometro] Datos parseados:', data);
+        // Solo usar datos guardados si el partido sigue iniciado
+        if (partido.partido_iniciado && partido.estado !== 'finalizado') {
+          console.log('[Cronometro] Restaurando estado desde localStorage');
+          setMinuto(data.minuto || partido.minuto_actual || 0);
+          setPeriodo(data.periodo || partido.periodo_actual || '1T');
+          setTiempoExtra(data.tiempoExtra || partido.tiempo_extra_periodo || 0);
+          setPausado(data.pausado || partido.partido_pausado || false);
+          setLoadedFromStorage(true);
+        } else {
+          console.log('[Cronometro] Partido no iniciado o finalizado, usando datos del servidor');
+          setLoadedFromStorage(true);
+        }
+      } else {
+        console.log('[Cronometro] No hay datos guardados en localStorage');
+        setLoadedFromStorage(true);
+      }
+    } catch (e) {
+      console.error('[Cronometro] Error al cargar cronómetro desde localStorage:', e);
+      setLoadedFromStorage(true);
+    }
+  }, [partido.id_partido, partido.partido_iniciado, partido.estado, storageKey]);
+
+  // Guardar estado en localStorage cuando cambie (solo después de cargar)
+  useEffect(() => {
+    if (!loadedFromStorage) return; // No guardar hasta que se cargue desde localStorage
+    
+    try {
+      const data = { minuto, periodo, tiempoExtra, pausado };
+      localStorage.setItem(storageKey, JSON.stringify(data));
+      console.log('[Cronometro] Guardando estado en localStorage:', data);
+    } catch (e) {
+      console.error('Error al guardar cronómetro en localStorage:', e);
+    }
+  }, [minuto, periodo, tiempoExtra, pausado, storageKey, loadedFromStorage]);
+
+  // Limpiar localStorage cuando el partido se finaliza
+  useEffect(() => {
+    if (partido.estado === 'finalizado' || !partido.partido_iniciado) {
+      try {
+        localStorage.removeItem(storageKey);
+      } catch (e) {
+        console.error('Error al limpiar localStorage:', e);
+      }
+    }
+  }, [partido.estado, partido.partido_iniciado, storageKey]);
 
   useEffect(() => {
     if (!partido.partido_iniciado || partido.partido_pausado || partido.estado === 'finalizado') {
@@ -26,11 +79,18 @@ const Cronometro = ({ partido }) => {
     }
 
     const interval = setInterval(() => {
-      setMinuto(prev => prev + 1);
+      setMinuto(prev => {
+        // Si llega a 45 y está en 1T, cambiar a 2T
+        if (prev === 44 && periodo === '1T') {
+          setPeriodo('2T');
+          return 0;
+        }
+        return prev + 1;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [partido.partido_iniciado, partido.partido_pausado, partido.estado]);
+  }, [partido.partido_iniciado, partido.partido_pausado, partido.estado, periodo]);
 
   const formatoTiempo = () => {
     if (tiempoExtra > 0) {
@@ -44,9 +104,6 @@ const Cronometro = ({ partido }) => {
       <div className="cronometro-time">
         {formatoTiempo()}' {periodo}
       </div>
-      {pausado && (
-        <div className="cronometro-status paused">Pausado</div>
-      )}
       {!partido.partido_iniciado && partido.estado !== 'finalizado' && (
         <div className="cronometro-status not-started">No iniciado</div>
       )}
