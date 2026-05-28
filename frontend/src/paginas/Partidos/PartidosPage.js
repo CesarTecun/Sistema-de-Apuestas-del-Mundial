@@ -13,6 +13,41 @@ import AlertaConfirmacion from '../Ligas/componentes/AlertaConfirmacion';
 import '../../estilos/componentes/modals.css';
 import './estilos/PartidosPage.css';
 
+const PaginacionControles = ({ pagina, totalPaginas, onChange }) => {
+  if (totalPaginas <= 1) return null;
+
+  const rango = () => {
+    const delta = 2;
+    const inicio = Math.max(1, pagina - delta);
+    const fin = Math.min(totalPaginas, pagina + delta);
+    const paginas = [];
+    if (inicio > 1) { paginas.push(1); if (inicio > 2) paginas.push('...'); }
+    for (let i = inicio; i <= fin; i++) paginas.push(i);
+    if (fin < totalPaginas) { if (fin < totalPaginas - 1) paginas.push('...'); paginas.push(totalPaginas); }
+    return paginas;
+  };
+
+  return (
+    <div className="paginacion">
+      <button className="paginacion-btn" disabled={pagina === 1} onClick={() => onChange(pagina - 1)}>
+        {'\u2039'} Anterior
+      </button>
+      <div className="paginacion-paginas">
+        {rango().map((p, i) =>
+          p === '...'
+            ? <span key={`e-${i}`} className="paginacion-ellipsis">…</span>
+            : <button key={p} className={`paginacion-num ${pagina === p ? 'activo' : ''}`} onClick={() => onChange(p)}>
+                {p}
+              </button>
+        )}
+      </div>
+      <button className="paginacion-btn" disabled={pagina === totalPaginas} onClick={() => onChange(pagina + 1)}>
+        Siguiente {'\u203a'}
+      </button>
+    </div>
+  );
+};
+
 // Error Boundary para capturar errores de renderizado
 class PartidosErrorBoundary extends React.Component {
   constructor(props) {
@@ -68,6 +103,10 @@ const PartidosPage = () => {
     setLigaSeleccionada,
     estadoSeleccionado,
     setEstadoSeleccionado,
+    pagina,
+    setPagina,
+    totalRegistros,
+    POR_PAGINA,
     loading,
     error,
     searchTerm,
@@ -77,6 +116,8 @@ const PartidosPage = () => {
     updatePartido,
     deletePartido
   } = usePartidos();
+
+  const totalPaginas = Math.ceil(totalRegistros / POR_PAGINA);
 
   const [showForm, setShowForm] = useState(false);
   const [editingPartido, setEditingPartido] = useState(null);
@@ -283,18 +324,33 @@ const PartidosPage = () => {
                   </p>
                 </div>
               ) : (
-                <div className="partidos-grid">
-                  {filteredPartidos.map((partido) => (
-                    <TarjetaPartido
-                      key={partido.id_partido}
-                      partido={partido}
-                      selecciones={selecciones}
-                      onEdit={handleEditClick}
-                      onDelete={handleDeletePartido}
-                      canManage={puedeGestionarLiga(partido.fk_id_liga)}
-                    />
-                  ))}
-                </div>
+                <>
+                  <div className="partidos-grid">
+                    {filteredPartidos.map((partido) => (
+                      <TarjetaPartido
+                        key={partido.id_partido}
+                        partido={partido}
+                        selecciones={selecciones}
+                        onEdit={handleEditClick}
+                        onDelete={handleDeletePartido}
+                        canManage={puedeGestionarLiga(partido.fk_id_liga)}
+                      />
+                    ))}
+                  </div>
+                  {totalRegistros > 0 && (
+                    <div className="partidos-paginacion-footer">
+                      <span>
+                        Mostrando {filteredPartidos.length} de {totalRegistros} partido(s)
+                      </span>
+                      <span>{POR_PAGINA} por página</span>
+                    </div>
+                  )}
+                  <PaginacionControles
+                    pagina={pagina}
+                    totalPaginas={totalPaginas}
+                    onChange={setPagina}
+                  />
+                </>
               )
             )}
           </div>

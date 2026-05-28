@@ -6,12 +6,15 @@ import { useAuth } from '../contextos/ContextoAutenticacion';
 
 export const usePartidos = () => {
   const { user } = useAuth();
+  const POR_PAGINA = 10;
   const [partidos, setPartidos] = useState([]);
   const [selecciones, setSelecciones] = useState([]);
   const [ligas, setLigas] = useState([]);
   const [sedes, setSedes] = useState([]);
   const [ligaSeleccionada, setLigaSeleccionada] = useState('');
   const [estadoSeleccionado, setEstadoSeleccionado] = useState('');
+  const [pagina, setPagina] = useState(1);
+  const [totalRegistros, setTotalRegistros] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,10 +22,11 @@ export const usePartidos = () => {
   const cargarPartidos = useCallback(async () => {
     try {
       setLoading(true);
-      const result = await servicioPartidos.getPartidos(ligaSeleccionada, estadoSeleccionado);
+      const result = await servicioPartidos.getPartidos(ligaSeleccionada, estadoSeleccionado, pagina, POR_PAGINA);
 
       if (result.success) {
-        setPartidos(result.data);
+        setPartidos(result.data.results ?? []);
+        setTotalRegistros(result.data.count ?? 0);
         setError('');
       } else {
         setError(result.error || 'Error al cargar los partidos');
@@ -33,7 +37,7 @@ export const usePartidos = () => {
     } finally {
       setLoading(false);
     }
-  }, [ligaSeleccionada, estadoSeleccionado]);
+  }, [ligaSeleccionada, estadoSeleccionado, pagina]);
 
   const cargarSelecciones = useCallback(async () => {
     try {
@@ -71,17 +75,25 @@ export const usePartidos = () => {
 
   useEffect(() => {
     cargarPartidos();
+  }, [cargarPartidos]);
+
+  useEffect(() => {
     cargarSelecciones();
     cargarLigas();
     cargarSedes();
-  }, [cargarPartidos, cargarSelecciones, cargarLigas, cargarSedes]);
+  }, [cargarSelecciones, cargarLigas, cargarSedes]);
+
+  // Resetear a página 1 cuando cambian filtros
+  useEffect(() => {
+    setPagina(1);
+  }, [ligaSeleccionada, estadoSeleccionado]);
 
   const createPartido = async (partidoData) => {
     try {
       const result = await servicioPartidos.createPartido(partidoData);
 
       if (result.success) {
-        setPartidos([...partidos, result.data]);
+        await cargarPartidos();
         return { success: true };
       } else {
         return { success: false, error: result.error || 'Error al crear partido' };
@@ -97,9 +109,7 @@ export const usePartidos = () => {
       const result = await servicioPartidos.updatePartido(partidoId, partidoData);
 
       if (result.success) {
-        setPartidos(partidos.map(partido => 
-          partido.id_partido === result.data.id_partido ? result.data : partido
-        ));
+        await cargarPartidos();
         return { success: true };
       } else {
         return { success: false, error: result.error || 'Error al actualizar partido' };
@@ -115,7 +125,7 @@ export const usePartidos = () => {
       const result = await servicioPartidos.deletePartido(partidoId);
 
       if (result.success) {
-        setPartidos(partidos.filter(partido => partido.id_partido !== partidoId));
+        await cargarPartidos();
         return { success: true };
       } else {
         return { success: false, error: result.error || 'Error al eliminar partido' };
@@ -131,9 +141,7 @@ export const usePartidos = () => {
       const result = await servicioPartidos.actualizarResultado(partidoId, golLocal, golVisitante, resultado);
 
       if (result.success) {
-        setPartidos(partidos.map(partido => 
-          partido.id_partido === result.data.id_partido ? result.data : partido
-        ));
+        await cargarPartidos();
         return { success: true };
       } else {
         return { success: false, error: result.error || 'Error al actualizar resultado' };
@@ -200,6 +208,10 @@ export const usePartidos = () => {
     setLigaSeleccionada,
     estadoSeleccionado,
     setEstadoSeleccionado,
+    pagina,
+    setPagina,
+    totalRegistros,
+    POR_PAGINA,
     loading,
     error,
     searchTerm,

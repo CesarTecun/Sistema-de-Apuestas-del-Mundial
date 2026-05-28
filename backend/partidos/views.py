@@ -1,4 +1,4 @@
-from rest_framework import permissions, status
+from rest_framework import permissions, status, pagination
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
@@ -12,6 +12,13 @@ from backend.ligas.utils import (
 )
 from backend.pronosticos.models import Pronostico
 from backend.pronosticos.utils import calcular_puntos_pronostico, actualizar_ranking_por_liga
+
+
+class PartidoPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 
 class JugadorViewSet(SoftDeleteModelViewSet):
     """
@@ -54,7 +61,8 @@ class PartidoViewSet(SoftDeleteModelViewSet):
     queryset = Partido.objects.all()
     serializer_class = PartidoSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+    pagination_class = PartidoPagination
+
     def get_queryset(self):
         """Filtrar partidos a las ligas permitidas y opcionalmente por liga o estado."""
         from backend.ligas.models import PartidoLiga

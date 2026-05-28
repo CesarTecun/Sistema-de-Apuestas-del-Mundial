@@ -1,15 +1,13 @@
 import servicioApi from './servicioApi';
 
 export const servicioPartidos = {
-  // Obtener todos los partidos
-  getPartidos: async (ligaId, estado) => {
+  // Obtener todos los partidos (paginado)
+  getPartidos: async (ligaId, estado, page = 1, pageSize = 10) => {
     try {
-      const params = {};
+      const params = { page, page_size: pageSize };
       if (ligaId) params.liga_id = ligaId;
       if (estado) params.estado = estado;
-      const response = await servicioApi.get('/partidos/partidos/', {
-        params: Object.keys(params).length > 0 ? params : undefined,
-      });
+      const response = await servicioApi.get('/partidos/partidos/', { params });
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al obtener partidos:', error);
