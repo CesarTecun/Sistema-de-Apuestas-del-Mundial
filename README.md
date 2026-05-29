@@ -133,36 +133,5 @@ Para el microservicio asegúrate de tener su `.env` y Postgres (puerto 5433 por 
 
 ---
 
-## Pruebas
 
-```bash
-# Backend
-python manage.py test
 
-# Frontend
-npm run lint
-npm test
-```
-
-Hay pruebas adicionales para lógica de pronósticos en `test_cierre_pronosticos.py`.
-
----
-
-## Flujo de trabajo recomendado
-
-1. Crear rama desde `main`: `git checkout -b feature/mi-cambio`.
-2. Realizar cambios y asegurarse de que backend/frontend compilen.
-3. Ejecutar `scripts/check_migrations.py` para prevenir migraciones accidentales.
-4. `git commit`, `git push` y abrir Pull Request.
-
----
-
-## Recursos adicionales
-
-- Documentación del microservicio marcador: [marcador-service/README.md](marcador-service/README.md)
-- Guías de migraciones: `docs/MIGRATIONS_GUIDE.md` y `docs/MIGRATIONS_SETUP.md`
-- Scripts y utilidades: revisar el directorio `scripts/`
-
----
-
-¿Necesitas ayuda? Revisa los archivos mencionados o abre un issue describiendo el contexto. ¡Bienvenido al proyecto!

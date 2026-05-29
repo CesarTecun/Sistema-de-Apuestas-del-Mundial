@@ -89,17 +89,7 @@ const TarjetaLiga = ({ liga, onEdit, onDelete, onView, onVerTabla, onInvitarPers
       </div>
       
       <div className="liga-card-actions">
-        <button 
-          className="action-button view-button"
-          onClick={() => onView(liga)}
-          title="Ver detalles"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-        </button>
-        
+       
         {esAdministrador && onInvitarPersona && (
           <button 
             className="action-button invite-button"
