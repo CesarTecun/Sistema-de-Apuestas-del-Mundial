@@ -51,6 +51,7 @@ class LigaViewSet(SoftDeleteModelViewSet):
     """
     serializer_class = LigaSerializer
     permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id_liga'
     
     def get_queryset(self):
         """Solo mostrar ligas donde el usuario es admin, participante o tiene invitación"""
@@ -89,7 +90,7 @@ class LigaViewSet(SoftDeleteModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     @action(detail=True, methods=['post'], url_path='enviar-invitacion')
-    def enviar_invitacion(self, request, pk=None):
+    def enviar_invitacion(self, request, id_liga=None):
         """Enviar invitación a un usuario para unirse a la liga"""
         try:
             liga = self.get_object()
@@ -165,7 +166,7 @@ class LigaViewSet(SoftDeleteModelViewSet):
         return Response(respuesta, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['post'], url_path='solicitar-ingreso')
-    def solicitar_ingreso(self, request, pk=None):
+    def solicitar_ingreso(self, request, id_liga=None):
         """Permitir que un usuario solicite unirse a una liga pública."""
         try:
             liga = self.get_object()
@@ -215,7 +216,7 @@ class LigaViewSet(SoftDeleteModelViewSet):
             'aprobacion_requerida': True
         }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
     
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, id_liga=None):
         """Obtener una liga específica"""
         try:
             liga = self.get_object()
@@ -224,10 +225,16 @@ class LigaViewSet(SoftDeleteModelViewSet):
         except Liga.DoesNotExist:
             return Response({'error': 'Liga no encontrada'}, status=status.HTTP_404_NOT_FOUND)
     
-    def update(self, request, pk=None):
+    def update(self, request, id_liga=None):
         """Actualizar una liga existente"""
         try:
             liga = self.get_object()
+            # Verificar que el usuario es administrador de la liga
+            if liga.fk_administrador != request.user.id_usuario:
+                return Response(
+                    {'error': 'Solo el administrador de la liga puede editarla'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
             serializer = self.get_serializer(liga, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -235,10 +242,16 @@ class LigaViewSet(SoftDeleteModelViewSet):
         except Liga.DoesNotExist:
             return Response({'error': 'Liga no encontrada'}, status=status.HTTP_404_NOT_FOUND)
     
-    def destroy(self, request, pk=None):
+    def destroy(self, request, id_liga=None):
         """Eliminar una liga"""
         try:
             liga = self.get_object()
+            # Verificar que el usuario es administrador de la liga
+            if liga.fk_administrador != request.user.id_usuario:
+                return Response(
+                    {'error': 'Solo el administrador de la liga puede eliminarla'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
             liga.delete()
             return Response({'message': 'Liga eliminada correctamente'}, status=status.HTTP_200_OK)
         except Liga.DoesNotExist:
