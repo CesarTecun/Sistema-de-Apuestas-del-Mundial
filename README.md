@@ -133,5 +133,107 @@ Para el microservicio asegúrate de tener su `.env` y Postgres (puerto 5433 por 
 
 ---
 
+## Despliegue en Railway
+
+Este proyecto está configurado para desplegar el backend y frontend en Railway, conectándose a bases de datos PostgreSQL existentes (NO se despliegan nuevas BDs en Railway).
+
+### Prerrequisitos
+
+- Cuenta en Railway (https://railway.app)
+- Bases de datos PostgreSQL existentes (principal y microservicio marcador)
+- Repositorio en GitHub conectado a Railway
+
+### Configuración del Backend
+
+1. **Variables de entorno en Railway**
+   - Crea un nuevo proyecto en Railway desde tu repositorio GitHub
+   - Agrega un servicio "Python" para el backend
+   - Configura las siguientes variables de entorno en el dashboard de Railway:
+
+   ```env
+   # Database (PostgreSQL existente)
+   DB_NAME=quiniela
+   DB_USER=tu_usuario
+   DB_PASSWORD=tu_password
+   DB_HOST=tu_host_postgresql
+   DB_PORT=5432
+   DB_SSLMODE=require
+
+   # Django Settings
+   DEBUG=False
+   SECRET_KEY=tu-secret-key-seguro
+   ALLOWED_HOSTS=localhost,127.0.0.1
+
+   # Frontend URL (para CORS)
+   FRONTEND_URL=https://tu-frontend-url.railway.app
+
+   # Microservicio Marcador
+   MARCADOR_SERVICE_URL=http://tu-marcador-service-url
+   MARCADOR_SERVICE_TIMEOUT=30
+
+   # Email (opcional)
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USE_TLS=True
+   EMAIL_HOST_USER=tu_email@gmail.com
+   EMAIL_HOST_PASSWORD=tu_contraseña_aplicacion
+   ```
+
+2. **Archivos creados para Railway**
+   - `backend/Procfile` - Configura el comando de inicio
+   - `backend/start.sh` - Ejecuta migraciones antes de iniciar el servidor
+   - `requirements.txt` - Incluye gunicorn y whitenoise para producción
+
+### Configuración del Frontend
+
+1. **Variables de entorno en Railway**
+   - Agrega un servicio "Node.js" para el frontend
+   - Configura la variable de entorno:
+
+   ```env
+   REACT_APP_API_URL=https://tu-backend-url.railway.app
+   ```
+
+2. **Archivos creados para Railway**
+   - `frontend/Procfile` - Configura el build y servidor estático
+   - `frontend/package.json` - Incluye `serve` para servir el build
+
+### Archivos de configuración
+
+- `railway.json` - Configuración general del proyecto en Railway
+- `.env.example.railway` - Plantilla de variables de entorno para Railway
+
+### Pasos de despliegue
+
+1. **Conectar repositorio a Railway**
+   - En Railway, selecciona "New Project" → "Deploy from GitHub repo"
+   - Selecciona tu repositorio
+
+2. **Desplegar el backend**
+   - Railway detectará automáticamente el directorio `backend/`
+   - Configura las variables de entorno mencionadas
+   - El despliegue ejecutará automáticamente las migraciones
+
+3. **Desplegar el frontend**
+   - Agrega un nuevo servicio "Node.js" al proyecto
+   - Configura el directorio raíz en `frontend/`
+   - Configura `REACT_APP_API_URL` con la URL del backend
+   - El despliegue construirá y servirá la aplicación React
+
+4. **Obtener URLs de Railway**
+   - Después del despliegue, Railway proporcionará URLs como:
+     - Backend: `https://backend-name.railway.app`
+     - Frontend: `https://frontend-name.railway.app`
+   - Actualiza las variables de entorno con estas URLs
+
+### Notas importantes
+
+- **Bases de datos**: Las BDs principal y del microservicio marcador NO se despliegan en Railway. Usa bases de datos existentes (Neon, Railway PostgreSQL, o tu propio servidor).
+- **Migraciones**: Se ejecutan automáticamente durante el despliegue del backend.
+- **Archivos estáticos**: Whitenoise sirve los archivos estáticos del backend.
+- **CORS**: Configurado dinámicamente desde `FRONTEND_URL`.
+
+---
+
 
 

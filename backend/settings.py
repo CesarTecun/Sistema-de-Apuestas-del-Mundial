@@ -20,12 +20,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-+&#w*5583p*pr=$1%&4_%yg^n0&)&hxm!di49i$0o0^6)ezspc"
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-+&#w*5583p*pr=$1%&4_%yg^n0&)&hxm!di49i$0o0^6)ezspc")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver', 'host.docker.internal']
+# Configurar ALLOWED_HOSTS dinámicamente para Railway
+RAILWAY_PUBLIC_DOMAIN = os.getenv("RAILWAY_PUBLIC_DOMAIN", "")
+RAILWAY_PRIVATE_DOMAIN = os.getenv("RAILWAY_PRIVATE_DOMAIN", "")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver,host.docker.internal").split(",")
+if RAILWAY_PUBLIC_DOMAIN:
+    ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
+if RAILWAY_PRIVATE_DOMAIN:
+    ALLOWED_HOSTS.append(RAILWAY_PRIVATE_DOMAIN)
 
 # Idioma y localización
 LANGUAGE_CODE = 'es'
@@ -60,6 +67,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Para servir archivos estáticos en Railway
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -155,6 +163,8 @@ LOGOUT_REDIRECT_URL = '/'
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -208,6 +218,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3001",
     "http://127.0.0.1:3001",
 ]
+
+# Agregar URLs de Railway para CORS
+FRONTEND_URL_RAILWAY = os.getenv("FRONTEND_URL", "")
+if FRONTEND_URL_RAILWAY and FRONTEND_URL_RAILWAY not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL_RAILWAY)
 
 CORS_ALLOW_CREDENTIALS = True
 
