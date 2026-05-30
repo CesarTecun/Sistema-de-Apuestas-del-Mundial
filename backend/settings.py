@@ -315,6 +315,42 @@ MARCADOR_SERVICE_URL = os.getenv('MARCADOR_SERVICE_URL', 'http://localhost:8001'
 MARCADOR_SERVICE_TIMEOUT = int(os.getenv('MARCADOR_SERVICE_TIMEOUT', '30'))
 
 # =============================================================================
+# CONFIGURACIÓN DE LOGGING PARA RENDER
+# =============================================================================
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
+
+# =============================================================================
 # CONFIGURACIÓN DE SEGURIDAD HTTPS/HSTS/COOKIES (OWASP A03)
 # =============================================================================
 # Estas opciones se activan automáticamente cuando DEBUG=False (producción)
