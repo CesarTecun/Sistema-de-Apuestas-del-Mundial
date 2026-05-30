@@ -285,20 +285,20 @@ SIMPLE_JWT = {
 }
 
 # =============================================================================
-# CONFIGURACIÓN DE CORREO SMTP
+# CONFIGURACIÓN DE CORREO SMTP (POSTMARK)
 # =============================================================================
 # Configuración usando variables de entorno para seguridad
-# Para Gmail: Generar contraseña de aplicación en https://myaccount.google.com/apppasswords
-# Para SendGrid: Usar API key como contraseña
+# Para Postmark: Usar Server Token como username y password
 
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Copa Mundial FIFA 2026 <quinielachechas@gmail.com>')
-SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'quinielachechas@gmail.com')
+POSTMARK_TOKEN = os.getenv('POSTMARK_SERVER_TOKEN', '')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.postmarkapp.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = POSTMARK_TOKEN
+EMAIL_HOST_PASSWORD = POSTMARK_TOKEN
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Copa Mundial FIFA 2026 <aibanezl@miumg.edu.gt>')
+SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'Copa Mundial FIFA 2026 <aibanezl@miumg.edu.gt>')
 
 # =============================================================================
 # CONFIGURACIÓN DEL MICROSERVICIO MARCADOR
