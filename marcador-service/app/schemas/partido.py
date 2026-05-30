@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -9,9 +10,9 @@ class PartidoBase(BaseModel):
     horario: datetime
     equipo_local: int
     equipo_visitante: int
-    fk_sede: int | None = None
-    fk_id_fase: int | None = None
-    fk_id_liga: int | None = None
+    fk_sede: Optional[int] = None
+    fk_id_fase: Optional[int] = None
+    fk_id_liga: Optional[int] = None
     tipo_partido: str = "Regular"
     estado: str = "programado"
 
@@ -19,43 +20,43 @@ class PartidoBase(BaseModel):
 class PartidoCreate(PartidoBase):
     gol_local: int = 0
     gol_visitante: int = 0
-    resultado: str | None = None
-    ganador_penales: int | None = None
+    resultado: Optional[str] = None
+    ganador_penales: Optional[int] = None
 
 
 class PartidoUpdate(BaseModel):
-    horario: datetime | None = None
-    equipo_local: int | None = None
-    equipo_visitante: int | None = None
-    fk_sede: int | None = None
-    fk_id_fase: int | None = None
-    fk_id_liga: int | None = None
-    gol_local: int | None = None
-    gol_visitante: int | None = None
-    ganador_penales: int | None = None
-    tipo_partido: str | None = None
-    resultado: str | None = None
-    estado: str | None = None
+    horario: Optional[datetime] = None
+    equipo_local: Optional[int] = None
+    equipo_visitante: Optional[int] = None
+    fk_sede: Optional[int] = None
+    fk_id_fase: Optional[int] = None
+    fk_id_liga: Optional[int] = None
+    gol_local: Optional[int] = None
+    gol_visitante: Optional[int] = None
+    ganador_penales: Optional[int] = None
+    tipo_partido: Optional[str] = None
+    resultado: Optional[str] = None
+    estado: Optional[str] = None
 
 
 class MarcadorUpdate(BaseModel):
-    gol_local: int | None = None
-    gol_visitante: int | None = None
-    resultado: str | None = Field(None, max_length=50)
-    estado: str | None = Field(None, max_length=20)
-    ganador_penales: int | None = None
-    faltas_local: int | None = None
-    faltas_visitante: int | None = None
+    gol_local: Optional[int] = None
+    gol_visitante: Optional[int] = None
+    resultado: Optional[str] = Field(None, max_length=50)
+    estado: Optional[str] = Field(None, max_length=20)
+    ganador_penales: Optional[int] = None
+    faltas_local: Optional[int] = None
+    faltas_visitante: Optional[int] = None
 
 
 class PartidoControlUpdate(BaseModel):
     """Schema para controlar el partido en vivo"""
-    estado: str | None = Field(None, max_length=20)  # programado, en_juego, finalizado
-    minuto_actual: int | None = None
-    periodo_actual: str | None = Field(None, max_length=20)  # 1T, 2T, ET1, ET2
-    tiempo_extra_periodo: int | None = None
-    partido_iniciado: bool | None = None
-    partido_pausado: bool | None = None
+    estado: Optional[str] = Field(None, max_length=20)  # programado, en_juego, finalizado
+    minuto_actual: Optional[int] = None
+    periodo_actual: Optional[str] = Field(None, max_length=20)  # 1T, 2T, ET1, ET2
+    tiempo_extra_periodo: Optional[int] = None
+    partido_iniciado: Optional[bool] = None
+    partido_pausado: Optional[bool] = None
 
 
 class PartidoResponse(PartidoBase):
@@ -64,21 +65,21 @@ class PartidoResponse(PartidoBase):
     id_partido: int
     gol_local: int
     gol_visitante: int
-    ganador_penales: int | None
-    resultado: str | None
+    ganador_penales: Optional[int]
+    resultado: Optional[str]
     status: bool
     resultado_display: str
-    ganador: int | None
+    ganador: Optional[int]
     # Campos de control del partido
-    minuto_actual: int | None = None
-    periodo_actual: str | None = None
-    tiempo_extra_periodo: int | None = None
-    partido_iniciado: bool | None = None
-    partido_pausado: bool | None = None
-    faltas_local: int | None = None
-    faltas_visitante: int | None = None
+    minuto_actual: Optional[int] = None
+    periodo_actual: Optional[str] = None
+    tiempo_extra_periodo: Optional[int] = None
+    partido_iniciado: Optional[bool] = None
+    partido_pausado: Optional[bool] = None
+    faltas_local: Optional[int] = None
+    faltas_visitante: Optional[int] = None
 
 
 class PartidoMarcadorResponse(PartidoResponse):
-    equipo_local_detalle: SeleccionResponse | None = None
-    equipo_visitante_detalle: SeleccionResponse | None = None
+    equipo_local_detalle: Optional[SeleccionResponse] = None
+    equipo_visitante_detalle: Optional[SeleccionResponse] = None

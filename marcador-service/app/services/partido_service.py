@@ -1,5 +1,6 @@
 import os
 import threading
+from typing import Optional
 
 import requests
 from sqlalchemy.orm import Session
@@ -52,7 +53,7 @@ def _ensure_seleccion_exists(db: Session, id_seleccion: int) -> bool:
     )
 
 
-def list_partidos(db: Session, estado: str | None = None, fk_id_liga: int | None = None) -> list[Partido]:
+def list_partidos(db: Session, estado: Optional[str] = None, fk_id_liga: Optional[int] = None) -> list[Partido]:
     query = db.query(Partido).filter(Partido.status.is_(True))
     if estado:
         query = query.filter(Partido.estado == estado)
@@ -61,7 +62,7 @@ def list_partidos(db: Session, estado: str | None = None, fk_id_liga: int | None
     return query.order_by(Partido.horario).all()
 
 
-def get_partido(db: Session, id_partido: int) -> Partido | None:
+def get_partido(db: Session, id_partido: int) -> Optional[Partido]:
     return (
         db.query(Partido)
         .filter(Partido.id_partido == id_partido, Partido.status.is_(True))

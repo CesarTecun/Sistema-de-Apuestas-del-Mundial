@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -17,8 +19,8 @@ router = APIRouter(prefix="/partidos", tags=["Partidos / Marcador"])
 
 @router.get("/", response_model=list[PartidoResponse])
 def listar_partidos(
-    estado: str | None = Query(None, description="programado | en_juego | finalizado"),
-    fk_id_liga: int | None = Query(None),
+    estado: Optional[str] = Query(None, description="programado | en_juego | finalizado"),
+    fk_id_liga: Optional[int] = Query(None),
     db: Session = Depends(get_db),
 ):
     return partido_service.list_partidos(db, estado=estado, fk_id_liga=fk_id_liga)

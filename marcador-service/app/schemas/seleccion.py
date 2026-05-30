@@ -1,11 +1,13 @@
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class SeleccionBase(BaseModel):
     pais: str = Field(..., max_length=100)
-    bandera: str | None = Field(None, max_length=255)
-    fk_id_fase_inicial: int | None = None
-    codigo_iso: str | None = Field(None, max_length=3)
+    bandera: Optional[str] = Field(None, max_length=255)
+    fk_id_fase_inicial: Optional[int] = None
+    codigo_iso: Optional[str] = Field(None, max_length=3)
 
 
 class SeleccionCreate(SeleccionBase):
@@ -13,10 +15,10 @@ class SeleccionCreate(SeleccionBase):
 
 
 class SeleccionUpdate(BaseModel):
-    pais: str | None = Field(None, max_length=100)
-    bandera: str | None = Field(None, max_length=255)
-    fk_id_fase_inicial: int | None = None
-    codigo_iso: str | None = Field(None, max_length=3)
+    pais: Optional[str] = Field(None, max_length=100)
+    bandera: Optional[str] = Field(None, max_length=255)
+    fk_id_fase_inicial: Optional[int] = None
+    codigo_iso: Optional[str] = Field(None, max_length=3)
 
 
 class SeleccionResponse(SeleccionBase):

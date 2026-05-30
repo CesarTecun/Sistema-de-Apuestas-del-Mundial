@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 
 from app.models.seleccion import Seleccion
@@ -11,7 +13,7 @@ def list_selecciones(db: Session, include_deleted: bool = False) -> list[Selecci
     return query.order_by(Seleccion.pais).all()
 
 
-def get_seleccion(db: Session, id_seleccion: int) -> Seleccion | None:
+def get_seleccion(db: Session, id_seleccion: int) -> Optional[Seleccion]:
     return (
         db.query(Seleccion)
         .filter(Seleccion.id_seleccion == id_seleccion, Seleccion.status.is_(True))
@@ -40,7 +42,7 @@ def delete_seleccion(db: Session, seleccion: Seleccion) -> None:
     db.commit()
 
 
-def restore_seleccion(db: Session, id_seleccion: int) -> Seleccion | None:
+def restore_seleccion(db: Session, id_seleccion: int) -> Optional[Seleccion]:
     seleccion = db.query(Seleccion).filter(Seleccion.id_seleccion == id_seleccion).first()
     if not seleccion:
         return None
