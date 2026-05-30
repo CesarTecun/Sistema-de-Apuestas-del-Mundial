@@ -7,7 +7,7 @@ INVITACION_SUBJECT = 'Invitación a una liga de la Copa Mundial FIFA 2026'
 
 def render_mensaje_invitacion(invitacion):
     mensaje_admin = invitacion.mensaje_invitacion or 'Sin mensaje personalizado'
-    login_url = f"{settings.FRONTEND_URL}/login"
+    login_url = "https://tu-nueva-url.com/login"
     return f"""
 ¡Hola!
 
@@ -22,7 +22,7 @@ Mensaje del administrador:
 {mensaje_admin}
 
 Pasos para unirte:
-1. Ingresa a {https://frontend-pdp7.onrender.com/login}
+1. Ingresa a {login_url}
 2. Si no tienes cuenta todavía, créala desde esa pantalla.
 3. Dentro del módulo "Ligas" presiona el botón "Unirme" y escribe tu código de invitación.
 
