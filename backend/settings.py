@@ -285,24 +285,20 @@ SIMPLE_JWT = {
 }
 
 # =============================================================================
-# CONFIGURACIÓN DE CORREO SMTP (Gmail)
+# CONFIGURACIÓN DE CORREO SMTP
 # =============================================================================
-# Usar contraseña de aplicación de Gmail (no la contraseña normal)
-# Generada en: https://myaccount.google.com/apppasswords
+# Configuración usando variables de entorno para seguridad
+# Para Gmail: Generar contraseña de aplicación en https://myaccount.google.com/apppasswords
+# Para SendGrid: Usar API key como contraseña
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'quinielachechas@gmail.com'
-EMAIL_HOST_PASSWORD = 'xmwo rmnf zvsr giew'  # Contraseña de aplicación
-DEFAULT_FROM_EMAIL = 'Copa Mundial FIFA 2026 <quinielachechas@gmail.com>'
-SERVER_EMAIL = 'quinielachechas@gmail.com'
-
-# Para evitar timeout del worker en Render, usar backend de consola (comentado para usar Gmail)
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# DEFAULT_FROM_EMAIL = 'Copa Mundial FIFA 2026 <quinielachechas@gmail.com>'
-# SERVER_EMAIL = 'quinielachechas@gmail.com'
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Copa Mundial FIFA 2026 <quinielachechas@gmail.com>')
+SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'quinielachechas@gmail.com')
 
 # =============================================================================
 # CONFIGURACIÓN DEL MICROSERVICIO MARCADOR
