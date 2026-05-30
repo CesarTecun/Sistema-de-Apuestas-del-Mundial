@@ -26,14 +26,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-+&#w*5583p*pr=$1%&4_%yg^n0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-# Configurar ALLOWED_HOSTS dinámicamente para Railway
-RAILWAY_PUBLIC_DOMAIN = os.getenv("RAILWAY_PUBLIC_DOMAIN", "")
-RAILWAY_PRIVATE_DOMAIN = os.getenv("RAILWAY_PRIVATE_DOMAIN", "")
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver,host.docker.internal").split(",")
-if RAILWAY_PUBLIC_DOMAIN:
-    ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
-if RAILWAY_PRIVATE_DOMAIN:
-    ALLOWED_HOSTS.append(RAILWAY_PRIVATE_DOMAIN)
+# Configurar ALLOWED_HOSTS dinámicamente para Render
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver,host.docker.internal,apuestas-del-mundial.onrender.com").split(",")
 
 # Idioma y localización
 LANGUAGE_CODE = 'es'
@@ -296,19 +290,19 @@ SIMPLE_JWT = {
 # Usar contraseña de aplicación de Gmail (no la contraseña normal)
 # Generada en: https://myaccount.google.com/apppasswords
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'quinielachechas@gmail.com'
-# EMAIL_HOST_PASSWORD = 'xmwo rmnf zvsr giew'  # Contraseña de aplicación
-# DEFAULT_FROM_EMAIL = 'Copa Mundial FIFA 2026 <quinielachechas@gmail.com>'
-# SERVER_EMAIL = 'quinielachechas@gmail.com'
-
-# Para evitar timeout del worker en Render, usar backend de consola
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'quinielachechas@gmail.com'
+EMAIL_HOST_PASSWORD = 'xmwo rmnf zvsr giew'  # Contraseña de aplicación
 DEFAULT_FROM_EMAIL = 'Copa Mundial FIFA 2026 <quinielachechas@gmail.com>'
 SERVER_EMAIL = 'quinielachechas@gmail.com'
+
+# Para evitar timeout del worker en Render, usar backend de consola (comentado para usar Gmail)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# DEFAULT_FROM_EMAIL = 'Copa Mundial FIFA 2026 <quinielachechas@gmail.com>'
+# SERVER_EMAIL = 'quinielachechas@gmail.com'
 
 # =============================================================================
 # CONFIGURACIÓN DEL MICROSERVICIO MARCADOR
