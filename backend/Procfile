@@ -1,1 +1,1 @@
-web: chmod +x start.sh && ./start.sh
+web: cd .. && python manage.py migrate --noinput && cd backend && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT --workers 4

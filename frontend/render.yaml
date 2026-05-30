@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: frontend-mundial
+    env: static
+    buildCommand: npm run build
+    publishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false
+      - key: REACT_APP_MARCADOR_URL
+        sync: false
