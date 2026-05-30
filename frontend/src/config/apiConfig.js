@@ -1,4 +1,4 @@
-// Configuración centralizada de la API - Updated for Render deployment
+// Configuración centralizada de la API - Updated for Render deployment - Force rebuild
 const API_BASE_URL = 'https://apuestas-del-mundial.onrender.com';
 
 export const API_ENDPOINTS = {
