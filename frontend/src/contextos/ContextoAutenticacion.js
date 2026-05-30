@@ -61,7 +61,7 @@ export const ProveedorAutenticacion = ({ children }) => {
       try {
         const token = localStorage.getItem('access_token');
         if (token) {
-          const response = await axios.get('http://localhost:8000/api/auth/check/');
+          const response = await axios.get('https://apuestas-del-mundial.onrender.com/api/auth/check/');
           if (response.data.is_authenticated) {
             setUser(response.data.user);
             setIsAuthenticated(true);
@@ -90,7 +90,7 @@ export const ProveedorAutenticacion = ({ children }) => {
   const login = async (email, password) => {
     try {
       // Paso 1: Login con el endpoint del backend (autenticación Django)
-      const loginResponse = await axios.post('http://localhost:8000/api/auth/login/', {
+      const loginResponse = await axios.post('https://apuestas-del-mundial.onrender.com/api/auth/login/', {
         email,
         password
       });
@@ -98,7 +98,7 @@ export const ProveedorAutenticacion = ({ children }) => {
       const user = loginResponse.data.user;
 
       // Paso 2: Obtener tokens JWT
-      const tokenResponse = await axios.post('http://localhost:8000/api/token/', {
+      const tokenResponse = await axios.post('https://apuestas-del-mundial.onrender.com/api/token/', {
         email,
         password
       });
@@ -147,13 +147,13 @@ export const ProveedorAutenticacion = ({ children }) => {
       console.log('Enviando datos de registro:', userData);
       
       // Paso 1: Registrar usuario
-      const registerResponse = await axios.post('http://localhost:8000/api/auth/register/', userData);
+      const registerResponse = await axios.post('https://apuestas-del-mundial.onrender.com/api/auth/register/', userData);
       console.log('Respuesta del servidor:', registerResponse.data);
       
       const user = registerResponse.data.user;
       
       // Paso 2: Obtener tokens JWT automáticamente
-      const tokenResponse = await axios.post('http://localhost:8000/api/token/', {
+      const tokenResponse = await axios.post('https://apuestas-del-mundial.onrender.com/api/token/', {
         email: userData.email,
         password: userData.password
       });
@@ -194,7 +194,7 @@ export const ProveedorAutenticacion = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('http://localhost:8000/api/auth/logout/');
+      await axios.post('https://apuestas-del-mundial.onrender.com/api/auth/logout/');
     } catch (error) {
       console.error('Error de logout:', error);
     } finally {

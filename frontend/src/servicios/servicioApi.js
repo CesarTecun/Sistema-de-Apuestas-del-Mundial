@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuración base de axios
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'https://apuestas-del-mundial.onrender.com/api';
 
 const servicioApi = axios.create({
   baseURL: API_BASE_URL,

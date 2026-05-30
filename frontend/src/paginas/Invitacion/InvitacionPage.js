@@ -19,7 +19,7 @@ const InvitacionPage = () => {
 
   const cargarInvitacion = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/ligas/invitaciones/publico/${codigo}/`);
+      const response = await axios.get(`https://apuestas-del-mundial.onrender.com/api/ligas/invitaciones/publico/${codigo}/`);
       setInvitacion(response.data);
       setLiga(response.data.liga);
       if (response.data.email_invitado) {
@@ -40,7 +40,7 @@ const InvitacionPage = () => {
 
     setRegistrando(true);
     try {
-      const response = await axios.post(`http://localhost:8000/api/ligas/invitaciones/publico/${codigo}/`, { email });
+      const response = await axios.post(`https://apuestas-del-mundial.onrender.com/api/ligas/invitaciones/publico/${codigo}/`, { email });
       
       // Si el usuario fue creado automáticamente, guardar el token
       if (response.data.access) {
