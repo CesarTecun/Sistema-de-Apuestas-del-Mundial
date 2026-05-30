@@ -3,7 +3,7 @@ services:
     name: backend-mundial
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python ../manage.py migrate --noinput && gunicorn wsgi:application --bind 0.0.0.0:$PORT --workers 4
+    startCommand: python ../manage.py migrate --fake-initial && gunicorn wsgi:application --bind 0.0.0.0:$PORT --workers 4
     envVars:
       - key: DATABASE_URL
         sync: false
