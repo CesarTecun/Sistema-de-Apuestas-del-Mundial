@@ -239,14 +239,20 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3001",
     "http://127.0.0.1:3001",
-    "https://frontend-mundial.onrender.com",
-    "https://frontend-pdp7.onrender.com",
 ]
 
 # Agregar URLs de Railway para CORS
 FRONTEND_URL_RAILWAY = os.getenv("FRONTEND_URL", "")
 if FRONTEND_URL_RAILWAY and FRONTEND_URL_RAILWAY not in CORS_ALLOWED_ORIGINS:
     CORS_ALLOWED_ORIGINS.append(FRONTEND_URL_RAILWAY)
+
+# Agregar URLs de Render para CORS desde variables de entorno
+CORS_RENDER_URLS = os.getenv("CORS_ALLOWED_ORIGINS", "")
+if CORS_RENDER_URLS:
+    render_urls = [url.strip() for url in CORS_RENDER_URLS.split(",")]
+    for url in render_urls:
+        if url and url not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(url)
 
 CORS_ALLOW_CREDENTIALS = True
 
