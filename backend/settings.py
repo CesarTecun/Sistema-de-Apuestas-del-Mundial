@@ -285,12 +285,16 @@ SIMPLE_JWT = {
 }
 
 # =============================================================================
-# CONFIGURACIÓN DE CORREO (POSTMARK)
+# CONFIGURACIÓN DE CORREO (POSTMARK VIA ANYMAIL)
 # =============================================================================
 # Configuración usando variables de entorno para seguridad
 
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django_postmark.EmailBackend')
-POSTMARK_SERVER_TOKEN = os.getenv('POSTMARK_SERVER_TOKEN', '')
+INSTALLED_APPS += ['anymail']
+
+EMAIL_BACKEND = 'anymail.backends.postmark.EmailBackend'
+ANYMAIL = {
+    'POSTMARK_SERVER_TOKEN': os.getenv('POSTMARK_SERVER_TOKEN', ''),
+}
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Copa Mundial FIFA 2026 <aibanezl@miumg.edu.gt>')
 SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'aibanezl@miumg.edu.gt')
 
