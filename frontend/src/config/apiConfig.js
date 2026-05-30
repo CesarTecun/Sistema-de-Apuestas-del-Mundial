@@ -1,5 +1,5 @@
 // Configuración centralizada de la API - Updated for Render deployment
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = 'https://apuestas-del-mundial.onrender.com';
 
 export const API_ENDPOINTS = {
   // Autenticación
