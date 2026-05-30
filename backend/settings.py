@@ -103,25 +103,46 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 import os
 from dotenv import load_dotenv
+import urllib.parse
 
 # Cargar variables desde config/.env (ubicado en la raíz del proyecto)
 ENV_PATH = Path(__file__).resolve().parent.parent / "config" / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
-# PostgreSQL para producción con Docker
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "quiniela"),
-        "USER": os.getenv("DB_USER", "postgres"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "PASSWORD"),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
-        "OPTIONS": {
-            "sslmode": os.getenv("DB_SSLMODE", "prefer"),
-        } if os.getenv("DB_SSLMODE") else {},
+# Configuración de base de datos para Render/Neon usando DATABASE_URL
+if os.getenv("DATABASE_URL"):
+    # Parsear DATABASE_URL para Render/Neon
+    db_url = os.getenv("DATABASE_URL")
+    parsed = urllib.parse.urlparse(db_url)
+    
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": parsed.path[1:],  # Quitar el slash inicial
+            "USER": parsed.username,
+            "PASSWORD": parsed.password,
+            "HOST": parsed.hostname,
+            "PORT": parsed.port or 5432,
+            "OPTIONS": {
+                "sslmode": "require",
+            },
+        }
     }
-}
+else:
+    # PostgreSQL para desarrollo local con Docker
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "quiniela"),
+            "USER": os.getenv("DB_USER", "postgres"),
+            "PASSWORD": os.getenv("DB_PASSWORD", "PASSWORD"),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+            "OPTIONS": {
+                "sslmode": os.getenv("DB_SSLMODE", "prefer"),
+            } if os.getenv("DB_SSLMODE") else {},
+        }
+    }
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
