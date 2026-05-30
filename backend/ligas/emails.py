@@ -7,7 +7,7 @@ INVITACION_SUBJECT = 'Invitación a una liga de la Copa Mundial FIFA 2026'
 
 def render_mensaje_invitacion(invitacion):
     mensaje_admin = invitacion.mensaje_invitacion or 'Sin mensaje personalizado'
-    login_url = "https://tu-nueva-url.com/login"
+    login_url = "https://frontend-pdp7.onrender.com/login"
     return f"""
 ¡Hola!
 

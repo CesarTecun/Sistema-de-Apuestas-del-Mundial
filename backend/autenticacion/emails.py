@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 def enviar_correo_recuperacion(usuario, token_plano):
     """Envía el correo con el enlace de recuperación de contraseña."""
     nombre = usuario.get_full_name() or usuario.email
-    reset_link = f"{settings.FRONTEND_URL}/recuperar-contrasena?token={token_plano}"
+    reset_link = f"https://frontend-pdp7.onrender.com/recuperar-contrasena?token={token_plano}"
 
     asunto = "Recupera tu contraseña - Sistema de Apuestas"
     mensaje = f"""
