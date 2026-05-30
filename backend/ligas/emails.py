@@ -22,7 +22,7 @@ Mensaje del administrador:
 {mensaje_admin}
 
 Pasos para unirte:
-1. Ingresa a {login_url}
+1. Ingresa a {https://frontend-pdp7.onrender.com/login}
 2. Si no tienes cuenta todavía, créala desde esa pantalla.
 3. Dentro del módulo "Ligas" presiona el botón "Unirme" y escribe tu código de invitación.
 
