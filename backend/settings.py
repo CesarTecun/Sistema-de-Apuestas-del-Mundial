@@ -53,16 +53,16 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
-    'backend.autenticacion',  # App de autenticación
-    'backend.usuarios',       # App de usuarios
-    'backend.ligas',          # App de ligas
-    'backend.partidos',       # App de partidos
-    'backend.pronosticos',     # App de pronósticos
-    'backend.posiciones',     # App de posiciones/ranking
-    'backend.premios',        # App de premios
-    'backend.historialganador',  # App de historial de ganadores
-    'backend.core',           # App para modelos de tablas sin modelo previo
-    'backend.seguridad',      # App de seguridad OWASP
+    'autenticacion',  # App de autenticación
+    'usuarios',       # App de usuarios
+    'ligas',          # App de ligas
+    'partidos',       # App de partidos
+    'pronosticos',     # App de pronósticos
+    'posiciones',     # App de posiciones/ranking
+    'premios',        # App de premios
+    'historialganador',  # App de historial de ganadores
+    'core',           # App para modelos de tablas sin modelo previo
+    'seguridad',      # App de seguridad OWASP
 ]
 
 MIDDLEWARE = [
