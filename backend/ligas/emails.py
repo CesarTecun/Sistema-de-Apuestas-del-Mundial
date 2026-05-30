@@ -45,5 +45,5 @@ def enviar_correo_invitacion(invitacion):
         message=render_mensaje_invitacion(invitacion),
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[invitacion.email_invitado],
-        fail_silently=False,
+        fail_silently=True,
     )
