@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import DateTime, Integer, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
@@ -19,14 +20,14 @@ class Partido(SoftDeleteMixin, Base):
     horario: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     equipo_local: Mapped[int] = mapped_column(Integer, nullable=False)
     equipo_visitante: Mapped[int] = mapped_column(Integer, nullable=False)
-    fk_sede: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    fk_id_fase: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    fk_id_liga: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    fk_sede: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    fk_id_fase: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    fk_id_liga: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)
     gol_local: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     gol_visitante: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    ganador_penales: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    ganador_penales: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     tipo_partido: Mapped[str] = mapped_column(String(50), default="Regular", nullable=False)
-    resultado: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    resultado: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     estado: Mapped[str] = mapped_column(String(20), default="programado", nullable=False)
     
     # Campos para control de partido en vivo
@@ -45,7 +46,7 @@ class Partido(SoftDeleteMixin, Base):
         return f"{self.gol_local} - {self.gol_visitante}"
 
     @property
-    def ganador(self) -> int | None:
+    def ganador(self) -> Optional[int]:
         if self.gol_local > self.gol_visitante:
             return self.equipo_local
         if self.gol_visitante > self.gol_local:
