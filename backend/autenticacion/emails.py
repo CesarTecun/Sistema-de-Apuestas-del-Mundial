@@ -28,7 +28,7 @@ Este es un correo automático, por favor no respondas a este mensaje.
         message=mensaje,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[usuario.email],
-        fail_silently=False,
+        fail_silently=True,
     )
 
 
