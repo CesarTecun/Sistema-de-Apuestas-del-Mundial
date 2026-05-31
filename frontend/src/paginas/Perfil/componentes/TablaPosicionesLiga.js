@@ -13,7 +13,7 @@ const TablaPosicionesLiga = ({ liga, onClose }) => {
 
   const cargarParticipantes = async () => {
     setLoading(true);
-    const result = await servicioLigas.getParticipantes(liga.id_liga);
+    const result = await servicioLigas.getParticipantes(liga.liga_id);
     if (result.success) {
       // El backend ya calcula los puntos y ordena por ranking
       setParticipantes(result.data);
