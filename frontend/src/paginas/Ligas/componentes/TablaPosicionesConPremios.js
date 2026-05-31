@@ -39,15 +39,15 @@ const TablaPosicionesConPremios = ({ liga, user, onClose }) => {
     const puntosPrimerLugar = puntosPorPosicion[0];
     const puntosSegundoLugar = n > 1 ? puntosPorPosicion[1] : 0;
     const puntosTercerLugar = n > 2 ? puntosPorPosicion[2] : 0;
-    const puntosUltimoLugar = puntosPorPosicion[n - 1];
+    const puntosCuartoLugar = n > 3 ? puntosPorPosicion[3] : 0;
 
     // Contar empates
     const empatePrimerLugar = puntosPorPosicion.filter(p => p === puntosPrimerLugar).length;
     const empateSegundoLugar = n > 1 ? puntosPorPosicion.slice(1).filter(p => p === puntosSegundoLugar).length : 0;
     const empateTercerLugar = n > 2 ? puntosPorPosicion.slice(2).filter(p => p === puntosTercerLugar).length : 0;
-    const empateUltimoLugar = puntosPorPosicion.filter(p => p === puntosUltimoLugar).length;
+    const empateCuartoLugar = n > 3 ? puntosPorPosicion.slice(3).filter(p => p === puntosCuartoLugar).length : 0;
 
-    // Calcular premios según reglas
+    // Calcular premios según reglas (primeros 4 lugares)
     if (empatePrimerLugar > 1) {
       // Empate en primer lugar: 85% se distribuye equitativamente
       const premioPorGanador = (montoTotal * 0.85) / empatePrimerLugar;
@@ -79,30 +79,26 @@ const TablaPosicionesConPremios = ({ liga, user, onClose }) => {
             } else {
               // Tercer lugar: 10%
               premios[participantesOrdenados[2].id_participante] = montoTotal * 0.10;
+
+              if (n > 3) {
+                if (empateCuartoLugar > 1) {
+                  // Empate en cuarto lugar: 10% se reparte equitativamente
+                  const premioPorGanador = (montoTotal * 0.10) / empateCuartoLugar;
+                  for (let i = 3; i < 3 + empateCuartoLugar; i++) {
+                    premios[participantesOrdenados[i].id_participante] = premioPorGanador;
+                  }
+                } else {
+                  // Cuarto lugar: 10%
+                  premios[participantesOrdenados[3].id_participante] = montoTotal * 0.10;
+                }
+              }
             }
           }
         }
       }
     }
 
-    // Último lugar: 10%
-    if (empateUltimoLugar > 1) {
-      // Empate en último lugar: 10% se reparte equitativamente
-      const premioPorGanador = (montoTotal * 0.10) / empateUltimoLugar;
-      for (let i = n - empateUltimoLugar; i < n; i++) {
-        const id = participantesOrdenados[i].id_participante;
-        // Solo si ya no tiene premio asignado
-        if (!premios[id]) {
-          premios[id] = premioPorGanador;
-        }
-      }
-    } else {
-      const id = participantesOrdenados[n - 1].id_participante;
-      if (!premios[id]) {
-        premios[id] = montoTotal * 0.10;
-      }
-    }
-
+    // A partir del 5to lugar, no reciben premio
     return premios;
   };
 
