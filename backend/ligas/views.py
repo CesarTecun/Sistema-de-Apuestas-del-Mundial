@@ -1,4 +1,5 @@
-from django.db.models import Q, Count, OuterRef, Subquery, IntegerField, F
+from django.db import models
+from django.db.models import Q, Count, OuterRef, Subquery, IntegerField, F, Sum
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -348,17 +349,31 @@ class SolicitudParticipacionViewSet(viewsets.ReadOnlyModelViewSet):
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def participantes_por_liga(request):
-    """Obtener participantes de una liga específica"""
+    """Obtener participantes de una liga específica ordenados por puntos"""
     try:
         liga_id = request.query_params.get('fk_id_liga')
         print(f"[participantes_por_liga] liga_id: {liga_id}")
-        
+
         if not liga_id:
             return Response({'error': 'Se requiere el parámetro fk_id_liga'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        participantes = ParticipanteLiga.objects.filter(fk_id_liga=liga_id)
+
+        from backend.pronosticos.models import Pronostico
+        from django.db.models import Sum, OuterRef, Subquery
+
+        # Obtener participantes y anotar sus puntos totales usando subquery
+        puntos_subquery = Pronostico.objects.filter(
+            fk_id_usuario=OuterRef('fk_id_usuario'),
+            fk_id_liga=OuterRef('fk_id_liga')
+        ).values('fk_id_usuario').annotate(
+            total=Sum('puntos_obtenidos')
+        ).values('total')[:1]
+
+        participantes = ParticipanteLiga.objects.filter(fk_id_liga=liga_id).annotate(
+            puntos_totales=Subquery(puntos_subquery, output_field=models.IntegerField())
+        ).order_by('-puntos_totales', 'fecha_union')
+
         print(f"[participantes_por_liga] Participantes encontrados: {participantes.count()}")
-        
+
         serializer = ParticipanteLigaSerializer(participantes, many=True)
         return Response(serializer.data)
     except Exception as e:

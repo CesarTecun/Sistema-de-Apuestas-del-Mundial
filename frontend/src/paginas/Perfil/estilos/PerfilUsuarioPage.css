@@ -355,6 +355,79 @@
   display: block;
 }
 
+.ver-tabla-liga-btn {
+  width: 100%;
+  background: rgba(212, 175, 55, 0.2);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.4);
+  color: #d4af37;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 30px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  backdrop-filter: var(--backdrop-blur-md);
+}
+
+.ver-tabla-liga-btn:hover {
+  background: rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+}
+
+.ver-posiciones-btn {
+  width: 100%;
+  background: rgba(212, 175, 55, 0.2);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.4);
+  color: #d4af37;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 30px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  backdrop-filter: var(--backdrop-blur-md);
+  margin-top: var(--spacing-md);
+}
+
+.ver-posiciones-btn:hover {
+  background: rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+}
+
+.ver-posiciones-pronostico-btn {
+  width: 100%;
+  background: rgba(212, 175, 55, 0.2);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.4);
+  color: #d4af37;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 30px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  backdrop-filter: var(--backdrop-blur-md);
+  margin-top: var(--spacing-sm);
+}
+
+.ver-posiciones-pronostico-btn:hover {
+  background: rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+}
+
+.otros-pronosticos-info {
+  margin-top: var(--spacing-sm);
+  text-align: center;
+}
+
+.otros-count {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
 .empty-state-compact {
   text-align: center;
   padding: 30px 20px;
@@ -527,6 +600,26 @@
   background: linear-gradient(135deg, #a83279 0%, #6a4c93 100%);
   border-color: transparent;
   color: white;
+}
+
+.ver-tabla-btn {
+  background: rgba(212, 175, 55, 0.2);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.4);
+  color: #d4af37;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 30px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  margin-left: auto;
+  backdrop-filter: var(--backdrop-blur-md);
+}
+
+.ver-tabla-btn:hover {
+  background: rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
 }
 
 /* ========================================

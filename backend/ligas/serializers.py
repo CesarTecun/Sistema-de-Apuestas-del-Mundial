@@ -82,7 +82,11 @@ class ParticipanteLigaSerializer(serializers.ModelSerializer):
             return None
 
     def get_puntos_totales(self, obj):
-        """Calcular los puntos totales del usuario en la liga"""
+        """Obtener los puntos totales del usuario en la liga (anotados en el queryset)"""
+        # Usar los puntos anotados en el queryset si están disponibles
+        if hasattr(obj, 'puntos_totales') and obj.puntos_totales is not None:
+            return obj.puntos_totales
+        # Fallback: calcular los puntos si no están anotados
         try:
             from backend.pronosticos.models import Pronostico
             puntos = Pronostico.objects.filter(
@@ -97,24 +101,27 @@ class ParticipanteLigaSerializer(serializers.ModelSerializer):
         """Calcular la posición en el ranking de la liga"""
         try:
             from backend.pronosticos.models import Pronostico
+            from django.db.models import OuterRef, Subquery
 
-            # Obtener todos los participantes de la liga con sus puntos
-            participantes_puntos = ParticipanteLiga.objects.filter(
+            # Usar la misma lógica de ordenamiento que la vista
+            puntos_subquery = Pronostico.objects.filter(
+                fk_id_usuario=OuterRef('fk_id_usuario'),
+                fk_id_liga=OuterRef('fk_id_liga')
+            ).values('fk_id_usuario').annotate(
+                total=Sum('puntos_obtenidos')
+            ).values('total')[:1]
+
+            participantes_ordenados = ParticipanteLiga.objects.filter(
                 fk_id_liga=obj.fk_id_liga,
                 estado_participacion='Activo'
-            ).values('fk_id_usuario').annotate(
-                puntos=Sum(
-                    Pronostico.objects.filter(
-                        fk_id_usuario=F('fk_id_usuario'),
-                        fk_id_liga=obj.fk_id_liga
-                    ).values('puntos_obtenidos')
-                )
-            ).order_by('-puntos')
+            ).annotate(
+                puntos_totales=Subquery(puntos_subquery, output_field=models.IntegerField())
+            ).order_by('-puntos_totales', 'fecha_union')
 
             # Encontrar la posición del usuario actual
             posicion = 1
-            for p in participantes_puntos:
-                if p['fk_id_usuario'] == obj.fk_id_usuario:
+            for p in participantes_ordenados:
+                if p.fk_id_usuario == obj.fk_id_usuario:
                     return posicion
                 posicion += 1
 

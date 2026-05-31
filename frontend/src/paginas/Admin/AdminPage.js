@@ -191,7 +191,7 @@ const GestionUsuarios = ({ notif }) => {
   const activar = async (id) => {
     setAccionando(id);
     try {
-      await servicioApi.post(`/usuarios/${id}/activar/`);
+      await servicioApi.patch(`/usuarios/${id}/`, { activo: true });
       // notif.success('Usuario activado correctamente');
       cargar();
     } catch {
@@ -208,7 +208,7 @@ const GestionUsuarios = ({ notif }) => {
     }
     setAccionando(id);
     try {
-      await servicioApi.post(`/usuarios/${id}/desactivar/`);
+      await servicioApi.patch(`/usuarios/${id}/`, { activo: false });
       // notif.success('Usuario desactivado correctamente');
       cargar();
     } catch {

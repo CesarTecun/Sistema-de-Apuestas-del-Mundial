@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import servicioLigas from '../../../servicios/servicioLigas';
-import './TablaParticipantes.css';
+import './TablaPosicionesLiga.css';
 
-const TablaParticipantes = ({ liga, onClose }) => {
+const TablaPosicionesLiga = ({ liga, onClose }) => {
   const [participantes, setParticipantes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,10 +41,10 @@ const TablaParticipantes = ({ liga, onClose }) => {
   };
 
   return (
-    <div className="tabla-participantes-overlay">
-      <div className="tabla-participantes-modal">
-        <div className="tabla-participantes-header">
-          <h2>Participantes de {liga.nombre_liga}</h2>
+    <div className="tabla-posiciones-overlay">
+      <div className="tabla-posiciones-modal">
+        <div className="tabla-posiciones-header">
+          <h2>Posiciones - {liga.liga_nombre}</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
 
@@ -62,14 +62,14 @@ const TablaParticipantes = ({ liga, onClose }) => {
         )}
 
         {!loading && !error && (
-          <div className="tabla-participantes-content">
+          <div className="tabla-posiciones-content">
             {participantes.length === 0 ? (
               <div className="empty-state">
                 <h3>No hay participantes</h3>
                 <p>Aún no hay participantes en esta liga.</p>
               </div>
             ) : (
-              <table className="participantes-table">
+              <table className="posiciones-table">
                 <thead>
                   <tr>
                     <th>Posición</th>
@@ -115,4 +115,4 @@ const TablaParticipantes = ({ liga, onClose }) => {
   );
 };
 
-export default TablaParticipantes;
+export default TablaPosicionesLiga;

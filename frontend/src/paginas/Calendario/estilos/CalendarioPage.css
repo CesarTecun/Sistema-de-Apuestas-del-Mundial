@@ -11,7 +11,7 @@
 .calendario-background {
   min-height: 100vh;
   width: 100%;
-  background: 
+  background:
     linear-gradient(135deg, rgba(33, 33, 33, 0.60) 0%, rgba(66, 66, 66, 0.75) 100%),
     url('https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
   background-attachment: fixed;
@@ -24,8 +24,9 @@
 }
 
 .calendario-wrapper {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .calendario-header {
@@ -33,12 +34,14 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--spacing-lg);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background: rgba(10, 25, 20, 0.4);
-  backdrop-filter: var(--backdrop-blur-xl);
-  border: var(--border-width-thin) solid var(--border-color-accent);
-  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
+  backdrop-filter: var(--backdrop-blur-lg);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.3);
+  border-radius: var(--border-radius-2xl);
   box-shadow: var(--shadow-lg);
+  gap: var(--spacing-xl);
+  width: 100%;
 }
 
 .calendario-title {
@@ -75,32 +78,34 @@
   justify-content: center;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
-  background: rgba(10, 25, 20, 0.4);
-  backdrop-filter: var(--backdrop-blur-xl);
-  border: var(--border-width-thin) solid var(--border-color-accent);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
+  backdrop-filter: var(--backdrop-blur-lg);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.3);
+  border-radius: var(--border-radius-2xl);
+  padding: var(--spacing-md) var(--spacing-xl);
   box-shadow: var(--shadow-lg);
+  width: 100%;
 }
 
 .nav-btn {
-  background: rgba(255, 255, 255, 0.12);
-  border: var(--border-width-thin) solid var(--border-color-accent);
-  color: var(--color-white);
+  background: rgba(212, 175, 55, 0.15);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.4);
+  color: #d4af37;
   width: 40px;
   height: 40px;
-  border-radius: var(--border-radius-full);
+  border-radius: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition-base);
+  backdrop-filter: var(--backdrop-blur-md);
 }
 
 .nav-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.18);
-  transform: scale(1.05);
-  border-color: rgba(212, 175, 55, 0.4);
+  background: rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
 }
 
 .nav-btn:disabled {
@@ -123,21 +128,22 @@
 }
 
 .fecha-picker {
-  background: rgba(255, 255, 255, 0.12);
-  border: var(--border-width-thin) solid var(--border-color-accent);
-  border-radius: var(--border-radius-lg);
-  color: var(--color-white);
+  background: rgba(212, 175, 55, 0.15);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.4);
+  border-radius: 30px;
+  color: #d4af37;
   padding: var(--spacing-xs) var(--spacing-md);
   font-size: var(--font-size-sm);
   cursor: pointer;
   outline: none;
   transition: all var(--transition-base);
+  backdrop-filter: var(--backdrop-blur-md);
 }
 
 .fecha-picker:focus {
-  border-color: #EC4899;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.25);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
 }
 
 .fecha-picker::-webkit-calendar-picker-indicator {
@@ -188,7 +194,7 @@
 .partido-row {
   background: rgba(10, 25, 20, 0.55);
   backdrop-filter: var(--backdrop-blur-xl);
-  border: var(--border-width-thin) solid var(--border-color-accent);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.3);
   border-radius: var(--border-radius-2xl);
   padding: var(--spacing-lg);
   display: grid;
@@ -278,7 +284,7 @@
   align-items: center;
   gap: var(--spacing-xs);
   background: rgba(0, 0, 0, 0.4);
-  border: var(--border-width-thin) solid var(--border-color-accent);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.3);
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-sm) var(--spacing-md);
   min-width: 70px;
@@ -316,15 +322,15 @@
 }
 
 .estado-tag.pendiente {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--text-secondary);
-  border: var(--border-width-thin) solid rgba(255, 255, 255, 0.15);
+  background: rgba(212, 175, 55, 0.15);
+  color: #d4af37;
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.3);
 }
 
 .estado-tag.finalizado {
   background: rgba(100, 100, 100, 0.25);
   color: var(--text-tertiary);
-  border: var(--border-width-thin) solid rgba(255, 255, 255, 0.15);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.2);
 }
 
 .estado-tag.en-vivo {
@@ -383,7 +389,7 @@
 .fecha-chip {
   flex-shrink: 0;
   background: rgba(10, 25, 20, 0.4);
-  border: var(--border-width-thin) solid var(--border-color-accent);
+  border: var(--border-width-thin) solid rgba(212, 175, 55, 0.3);
   border-radius: var(--border-radius-full);
   padding: var(--spacing-sm) var(--spacing-md);
   color: var(--text-secondary);
@@ -396,7 +402,7 @@
 }
 
 .fecha-chip:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(212, 175, 55, 0.15);
   border-color: rgba(212, 175, 55, 0.4);
   transform: translateY(-2px);
 }

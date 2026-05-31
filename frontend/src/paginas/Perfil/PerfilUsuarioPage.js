@@ -6,6 +6,8 @@ import servicioLigas from '../../servicios/servicioLigas';
 import TopBar from '../../componentes/TopBar';
 import PerfilHeader from './componentes/PerfilHeader';
 import BuzonInvitaciones from './componentes/BuzonInvitaciones';
+import TablaPosicionesLiga from './componentes/TablaPosicionesLiga';
+import TablaPronosticosPartido from './componentes/TablaPronosticosPartido';
 import useNotificaciones from '../../hooks/useNotificaciones';
 import NotificacionesContainer from '../../componentes/NotificacionesContainer';
 import './estilos/PerfilUsuarioPage.css';
@@ -21,16 +23,18 @@ const PerfilUsuarioPage = () => {
   } = useNotificaciones();
   
   const [historial, setHistorial] = useState(null);
+  const [pronosticosPartidos, setPronosticosPartidos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('pronosticos');
   const [filtroAcierto, setFiltroAcierto] = useState('todos');
   const [hasVisited, setHasVisited] = useState(false);
-  const [ligasUsuario, setLigasUsuario] = useState([]);
-  const [ligasLoading, setLigasLoading] = useState(false);
   const [invitaciones, setInvitaciones] = useState([]);
   const [invitacionesLoading, setInvitacionesLoading] = useState(false);
-  const [misLigasExpanded, setMisLigasExpanded] = useState(false);
+  const [posicionesLigaOpen, setPosicionesLigaOpen] = useState(false);
+  const [ligaSeleccionada, setLigaSeleccionada] = useState(null);
+  const [pronosticosPartidoOpen, setPronosticosPartidoOpen] = useState(false);
+  const [partidoSeleccionado, setPartidoSeleccionado] = useState(null);
 
   useEffect(() => {
     const visited = sessionStorage.getItem('perfil_visited');
@@ -44,35 +48,26 @@ const PerfilUsuarioPage = () => {
   useEffect(() => {
     cargarHistorial();
     cargarInvitaciones();
-    cargarLigasUsuario();
   }, []);
 
   const cargarHistorial = async () => {
     setLoading(true);
     setError(null);
-    const result = await servicioHistorial.getHistorialUsuario();
-    if (result.success) {
-      setHistorial(result.data);
+
+    // Cargar historial principal
+    const historialResult = await servicioHistorial.getHistorialUsuario();
+    if (historialResult.success) {
+      setHistorial(historialResult.data);
     } else {
-      setError(result.error);
+      setError(historialResult.error);
     }
+
+    // TODO: Implementar endpoint en backend para obtener pronósticos de partidos de otros usuarios
+    // Por ahora, no mostramos información de otros usuarios
+    setPronosticosPartidos(null);
+
     setLoading(false);
   };
-
-  const cargarLigasUsuario = async () => {
-    setLigasLoading(true);
-    try {
-      const result = await servicioLigas.getLigas();
-      if (result.success) {
-        setLigasUsuario(result.data);
-      }
-    } catch (error) {
-      console.error('Error al cargar ligas:', error);
-    } finally {
-      setLigasLoading(false);
-    }
-  };
-
 
   const handleLogout = async () => {
     await logout();
@@ -86,6 +81,11 @@ const PerfilUsuarioPage = () => {
     if (filtroAcierto === 'pendientes') return p.estado_partido !== 'finalizado';
     return true;
   }) || [];
+
+  // Función para verificar si el partido tiene resultado (finalizado)
+  const partidoTieneResultado = (estadoPartido) => {
+    return estadoPartido?.toLowerCase() === 'finalizado';
+  };
 
   const getBadgeClass = (tipo) => {
     switch (tipo) {
@@ -213,75 +213,6 @@ const PerfilUsuarioPage = () => {
                   </div>
                 </div>
 
-                {/* Mis Ligas Section */}
-                <div className="mis-ligas-section">
-                  <div className="section-header" onClick={() => setMisLigasExpanded(!misLigasExpanded)}>
-                    <h2 className="section-title">Mis Ligas</h2>
-                    <svg 
-                      className={`chevron-icon ${misLigasExpanded ? 'expanded' : ''}`}
-                      width="20" 
-                      height="20" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2"
-                    >
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                  </div>
-                  {misLigasExpanded && (
-                    <div className="section-content">
-                      {ligasLoading ? (
-                        <div className="empty-state-compact">
-                          <p>Cargando ligas...</p>
-                        </div>
-                      ) : !ligasUsuario || ligasUsuario.length === 0 ? (
-                        <div className="empty-state-compact">
-                          <div className="empty-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                              <circle cx="9" cy="7" r="4"></circle>
-                              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
-                          </div>
-                          <p>Aún no participas en ninguna liga.</p>
-                        </div>
-                      ) : (
-                        <div className="ligas-compact-grid">
-                          {ligasUsuario.map((liga) => {
-                            const ligaHistorial = historial?.resumen_ligas?.find(h => h.liga_id === liga.id_liga);
-                            return (
-                              <div key={liga.id_liga} className="liga-compact-card">
-                                <div className="liga-compact-header">
-                                  <h3>{liga.nombre_liga}</h3>
-                                  <span className="liga-compact-status" style={{ background: 'linear-gradient(135deg, #a83279 0%, #6a4c93 100%)' }}>
-                                    {liga.tipo_liga}
-                                  </span>
-                                </div>
-                                <div className="liga-compact-stats">
-                                  <div className="compact-stat">
-                                    <span className="compact-stat-label">Puntos</span>
-                                    <span className="compact-stat-value">{ligaHistorial?.puntos_totales || 0}</span>
-                                  </div>
-                                  <div className="compact-stat">
-                                    <span className="compact-stat-label">Partidos</span>
-                                    <span className="compact-stat-value">{ligaHistorial?.partidos_jugados || 0}</span>
-                                  </div>
-                                  <div className="compact-stat">
-                                    <span className="compact-stat-label">Exactos</span>
-                                    <span className="compact-stat-value">{ligaHistorial?.marcadores_exactos || 0}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
                 {/* Buzón de Invitaciones */}
                 <BuzonInvitaciones 
                   invitaciones={invitaciones}
@@ -325,25 +256,25 @@ const PerfilUsuarioPage = () => {
                     <div className="perfil-filters">
                       <label>Filtrar por:</label>
                       <div className="filter-buttons">
-                        <button 
+                        <button
                           className={`filter-btn ${filtroAcierto === 'todos' ? 'active' : ''}`}
                           onClick={() => setFiltroAcierto('todos')}
                         >
                           Todos
                         </button>
-                        <button 
+                        <button
                           className={`filter-btn ${filtroAcierto === 'aciertos' ? 'active' : ''}`}
                           onClick={() => setFiltroAcierto('aciertos')}
                         >
                           Aciertos
                         </button>
-                        <button 
+                        <button
                           className={`filter-btn ${filtroAcierto === 'fallidos' ? 'active' : ''}`}
                           onClick={() => setFiltroAcierto('fallidos')}
                         >
                           Fallidos
                         </button>
-                        <button 
+                        <button
                           className={`filter-btn ${filtroAcierto === 'pendientes' ? 'active' : ''}`}
                           onClick={() => setFiltroAcierto('pendientes')}
                         >
@@ -365,34 +296,50 @@ const PerfilUsuarioPage = () => {
                       </div>
                     ) : (
                       <div className="pronosticos-grid">
-                        {pronosticosFiltrados.map((p) => (
-                          <div key={p.id_pronostico} className="pronostico-card-new">
-                            <div className="pronostico-match">
-                              <span className="team-name">{p.equipo_local}</span>
-                              <span className="match-vs">VS</span>
-                              <span className="team-name">{p.equipo_visitante}</span>
-                            </div>
-                            <div className="pronostico-details">
-                              <div className="detail-row">
-                                <span className="detail-label">Tu pronóstico:</span>
-                                <span className="detail-value">{p.resultado_pronosticado}</span>
+                        {pronosticosFiltrados.map((p) => {
+                          // Verificar si el partido tiene resultado
+                          const tieneResultado = partidoTieneResultado(p.estado_partido);
+
+                          return (
+                            <div key={p.id_pronostico} className="pronostico-card-new">
+                              <div className="pronostico-match">
+                                <span className="team-name">{p.equipo_local}</span>
+                                <span className="match-vs">VS</span>
+                                <span className="team-name">{p.equipo_visitante}</span>
                               </div>
-                              <div className="detail-row">
-                                <span className="detail-label">Resultado real:</span>
-                                <span className="detail-value actual">{p.resultado_real}</span>
+                              <div className="pronostico-details">
+                                <div className="detail-row">
+                                  <span className="detail-label">Tu pronóstico:</span>
+                                  <span className="detail-value">{p.resultado_pronosticado}</span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">Resultado real:</span>
+                                  <span className="detail-value actual">{p.resultado_real}</span>
+                                </div>
                               </div>
-                            </div>
-                            <div className="pronostico-footer-new">
-                              <span className={`badge-new ${getBadgeClass(p.tipo_acierto)}`}>
-                                {p.tipo_acierto}
-                              </span>
-                              <div className="points-status">
-                                <span className="points">+{p.puntos_obtenidos} pts</span>
-                                <span className="status">{p.estado_partido}</span>
+                              <div className="pronostico-footer-new">
+                                <span className={`badge-new ${getBadgeClass(p.tipo_acierto)}`}>
+                                  {p.tipo_acierto}
+                                </span>
+                                <div className="points-status">
+                                  <span className="points">+{p.puntos_obtenidos} pts</span>
+                                  <span className="status">{p.estado_partido}</span>
+                                </div>
                               </div>
+                              {(p.liga_nombre || p.fk_id_liga) && (
+                                <button
+                                  className="ver-posiciones-pronostico-btn"
+                                  onClick={() => {
+                                    setPartidoSeleccionado(p);
+                                    setPronosticosPartidoOpen(true);
+                                  }}
+                                >
+                                  {tieneResultado ? 'Ver Ranking Completo' : 'Ver Pronósticos'}
+                                </button>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -452,6 +399,15 @@ const PerfilUsuarioPage = () => {
                                 <div className="progress-segment fallido" style={{ width: `${(liga.fallidos / liga.partidos_jugados) * 100}%` }} />
                               </div>
                             )}
+                            <button
+                              className="ver-posiciones-btn"
+                              onClick={() => {
+                                setLigaSeleccionada(liga);
+                                setPosicionesLigaOpen(true);
+                              }}
+                            >
+                              Ver Posiciones
+                            </button>
                           </div>
                         ))}
                       </div>
@@ -463,10 +419,31 @@ const PerfilUsuarioPage = () => {
           </div>
         </div>
 
-        <NotificacionesContainer 
+        <NotificacionesContainer
           notificaciones={notificaciones}
           onClose={cerrarNotificacion}
         />
+
+        {posicionesLigaOpen && ligaSeleccionada && (
+          <TablaPosicionesLiga
+            liga={ligaSeleccionada}
+            onClose={() => {
+              setPosicionesLigaOpen(false);
+              setLigaSeleccionada(null);
+            }}
+          />
+        )}
+
+        {pronosticosPartidoOpen && partidoSeleccionado && (
+          <TablaPronosticosPartido
+            partido={partidoSeleccionado}
+            user={user}
+            onClose={() => {
+              setPronosticosPartidoOpen(false);
+              setPartidoSeleccionado(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );

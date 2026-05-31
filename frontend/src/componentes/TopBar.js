@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import servicioLigas from '../servicios/servicioLigas';
 import './TopBar.css';
 
 const TopBar = ({ user, onLogout, showBackButton = false }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [invitaciones, setInvitaciones] = useState([]);
   const [invitacionesLoading, setInvitacionesLoading] = useState(false);
 
@@ -40,6 +41,10 @@ const TopBar = ({ user, onLogout, showBackButton = false }) => {
 
   const invitationCount = invitacionesLoading ? 0 : invitaciones.filter(inv => inv.estado_invitacion === 'Pendiente').length;
 
+  const isActivePath = (path) => {
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
+
   return (
     <div className="top-bar">
       {showBackButton && (
@@ -58,8 +63,8 @@ const TopBar = ({ user, onLogout, showBackButton = false }) => {
       )}
 
       <div className="top-bar-nav">
-        <button 
-          className="nav-button"
+        <button
+          className={`nav-button ${isActivePath('/home') ? 'active' : ''}`}
           onClick={() => handleNavigate('/home')}
           aria-label="Home"
         >
@@ -69,8 +74,8 @@ const TopBar = ({ user, onLogout, showBackButton = false }) => {
           </svg>
           <span>Home</span>
         </button>
-        <button 
-          className="nav-button"
+        <button
+          className={`nav-button ${isActivePath('/ligas') ? 'active' : ''}`}
           onClick={() => handleNavigate('/ligas')}
           aria-label="Ligas"
         >
@@ -82,8 +87,8 @@ const TopBar = ({ user, onLogout, showBackButton = false }) => {
           </svg>
           <span>Ligas</span>
         </button>
-        <button 
-          className="nav-button"
+        <button
+          className={`nav-button ${isActivePath('/partidos') ? 'active' : ''}`}
           onClick={() => handleNavigate('/partidos')}
           aria-label="Partidos"
         >
@@ -93,8 +98,8 @@ const TopBar = ({ user, onLogout, showBackButton = false }) => {
           </svg>
           <span>Partidos</span>
         </button>
-        <button 
-          className="nav-button"
+        <button
+          className={`nav-button ${isActivePath('/calendario') ? 'active' : ''}`}
           onClick={() => handleNavigate('/calendario')}
           aria-label="Calendario"
         >
@@ -106,8 +111,8 @@ const TopBar = ({ user, onLogout, showBackButton = false }) => {
           </svg>
           <span>Calendario</span>
         </button>
-        <button 
-          className="nav-button"
+        <button
+          className={`nav-button ${isActivePath('/selecciones') ? 'active' : ''}`}
           onClick={() => handleNavigate('/selecciones')}
           aria-label="Selecciones"
         >
@@ -117,8 +122,8 @@ const TopBar = ({ user, onLogout, showBackButton = false }) => {
           </svg>
           <span>Selecciones</span>
         </button>
-        <button 
-          className="nav-button"
+        <button
+          className={`nav-button ${isActivePath('/pronosticos') ? 'active' : ''}`}
           onClick={() => handleNavigate('/pronosticos')}
           aria-label="Apuestas"
         >
@@ -129,7 +134,7 @@ const TopBar = ({ user, onLogout, showBackButton = false }) => {
         </button>
       </div>
 
-      <div className="user-info" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
+      <div className={`user-info ${isActivePath('/perfil') ? 'active' : ''}`} onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
         <div className="user-avatar">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
