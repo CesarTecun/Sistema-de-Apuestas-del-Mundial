@@ -280,7 +280,7 @@ class InvitacionSerializer(serializers.ModelSerializer):
 
     """Serializer para crear y gestionar invitaciones"""
 
-    liga_nombre = serializers.SerializerMethodField()
+    liga_nombre = serializers.CharField(read_only=True)
 
 
 
@@ -312,21 +312,7 @@ class InvitacionSerializer(serializers.ModelSerializer):
 
         ]
 
-        read_only_fields = ['id_invitacion', 'codigo_invitacion', 'fecha_invitacion', 'estado_invitacion']
-
-
-
-    def get_liga_nombre(self, obj):
-
-        try:
-
-            liga = Liga.objects.get(id_liga=obj.fk_id_liga)
-
-            return liga.nombre_liga
-
-        except Liga.DoesNotExist:
-
-            return "Liga no encontrada"
+        read_only_fields = ['id_invitacion', 'codigo_invitacion', 'fecha_invitacion', 'estado_invitacion', 'liga_nombre']
 
 
 
