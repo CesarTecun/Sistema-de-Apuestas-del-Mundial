@@ -102,8 +102,7 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
 
   const tiposLiga = [
     { value: 'Diversion', label: 'Diversión' },
-    { value: 'Competitiva', label: 'Competitiva' },
-    { value: 'Dinero', label: 'Dinero' }
+    { value: 'Competitiva', label: 'Competitiva' }
   ];
 
   const estados = [

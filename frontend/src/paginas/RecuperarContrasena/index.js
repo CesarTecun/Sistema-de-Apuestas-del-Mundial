@@ -107,105 +107,107 @@ const RecuperarContrasenaPage = () => {
 
   return (
     <div className="recovery-page">
-      <div className="recovery-panel">
-        <div className="recovery-logo">
-          <LogoCopaMundial size={120} />
-        </div>
-        <div className="recovery-content">
-          <h1>{hasToken ? 'Restablece tu contraseña' : 'Recupera tu acceso'}</h1>
-          <p>
-            {hasToken
-              ? 'Crea una nueva contraseña segura para continuar disfrutando del sistema.'
-              : 'Ingresa tu correo electrónico y te enviaremos instrucciones para recuperar tu acceso.'}
-          </p>
+      <div className="recovery-background">
+        <div className="recovery-panel">
+          <div className="recovery-logo">
+            <LogoCopaMundial size={120} />
+          </div>
+          <div className="recovery-content">
+            <h1>{hasToken ? 'Restablece tu contraseña' : 'Recupera tu acceso'}</h1>
+            <p>
+              {hasToken
+                ? 'Crea una nueva contraseña segura para continuar disfrutando del sistema.'
+                : 'Ingresa tu correo electrónico y te enviaremos instrucciones para recuperar tu acceso.'}
+            </p>
 
-          {!hasToken && (
-            <form className="recovery-form" onSubmit={handleRequestSubmit}>
-              <label htmlFor="email">Correo electrónico</label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="tucorreo@ejemplo.com"
-                required
-              />
-
-              {requestFeedback.status !== 'idle' && (
-                <div className={`recovery-alert recovery-alert--${requestFeedback.status}`}>
-                  {requestFeedback.message}
-                </div>
-              )}
-
-              <button type="submit" className="recovery-button" disabled={requestLoading}>
-                {requestLoading ? 'Enviando enlace...' : 'Enviar instrucciones'}
-              </button>
-
-              <p className="recovery-hint">
-                ¿No encuentras el correo? Revisa spam o <span>promociones</span>.
-              </p>
-            </form>
-          )}
-
-          {hasToken && (
-            <form className="recovery-form" onSubmit={handleResetSubmit}>
-              <label htmlFor="password">Nueva contraseña</label>
-              <div className="password-field">
+            {!hasToken && (
+              <form className="recovery-form" onSubmit={handleRequestSubmit}>
+                <label htmlFor="email">Correo electrónico</label>
                 <input
-                  id="password"
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="tucorreo@ejemplo.com"
+                  required
+                />
+
+                {requestFeedback.status !== 'idle' && (
+                  <div className={`recovery-alert recovery-alert--${requestFeedback.status}`}>
+                    {requestFeedback.message}
+                  </div>
+                )}
+
+                <button type="submit" className="recovery-button" disabled={requestLoading}>
+                  {requestLoading ? 'Enviando enlace...' : 'Enviar instrucciones'}
+                </button>
+
+                <p className="recovery-hint">
+                  ¿No encuentras el correo? Revisa spam o <span>promociones</span>.
+                </p>
+              </form>
+            )}
+
+            {hasToken && (
+              <form className="recovery-form" onSubmit={handleResetSubmit}>
+                <label htmlFor="password">Nueva contraseña</label>
+                <div className="password-field">
+                  <input
+                    id="password"
+                    type={showPasswords ? 'text' : 'password'}
+                    value={passwordData.password}
+                    onChange={(event) =>
+                      setPasswordData((prev) => ({ ...prev, password: event.target.value }))
+                    }
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button type="button" className="toggle-visibility" onClick={toggleShowPasswords}>
+                    {showPasswords ? 'Ocultar' : 'Mostrar'}
+                  </button>
+                </div>
+
+                <label htmlFor="password2">Confirma tu contraseña</label>
+                <input
+                  id="password2"
                   type={showPasswords ? 'text' : 'password'}
-                  value={passwordData.password}
+                  value={passwordData.password2}
                   onChange={(event) =>
-                    setPasswordData((prev) => ({ ...prev, password: event.target.value }))
+                    setPasswordData((prev) => ({ ...prev, password2: event.target.value }))
                   }
                   placeholder="••••••••"
                   required
                 />
-                <button type="button" className="toggle-visibility" onClick={toggleShowPasswords}>
-                  {showPasswords ? 'Ocultar' : 'Mostrar'}
+
+                <ul className="password-hints">
+                  <li>Debe tener al menos 8 caracteres.</li>
+                  <li>Combina letras mayúsculas, minúsculas, números y símbolos.</li>
+                </ul>
+
+                {(localValidationError || resetFeedback.status !== 'idle') && (
+                  <div className={`recovery-alert recovery-alert--${resetFeedback.status}`}>
+                    {localValidationError || resetFeedback.message}
+                  </div>
+                )}
+
+                <button type="submit" className="recovery-button" disabled={resetLoading}>
+                  {resetLoading ? 'Actualizando...' : 'Guardar nueva contraseña'}
                 </button>
-              </div>
-
-              <label htmlFor="password2">Confirma tu contraseña</label>
-              <input
-                id="password2"
-                type={showPasswords ? 'text' : 'password'}
-                value={passwordData.password2}
-                onChange={(event) =>
-                  setPasswordData((prev) => ({ ...prev, password2: event.target.value }))
-                }
-                placeholder="••••••••"
-                required
-              />
-
-              <ul className="password-hints">
-                <li>Debe tener al menos 8 caracteres.</li>
-                <li>Combina letras mayúsculas, minúsculas, números y símbolos.</li>
-              </ul>
-
-              {(localValidationError || resetFeedback.status !== 'idle') && (
-                <div className={`recovery-alert recovery-alert--${resetFeedback.status}`}>
-                  {localValidationError || resetFeedback.message}
-                </div>
-              )}
-
-              <button type="submit" className="recovery-button" disabled={resetLoading}>
-                {resetLoading ? 'Actualizando...' : 'Guardar nueva contraseña'}
-              </button>
-            </form>
-          )}
-
-          <div className="recovery-footer">
-            <Link to="/login">Volver al inicio de sesión</Link>
-            {!hasToken && (
-              <button
-                type="button"
-                className="recovery-contact"
-                onClick={() => navigate('/registro')}
-              >
-                ¿No tienes cuenta? Regístrate
-              </button>
+              </form>
             )}
+
+            <div className="recovery-footer">
+              <Link to="/login">Volver al inicio de sesión</Link>
+              {!hasToken && (
+                <button
+                  type="button"
+                  className="recovery-contact"
+                  onClick={() => navigate('/registro')}
+                >
+                  ¿No tienes cuenta? Regístrate
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

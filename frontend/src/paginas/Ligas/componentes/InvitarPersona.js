@@ -22,7 +22,15 @@ const InvitarPersona = ({ liga, onClose, onSuccess }) => {
       // onSuccess('Invitación enviada exitosamente');
       onClose();
     } else {
-      setError(result.error);
+      // Mejorar mensaje de error para invitaciones duplicadas
+      const errorMessage = result.error || 'Error al enviar invitación';
+      if (errorMessage.includes('ya existe') || errorMessage.includes('duplicate') || errorMessage.includes('ya invitado')) {
+        setError('Este usuario ya ha sido invitado a esta liga.');
+      } else if (errorMessage.includes('ya es participante') || errorMessage.includes('ya miembro')) {
+        setError('Este usuario ya es miembro de esta liga.');
+      } else {
+        setError(errorMessage);
+      }
     }
     setLoading(false);
   };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import servicioLigas from '../../../servicios/servicioLigas';
+import servicioPronosticos from '../../../servicios/servicioPronosticos';
 import './TablaPronosticosPartido.css';
 
 const TablaPronosticosPartido = ({ partido, user, onClose }) => {
@@ -18,38 +19,38 @@ const TablaPronosticosPartido = ({ partido, user, onClose }) => {
 
   const cargarPronosticosPartido = async () => {
     setLoading(true);
-    // Obtener todos los pronósticos de la liga
-    const result = await servicioLigas.getParticipantes(partido.fk_id_liga);
-    if (result.success) {
-      // Filtrar pronósticos por partido (equipo_local y equipo_visitante)
-      const pronosticosPartido = result.data.filter(p =>
-        p.equipo_local === partido.equipo_local &&
-        p.equipo_visitante === partido.equipo_visitante
-      );
-      // Agrupar por usuario y mostrar su pronóstico para este partido
-      const pronosticosAgrupados = pronosticosPartido.reduce((acc, pronostico) => {
-        const email = pronostico.usuario_email || pronostico.usuario_nombre;
-        if (!acc[email]) {
-          acc[email] = {
-            usuario_nombre: pronostico.usuario_nombre,
-            usuario_email: pronostico.usuario_email,
-            resultado_pronosticado: pronostico.resultado_pronosticado,
-            puntos_obtenidos: pronostico.puntos_obtenidos || 0,
-            tipo_acierto: pronostico.tipo_acierto,
-            estado_partido: pronostico.estado_partido
-          };
+    try {
+      // Obtener pronósticos del partido filtrados por liga
+      let pronosticosResult;
+      if (partido.fk_id_liga) {
+        pronosticosResult = await servicioPronosticos.getPronosticosPorPartidoLiga(
+          partido.fk_id_partido,
+          partido.fk_id_liga
+        );
+        // Fallback al endpoint original si el nuevo endpoint no está disponible (404)
+        if (!pronosticosResult.success && pronosticosResult.error?.includes('404')) {
+          console.warn('Endpoint por-partido-liga no disponible, usando fallback');
+          pronosticosResult = await servicioPronosticos.getPronosticosPorPartido(partido.fk_id_partido);
         }
-        return acc;
-      }, {});
+      } else {
+        pronosticosResult = await servicioPronosticos.getPronosticosPorPartido(partido.fk_id_partido);
+      }
 
-      // Convertir a array y ordenar por puntos de forma descendente
-      const pronosticosOrdenados = Object.values(pronosticosAgrupados).sort((a, b) =>
-        (b.puntos_obtenidos || 0) - (a.puntos_obtenidos || 0)
-      );
+      if (pronosticosResult.success) {
+        console.log('Pronósticos del partido:', pronosticosResult.data);
 
-      setPronosticos(pronosticosOrdenados);
-    } else {
-      setError(result.error);
+        // Ordenar por puntos de forma descendente
+        const pronosticosOrdenados = pronosticosResult.data.sort((a, b) =>
+          (b.puntos_obtenidos || 0) - (a.puntos_obtenidos || 0)
+        );
+
+        setPronosticos(pronosticosOrdenados);
+      } else {
+        setError(pronosticosResult.error);
+      }
+    } catch (err) {
+      console.error('Error al cargar pronósticos:', err);
+      setError('Error al cargar pronósticos');
     }
     setLoading(false);
   };
@@ -97,7 +98,6 @@ const TablaPronosticosPartido = ({ partido, user, onClose }) => {
                   <tr>
                     <th>Posición</th>
                     <th>Usuario</th>
-                    <th>Email</th>
                     <th>Pronóstico</th>
                     <th>Puntos</th>
                     <th>Estado</th>
@@ -109,7 +109,7 @@ const TablaPronosticosPartido = ({ partido, user, onClose }) => {
                     const tieneResultado = partidoTieneResultado();
                     return (
                       <tr 
-                        key={pronostico.usuario_email} 
+                        key={`${pronostico.usuario_email}-${index}`}
                         className={esUsuarioActual ? 'mi-pronostico' : ''}
                       >
                         <td>
@@ -123,11 +123,10 @@ const TablaPronosticosPartido = ({ partido, user, onClose }) => {
                             <span className="mi-badge">Yo</span>
                           )}
                         </td>
-                        <td>{pronostico.usuario_email}</td>
                         <td>
                           {esUsuarioActual || tieneResultado ? (
                             <span className="pronostico-badge">
-                              {pronostico.resultado_pronosticado}
+                              {pronostico.resultado_display}
                             </span>
                           ) : (
                             <span className="pronostico-oculto">
@@ -148,8 +147,8 @@ const TablaPronosticosPartido = ({ partido, user, onClose }) => {
                         </td>
                         <td>
                           {esUsuarioActual || tieneResultado ? (
-                            <span className={`estado-badge ${getBadgeClass(pronostico.tipo_acierto)}`}>
-                              {pronostico.tipo_acierto}
+                            <span className={`estado-badge badge-pendiente`}>
+                              {pronostico.ganador_pronostico}
                             </span>
                           ) : (
                             <span className="estado-badge badge-pendiente">

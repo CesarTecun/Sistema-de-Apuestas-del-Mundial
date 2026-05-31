@@ -89,6 +89,17 @@ const servicioPronosticos = {
     }
   },
 
+  async getPronosticosPorPartidoLiga(partidoId, ligaId) {
+    try {
+      const response = await servicioApi.get('/pronosticos/por-partido-liga/', { params: { partido_id: partidoId, liga_id: ligaId } });
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Error al obtener pronósticos del partido por liga:', error);
+      const errorMessage = error.response?.data?.detail || 'Error al cargar pronósticos del partido por liga';
+      return { success: false, error: errorMessage };
+    }
+  },
+
   async getPronosticosUsuarioLiga(usuarioId, ligaId) {
     try {
       const response = await servicioApi.get('/pronosticos/usuario-liga/', { params: { usuario_id: usuarioId, liga_id: ligaId } });

@@ -5,6 +5,7 @@ from .views import (
     pronosticos_por_usuario,
     pronosticos_por_liga,
     pronosticos_por_partido,
+    pronosticos_por_partido_liga,
     pronosticos_usuario_liga,
     verificar_pronostico_disponible,
     historial_usuario
@@ -18,6 +19,7 @@ urlpatterns = [
     path('por-usuario/', pronosticos_por_usuario, name='pronosticos_por_usuario'),
     path('por-liga/', pronosticos_por_liga, name='pronosticos_por_liga'),
     path('por-partido/', pronosticos_por_partido, name='pronosticos_por_partido'),
+    path('por-partido-liga/', pronosticos_por_partido_liga, name='pronosticos_por_partido_liga'),
     path('usuario-liga/', pronosticos_usuario_liga, name='pronosticos_usuario_liga'),
     path('verificar-disponible/', verificar_pronostico_disponible, name='verificar_pronostico_disponible'),
     path('mi-historial/', historial_usuario, name='historial_usuario'),

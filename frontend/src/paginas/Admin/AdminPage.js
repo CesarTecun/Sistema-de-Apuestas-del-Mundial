@@ -191,9 +191,14 @@ const GestionUsuarios = ({ notif }) => {
   const activar = async (id) => {
     setAccionando(id);
     try {
-      await servicioApi.patch(`/usuarios/${id}/`, { activo: true });
+      await servicioApi.patch(`/usuarios/${id}/`, { status: true });
+      // Actualizar solo el usuario específico en el estado local
+      setUsuarios(prevUsuarios =>
+        prevUsuarios.map(usuario =>
+          usuario.id_usuario === id ? { ...usuario, status: true } : usuario
+        )
+      );
       // notif.success('Usuario activado correctamente');
-      cargar();
     } catch {
       notif.error('Error al activar usuario');
     } finally {
@@ -208,9 +213,14 @@ const GestionUsuarios = ({ notif }) => {
     }
     setAccionando(id);
     try {
-      await servicioApi.patch(`/usuarios/${id}/`, { activo: false });
+      await servicioApi.patch(`/usuarios/${id}/`, { status: false });
+      // Actualizar solo el usuario específico en el estado local
+      setUsuarios(prevUsuarios =>
+        prevUsuarios.map(usuario =>
+          usuario.id_usuario === id ? { ...usuario, status: false } : usuario
+        )
+      );
       // notif.success('Usuario desactivado correctamente');
-      cargar();
     } catch {
       notif.error('Error al desactivar usuario');
     } finally {

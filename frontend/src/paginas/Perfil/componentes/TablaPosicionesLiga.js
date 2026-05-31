@@ -15,25 +15,8 @@ const TablaPosicionesLiga = ({ liga, onClose }) => {
     setLoading(true);
     const result = await servicioLigas.getParticipantes(liga.id_liga);
     if (result.success) {
-      // Agrupar por usuario (email) y sumar puntos
-      const participantesAgrupados = result.data.reduce((acc, participante) => {
-        const email = participante.usuario_email || participante.usuario_nombre;
-        if (!acc[email]) {
-          acc[email] = {
-            ...participante,
-            puntos_totales: 0
-          };
-        }
-        acc[email].puntos_totales += (participante.puntos_totales || 0);
-        return acc;
-      }, {});
-
-      // Convertir a array y ordenar por puntos de forma descendente
-      const participantesOrdenados = Object.values(participantesAgrupados).sort((a, b) =>
-        (b.puntos_totales || 0) - (a.puntos_totales || 0)
-      );
-
-      setParticipantes(participantesOrdenados);
+      // El backend ya calcula los puntos y ordena por ranking
+      setParticipantes(result.data);
     } else {
       setError(result.error);
     }

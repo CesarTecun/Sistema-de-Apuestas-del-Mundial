@@ -25,6 +25,13 @@ const TopBar = ({ user, onLogout, showBackButton = false }) => {
 
   useEffect(() => {
     cargarInvitaciones();
+    
+    // Actualizar invitaciones cada 30 segundos
+    const interval = setInterval(() => {
+      cargarInvitaciones();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const handleBack = () => {

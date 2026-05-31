@@ -4,11 +4,33 @@ from .models import Pronostico
 class PronosticoSerializer(serializers.ModelSerializer):
     resultado_display = serializers.ReadOnlyField()
     ganador_pronostico = serializers.ReadOnlyField()
+    usuario_nombre = serializers.SerializerMethodField()
+    usuario_email = serializers.SerializerMethodField()
     
     class Meta:
         model = Pronostico
-        fields = '__all__'
+        fields = ['id_pronostico', 'fk_id_usuario', 'fk_id_partido', 'fk_id_liga', 
+                  'gol_local', 'gol_visitante', 'puntos_obtenidos', 'resultado_display', 
+                  'ganador_pronostico', 'usuario_nombre', 'usuario_email']
         read_only_fields = ('id_pronostico', 'fk_id_usuario', 'puntos_obtenidos')
+    
+    def get_usuario_nombre(self, obj):
+        """Obtener el nombre completo del usuario"""
+        try:
+            from backend.usuarios.models import Usuario
+            usuario = Usuario.objects.get(id_usuario=obj.fk_id_usuario)
+            return usuario.get_full_name() or 'Usuario'
+        except Usuario.DoesNotExist:
+            return 'Usuario no encontrado'
+    
+    def get_usuario_email(self, obj):
+        """Obtener el email del usuario"""
+        try:
+            from backend.usuarios.models import Usuario
+            usuario = Usuario.objects.get(id_usuario=obj.fk_id_usuario)
+            return usuario.email
+        except Usuario.DoesNotExist:
+            return None
     
     def validate(self, data):
         """Validación personalizada para los goles"""

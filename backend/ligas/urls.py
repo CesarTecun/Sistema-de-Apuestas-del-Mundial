@@ -9,6 +9,7 @@ from .views import (
     InvitacionPublicaView,
     ligas_por_usuario,
     enviar_invitacion_email_api,
+    participantes_por_liga,
 )
 
 router = DefaultRouter()
@@ -20,6 +21,7 @@ router.register(r'', LigaViewSet, basename='liga')
 urlpatterns = [
     path('publicas/', LigasPublicasView.as_view(), name='ligas_publicas'),
     path('por-usuario/', ligas_por_usuario, name='ligas_por_usuario'),
+    path('participantes/por-liga/', participantes_por_liga, name='participantes_por_liga'),
     path('invitaciones/enviar-email/', enviar_invitacion_email_api, name='enviar_invitacion_email'),
     path('invitaciones/publico/<uuid:codigo>/', InvitacionPublicaView.as_view(), name='invitacion_publica'),
     path('', include(router.urls)),
