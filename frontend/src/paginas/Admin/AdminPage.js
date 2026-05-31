@@ -659,8 +659,8 @@ const AuditLog = () => {
               </thead>
               <tbody>
                 {registros.map((r, i) => (
-                  <tr key={r.id ?? i}>
-                    <td style={{ color: 'var(--text-muted)' }}>{r.id}</td>
+                  <tr key={r.id_audit_log ?? i}>
+                    <td style={{ color: 'var(--text-muted)' }}>{i + 1}</td>
                     <td><span className="badge badge-info">{r.table_name}</span></td>
                     <td>
                       <span className={`badge ${
@@ -668,7 +668,7 @@ const AuditLog = () => {
                         r.operation === 'DELETE' ? 'badge-danger' : 'badge-warning'
                       }`}>{r.operation}</span>
                     </td>
-                    <td style={{ color: 'var(--text-tertiary)' }}>{r.record_id}</td>
+                    <td style={{ color: 'var(--text-tertiary)' }}>{r.record_pk || '—'}</td>
                     <td style={{ color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>
                       {fmtDatetime(r.changed_at)}
                     </td>

@@ -7,6 +7,8 @@ const BuzonInvitaciones = ({ invitaciones, loading, onInvitacionAceptada }) => {
   const [procesando, setProcesando] = useState({});
   const [error, setError] = useState(null);
 
+  console.log('[BuzonInvitaciones] Props recibidas:', { invitaciones, loading });
+
   const handleAceptarInvitacion = async (invitacion) => {
     setProcesando(prev => ({ ...prev, [invitacion.id_invitacion]: true }));
     setError(null);
@@ -54,6 +56,8 @@ const BuzonInvitaciones = ({ invitaciones, loading, onInvitacionAceptada }) => {
     inv => inv.estado_invitacion === 'Pendiente'
   );
 
+  console.log('[BuzonInvitaciones] Invitaciones pendientes:', invitacionesPendientes);
+
   if (loading) {
     return (
       <div className="buzon-container">
@@ -96,7 +100,7 @@ const BuzonInvitaciones = ({ invitaciones, loading, onInvitacionAceptada }) => {
               <div className="invitacion-info">
                 <div className="invitacion-liga">
                   <span className="invitacion-label">Liga:</span>
-                  <span className="invitacion-valor">{invitacion.liga_nombre || 'Cargando...'}</span>
+                  <span className="invitacion-valor">{invitacion.liga_nombre || invitacion.nombre_liga || 'Cargando...'}</span>
                 </div>
                 <div className="invitacion-mensaje">
                   {invitacion.mensaje_invitacion && (
