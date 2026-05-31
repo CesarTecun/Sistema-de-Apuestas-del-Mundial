@@ -25,15 +25,16 @@ const TablaPronosticosPartido = ({ partido, user, onClose }) => {
       // Obtener pronósticos del partido filtrados por liga
       let pronosticosResult;
       if (partido.fk_id_liga) {
+        // Intentar primero con el nuevo endpoint
         pronosticosResult = await servicioPronosticos.getPronosticosPorPartidoLiga(
           partido.fk_id_partido,
           partido.fk_id_liga
         );
         console.log('[TablaPronosticosPartido] Resultado endpoint por-partido-liga:', pronosticosResult);
 
-        // Fallback al endpoint original si el nuevo endpoint no está disponible (404 u otro error)
-        if (!pronosticosResult.success) {
-          console.warn('[TablaPronosticosPartido] Endpoint por-partido-liga falló, usando fallback. Error:', pronosticosResult.error);
+        // Si falla, intentar con el endpoint original
+        if (!pronosticosResult.success || !pronosticosResult.data || pronosticosResult.data.length === 0) {
+          console.warn('[TablaPronosticosPartido] Endpoint por-partido-liga falló o no trajo datos, usando fallback. Error:', pronosticosResult.error);
           pronosticosResult = await servicioPronosticos.getPronosticosPorPartido(partido.fk_id_partido);
           console.log('[TablaPronosticosPartido] Resultado fallback:', pronosticosResult);
         }
@@ -43,14 +44,20 @@ const TablaPronosticosPartido = ({ partido, user, onClose }) => {
       }
 
       if (pronosticosResult.success) {
-        console.log('[TablaPronosticosPartido] Pronósticos cargados:', pronosticosResult.data.length);
+        console.log('[TablaPronosticosPartido] Pronósticos cargados:', pronosticosResult.data?.length || 0);
 
-        // Ordenar por puntos de forma descendente
-        const pronosticosOrdenados = pronosticosResult.data.sort((a, b) =>
-          (b.puntos_obtenidos || 0) - (a.puntos_obtenidos || 0)
-        );
+        // Si no hay datos, no establecer error, solo mostrar empty state
+        if (!pronosticosResult.data || pronosticosResult.data.length === 0) {
+          console.warn('[TablaPronosticosPartido] No hay pronósticos para este partido');
+          setPronosticos([]);
+        } else {
+          // Ordenar por puntos de forma descendente
+          const pronosticosOrdenados = pronosticosResult.data.sort((a, b) =>
+            (b.puntos_obtenidos || 0) - (a.puntos_obtenidos || 0)
+          );
 
-        setPronosticos(pronosticosOrdenados);
+          setPronosticos(pronosticosOrdenados);
+        }
       } else {
         console.error('[TablaPronosticosPartido] Error al cargar pronósticos:', pronosticosResult.error);
         setError(pronosticosResult.error);
