@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.mail import send_mail
+from django.utils.html import escape
 
 
 def enviar_correo_recuperacion(usuario, token_plano):
@@ -66,6 +67,7 @@ Este es un correo automático, por favor no respondas a este mensaje.
             text-decoration: none;
             border-radius: 4px;
             margin: 20px 0;
+            cursor: pointer;
         }}
         .button:hover {{
             background-color: #2980b9;
@@ -86,15 +88,15 @@ Este es un correo automático, por favor no respondas a este mensaje.
             <h1>Recupera tu contraseña</h1>
         </div>
         <div class="content">
-            <p>Hola <strong>{nombre}</strong>,</p>
+            <p>Hola <strong>{escape(nombre)}</strong>,</p>
             <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta.</p>
             <p>Para continuar, haz clic en el siguiente enlace (válido por 24 horas):</p>
             <p style="text-align: center;">
-                <a href="{reset_link}" class="button">Restablecer Contraseña</a>
+                <a href="{escape(reset_link)}" class="button">Restablecer Contraseña</a>
             </p>
             <p style="font-size: 12px; color: #666;">
                 Si el botón no funciona, copia y pega este enlace en tu navegador:<br>
-                <a href="{reset_link}" style="color: #3498db;">{reset_link}</a>
+                <a href="{escape(reset_link)}" style="color: #3498db;">{escape(reset_link)}</a>
             </p>
             <p>Si tú no solicitaste este cambio, ignora este mensaje. Tu contraseña seguirá siendo la misma.</p>
         </div>
