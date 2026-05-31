@@ -301,6 +301,7 @@ def historial_usuario(request):
     - Pronósticos con detalle de partidos, puntos y aciertos
     - Resumen por liga (puntos, posición, partidos jugados, aciertos)
     """
+    from django.db import models
     from backend.pronosticos.models import Pronostico
     from backend.partidos.models import Partido, Seleccion
     from backend.posiciones.models import Ranking
