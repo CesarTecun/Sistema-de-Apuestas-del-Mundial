@@ -156,7 +156,9 @@ class LigaViewSet(SoftDeleteModelViewSet):
             except Exception as exc:
                 error_correo = str(exc)
         
-        serializer = InvitacionSerializer(invitacion)
+        # Pasar la liga en el contexto del serializer
+        ligas_dict = {liga.id_liga: liga}
+        serializer = InvitacionSerializer(invitacion, context={'ligas_cache': ligas_dict})
         respuesta = {
             'message': 'Invitación creada',
             'invitacion': serializer.data,
@@ -477,6 +479,44 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
             Q(fk_id_usuario_invitado=user.id_usuario) | Q(email_invitado__iexact=user.email)
         )
     
+    def list(self, request, *args, **kwargs):
+        """Override list para prefetchear ligas y pasarlas al contexto del serializer"""
+        queryset = self.get_queryset()
+        
+        # Obtener todos los IDs de liga únicos para prefetchear las ligas
+        liga_ids = queryset.values_list('fk_id_liga', flat=True).distinct()
+        
+        # Prefetchear las ligas en un diccionario para acceso rápido
+        ligas_dict = {liga.id_liga: liga for liga in Liga.objects.filter(id_liga__in=liga_ids)}
+        
+        # Serializar con el contexto que incluye el cache de ligas
+        serializer = self.get_serializer(queryset, many=True, context={'ligas_cache': ligas_dict})
+        return Response(serializer.data)
+    
+    def retrieve(self, request, *args, **kwargs):
+        """Override retrieve para prefetchear la liga y pasarla al contexto del serializer"""
+        instance = self.get_object()
+        
+        # Obtener la liga para el contexto del serializer
+        liga = Liga.objects.filter(id_liga=instance.fk_id_liga).first()
+        ligas_dict = {liga.id_liga: liga} if liga else {}
+        
+        serializer = self.get_serializer(instance, context={'ligas_cache': ligas_dict})
+        return Response(serializer.data)
+    
+    def update(self, request, *args, **kwargs):
+        """Override update para prefetchear la liga y pasarla al contexto del serializer"""
+        instance = self.get_object()
+        
+        # Obtener la liga para el contexto del serializer
+        liga = Liga.objects.filter(id_liga=instance.fk_id_liga).first()
+        ligas_dict = {liga.id_liga: liga} if liga else {}
+        
+        serializer = self.get_serializer(instance, data=request.data, partial=True, context={'ligas_cache': ligas_dict})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    
     @action(detail=True, methods=['post'], url_path='aceptar')
     def aceptar(self, request, id_invitacion=None):
         """Aceptar una invitación y unirse a la liga"""
@@ -510,9 +550,13 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
                 estado_participacion='Activo'
             )
         
+        # Obtener la liga para el contexto del serializer
+        liga = Liga.objects.filter(id_liga=invitacion.fk_id_liga).first()
+        ligas_dict = {liga.id_liga: liga} if liga else {}
+        
         return Response({
             'message': 'Invitación aceptada exitosamente',
-            'invitacion': InvitacionSerializer(invitacion).data
+            'invitacion': InvitacionSerializer(invitacion, context={'ligas_cache': ligas_dict}).data
         }, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'], url_path='rechazar')
@@ -535,9 +579,13 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
         invitacion.estado_invitacion = 'Rechazada'
         invitacion.save()
         
+        # Obtener la liga para el contexto del serializer
+        liga = Liga.objects.filter(id_liga=invitacion.fk_id_liga).first()
+        ligas_dict = {liga.id_liga: liga} if liga else {}
+        
         return Response({
             'message': 'Invitación rechazada',
-            'invitacion': InvitacionSerializer(invitacion).data
+            'invitacion': InvitacionSerializer(invitacion, context={'ligas_cache': ligas_dict}).data
         }, status=status.HTTP_200_OK)
     
     def create(self, request, *args, **kwargs):
@@ -546,25 +594,32 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
         serializer.is_valid(raise_exception=True)
         invitacion = serializer.save()
         
+        # Obtener la liga para el contexto del serializer
+        liga = Liga.objects.filter(id_liga=invitacion.fk_id_liga).first()
+        ligas_dict = {liga.id_liga: liga} if liga else {}
+        
+        # Re-serializar con el contexto que incluye el cache de ligas
+        serializer_with_context = InvitacionSerializer(invitacion, context={'ligas_cache': ligas_dict})
+        
         # Enviar correo si se proporcionó email
         if invitacion.email_invitado:
             try:
                 enviar_correo_invitacion(invitacion)
                 return Response({
-                    'invitacion': serializer.data,
+                    'invitacion': serializer_with_context.data,
                     'email_enviado': True,
                     'message': 'Invitación creada y correo enviado exitosamente'
                 }, status=status.HTTP_201_CREATED)
             except Exception as e:
                 return Response({
-                    'invitacion': serializer.data,
+                    'invitacion': serializer_with_context.data,
                     'email_enviado': False,
                     'error': str(e),
                     'message': 'Invitación creada pero hubo error al enviar correo'
                 }, status=status.HTTP_201_CREATED)
         
         return Response({
-            'invitacion': serializer.data,
+            'invitacion': serializer_with_context.data,
             'email_enviado': False,
             'message': 'Invitación creada (sin correo - no se proporcionó email)'
         }, status=status.HTTP_201_CREATED)

@@ -282,6 +282,8 @@ class InvitacionSerializer(serializers.ModelSerializer):
 
     liga_nombre = serializers.SerializerMethodField()
 
+    nombre_liga = serializers.SerializerMethodField()  # Campo adicional para compatibilidad
+
 
 
     class Meta:
@@ -308,7 +310,9 @@ class InvitacionSerializer(serializers.ModelSerializer):
 
             'fecha_invitacion',
 
-            'liga_nombre'
+            'liga_nombre',
+
+            'nombre_liga'
 
         ]
 
@@ -318,21 +322,44 @@ class InvitacionSerializer(serializers.ModelSerializer):
 
     def get_liga_nombre(self, obj):
 
+        return self._get_nombre_liga(obj)
+
+
+
+    def get_nombre_liga(self, obj):
+
+        return self._get_nombre_liga(obj)
+
+
+
+    def _get_nombre_liga(self, obj):
+
+        """Método auxiliar para obtener el nombre de la liga"""
         if not obj.fk_id_liga:
 
             return "Liga no especificada"
 
         try:
 
-            liga = Liga.objects.get(id_liga=obj.fk_id_liga)
+            # Intentar usar el cache de ligas del contexto si está disponible
+            ligas_cache = self.context.get('ligas_cache')
+            if ligas_cache:
+                liga = ligas_cache.get(obj.fk_id_liga)
+                if liga:
+                    return liga.nombre_liga if liga.nombre_liga else "Sin nombre"
 
-            return liga.nombre_liga if liga.nombre_liga else "Sin nombre"
+            # Fallback: consultar la base de datos
+            liga = Liga.objects.filter(id_liga=obj.fk_id_liga).first()
 
-        except Liga.DoesNotExist:
+            if liga:
+
+                return liga.nombre_liga if liga.nombre_liga else "Sin nombre"
 
             return "Liga eliminada"
 
         except Exception as e:
+
+            print(f"[InvitacionSerializer] Error al obtener nombre de liga: {e}")
 
             return "Error"
 
