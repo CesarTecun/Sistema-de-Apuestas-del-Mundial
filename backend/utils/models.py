@@ -35,6 +35,62 @@ class SoftDeleteModel(models.Model):
     class Meta:
         abstract = True
 
+    def save(self, *args, **kwargs):
+        """
+        Sobrescribe save() para registrar actualizaciones en AuditLog.
+        """
+        # Determinar si es una actualización (el objeto ya existe en BD)
+        is_update = self.pk is not None
+
+        # Si es una actualización, registrar en AuditLog
+        if is_update:
+            try:
+                from backend.core.models import AuditLog
+                table_name = self._meta.db_table
+                pk_value = str(self.pk)
+
+                # Obtener datos antiguos del objeto
+                try:
+                    old_instance = self.__class__.objects.get(pk=self.pk)
+                    old_data = {}
+                    for field in self._meta.fields:
+                        value = getattr(old_instance, field.name)
+                        if hasattr(value, 'isoformat'):
+                            old_data[field.name] = value.isoformat()
+                        else:
+                            old_data[field.name] = value
+                except self.__class__.DoesNotExist:
+                    old_data = None
+
+                # Obtener datos nuevos
+                new_data = {}
+                for field in self._meta.fields:
+                    value = getattr(self, field.name)
+                    if hasattr(value, 'isoformat'):
+                        new_data[field.name] = value.isoformat()
+                    else:
+                        new_data[field.name] = value
+
+                # Obtener usuario que hace la modificación si está disponible
+                updated_by = getattr(self, 'updated_by', None) or 'unknown'
+
+                AuditLog.objects.create(
+                    table_name=table_name,
+                    operation='UPDATE',
+                    record_pk=pk_value,
+                    old_data=old_data,
+                    new_data=new_data,
+                    changed_by=str(updated_by),
+                    changed_at=timezone.now()
+                )
+            except Exception as e:
+                # Si falla el registro en AuditLog, continuar con el save
+                import traceback
+                print(f"Error al registrar actualización en AuditLog: {e}")
+                traceback.print_exc()
+
+        super().save(*args, **kwargs)
+
     def delete(self, using=None, keep_parents=False):
         """
         Sobrescribe delete() para implementar soft delete.
@@ -55,28 +111,32 @@ class SoftDeleteModel(models.Model):
             from backend.core.models import AuditLog
             table_name = self._meta.db_table
             pk_value = str(self.pk)
-            
+
             # Obtener datos del objeto antes de eliminar
             old_data = {}
             for field in self._meta.fields:
-                old_data[field.name] = getattr(self, field.name)
-            
-            # Convertir datetime a string para JSON
-            old_data_json = json.dumps(old_data, default=str)
-            
+                value = getattr(self, field.name)
+                # Convertir datetime y otros objetos no serializables a string
+                if hasattr(value, 'isoformat'):
+                    old_data[field.name] = value.isoformat()
+                else:
+                    old_data[field.name] = value
+
             AuditLog.objects.create(
                 table_name=table_name,
                 operation='DELETE',
                 record_pk=pk_value,
-                old_data=old_data_json,
+                old_data=old_data,
                 new_data=None,
                 changed_by=str(deleted_by) if deleted_by else 'unknown',
                 changed_at=timezone.now()
             )
         except Exception as e:
             # Si falla el registro en AuditLog, continuar con la eliminación
+            import traceback
             print(f"Error al registrar en AuditLog: {e}")
-        
+            traceback.print_exc()
+
         super().delete(using=using, keep_parents=keep_parents)
 
     def restore(self):
