@@ -50,7 +50,9 @@ const servicioLigas = {
   async getInvitaciones(ligaId) {
     try {
       const url = ligaId ? `/ligas/invitaciones/?fk_id_liga=${ligaId}` : '/ligas/invitaciones/';
+      console.log('[servicioLigas] Obteniendo invitaciones de:', url);
       const response = await servicioApi.get(url);
+      console.log('[servicioLigas] Respuesta de invitaciones:', response.data);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error al obtener invitaciones:', error);

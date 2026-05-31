@@ -587,8 +587,8 @@ const AuditLog = () => {
       if (filtroOp) params.operation = filtroOp;
       const res = await servicioApi.get('/core/audit-log/', { params });
       const data = res.data;
-      //Debugear los 15 primeros registros
-      //console.log('AuditLog response:', data.results.slice(0, 15));
+      console.log('[AuditLog] Respuesta del backend:', data);
+      console.log('[AuditLog] Primer registro:', data.results?.[0]);
       setRegistros(data.results ?? []);
       setTotalRegistros(data.count ?? 0);
     } catch {
