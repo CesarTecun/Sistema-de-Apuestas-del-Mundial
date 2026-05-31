@@ -14,12 +14,12 @@ Hola {nombre},
 Recibimos una solicitud para restablecer la contraseña de tu cuenta.
 
 Para continuar, haz clic en el siguiente enlace (válido por 24 horas):
-{reset_link}
+<a href="{reset_link}">Restablecer contraseña</a>
 
 Si tú no solicitaste este cambio, ignora este mensaje. Tu contraseña seguirá siendo la misma.
 
 ---
-Sistema de Apuestas del Mundial 2026
+Sistema de Apuestas del Mundial 2027
 Este es un correo automático, por favor no respondas a este mensaje.
 """
 
@@ -29,6 +29,10 @@ Este es un correo automático, por favor no respondas a este mensaje.
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[usuario.email],
         fail_silently=True,
+        html_message=mensaje.replace(
+        reset_link,
+        f'<a href="{reset_link}">{reset_link}</a>'
+    ),
     )
 
 
