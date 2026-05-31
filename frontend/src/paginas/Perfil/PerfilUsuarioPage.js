@@ -427,6 +427,7 @@ const PerfilUsuarioPage = () => {
         {posicionesLigaOpen && ligaSeleccionada && (
           <TablaPosicionesLiga
             liga={ligaSeleccionada}
+            user={user}
             onClose={() => {
               setPosicionesLigaOpen(false);
               setLigaSeleccionada(null);

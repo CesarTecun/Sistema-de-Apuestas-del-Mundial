@@ -349,7 +349,7 @@ class SolicitudParticipacionViewSet(viewsets.ReadOnlyModelViewSet):
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def participantes_por_liga(request):
-    """Obtener participantes de una liga específica ordenados por puntos"""
+    """Obtener participantes de una liga específica ordenados por puntos (solo usuarios que han participado)"""
     try:
         liga_id = request.query_params.get('fk_id_liga')
         print(f"[participantes_por_liga] liga_id: {liga_id}")
@@ -358,7 +358,14 @@ def participantes_por_liga(request):
             return Response({'error': 'Se requiere el parámetro fk_id_liga'}, status=status.HTTP_400_BAD_REQUEST)
 
         from backend.pronosticos.models import Pronostico
-        from django.db.models import Sum, OuterRef, Subquery
+        from django.db.models import Sum, OuterRef, Subquery, Count
+
+        # Obtener usuarios que han hecho al menos un pronóstico en esta liga
+        usuarios_con_pronosticos = Pronostico.objects.filter(
+            fk_id_liga=liga_id
+        ).values_list('fk_id_usuario', flat=True).distinct()
+
+        print(f"[participantes_por_liga] Usuarios con pronósticos: {list(usuarios_con_pronosticos)}")
 
         # Obtener participantes y anotar sus puntos totales usando subquery
         puntos_subquery = Pronostico.objects.filter(
@@ -368,11 +375,17 @@ def participantes_por_liga(request):
             total=Sum('puntos_obtenidos')
         ).values('total')[:1]
 
-        participantes = ParticipanteLiga.objects.filter(fk_id_liga=liga_id).annotate(
+        # Filtrar solo usuarios que han participado y ordenar por puntos descendentes
+        participantes = ParticipanteLiga.objects.filter(
+            fk_id_liga=liga_id,
+            fk_id_usuario__in=usuarios_con_pronosticos
+        ).annotate(
             puntos_totales=Subquery(puntos_subquery, output_field=models.IntegerField())
         ).order_by('-puntos_totales', 'fecha_union')
 
         print(f"[participantes_por_liga] Participantes encontrados: {participantes.count()}")
+        for p in participantes:
+            print(f"[participantes_por_liga] Usuario {p.fk_id_usuario}: {p.puntos_totales} pts")
 
         serializer = ParticipanteLigaSerializer(participantes, many=True)
         return Response(serializer.data)

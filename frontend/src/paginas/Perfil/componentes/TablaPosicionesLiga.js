@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import servicioLigas from '../../../servicios/servicioLigas';
 import './TablaPosicionesLiga.css';
 
-const TablaPosicionesLiga = ({ liga, onClose }) => {
+const TablaPosicionesLiga = ({ liga, user, onClose }) => {
   const [participantes, setParticipantes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -64,30 +64,41 @@ const TablaPosicionesLiga = ({ liga, onClose }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {participantes.map((participante, index) => (
-                    <tr key={participante.id_participante}>
-                      <td>
-                        <span className="posicion-badge">
-                          #{index + 1}
-                        </span>
-                      </td>
-                      <td>{participante.usuario_nombre}</td>
-                      <td>{participante.usuario_email}</td>
-                      <td>
-                        <span className={`estado-badge ${participante.estado_participacion.toLowerCase()}`}>
-                          {participante.estado_participacion}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="puntos-badge">
-                          {participante.puntos_totales || 0} pts
-                        </span>
-                      </td>
-                      <td>
-                        {new Date(participante.fecha_union).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
+                  {participantes.map((participante, index) => {
+                    const esUsuarioActual = participante.usuario_email === user?.email;
+                    return (
+                      <tr 
+                        key={participante.id_participante}
+                        className={esUsuarioActual ? 'mi-participante' : ''}
+                      >
+                        <td>
+                          <span className="posicion-badge">
+                            #{index + 1}
+                          </span>
+                        </td>
+                        <td>
+                          {participante.usuario_nombre}
+                          {esUsuarioActual && (
+                            <span className="mi-badge">Yo</span>
+                          )}
+                        </td>
+                        <td>{participante.usuario_email}</td>
+                        <td>
+                          <span className={`estado-badge ${participante.estado_participacion.toLowerCase()}`}>
+                            {participante.estado_participacion}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="puntos-badge">
+                            {participante.puntos_totales || 0} pts
+                          </span>
+                        </td>
+                        <td>
+                          {new Date(participante.fecha_union).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}

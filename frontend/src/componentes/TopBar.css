@@ -70,6 +70,32 @@
   transform: translateY(-2px);
 }
 
+.nav-button.admin-button {
+  background: rgba(168, 50, 121, 0.2);
+  border-color: rgba(168, 50, 121, 0.5);
+  color: #a83279;
+}
+
+.nav-button.admin-button:hover {
+  background: rgba(168, 50, 121, 0.3);
+  border-color: rgba(168, 50, 121, 0.7);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(168, 50, 121, 0.3);
+}
+
+.nav-button.admin-button.active {
+  background: linear-gradient(135deg, rgba(168, 50, 121, 0.4) 0%, rgba(106, 76, 147, 0.4) 100%);
+  border-color: #a83279;
+  color: #ff69b4;
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 0 15px rgba(168, 50, 121, 0.3);
+}
+
+.nav-button.admin-button.active:hover {
+  background: linear-gradient(135deg, rgba(168, 50, 121, 0.5) 0%, rgba(106, 76, 147, 0.5) 100%);
+  transform: translateY(-2px);
+}
+
 .nav-button svg {
   flex-shrink: 0;
 }

@@ -360,13 +360,12 @@ def historial_usuario(request):
         # Resumen por liga
         ligas_ids = {p.fk_id_liga for p in pronosticos}
         ligas = {l.id_liga: l for l in Liga.objects.filter(id_liga__in=ligas_ids)}
-        rankings = {r.fk_id_liga: r for r in Ranking.objects.filter(fk_id_usuario=usuario_id, fk_id_liga__in=ligas_ids)}
+        from backend.ligas.models import ParticipanteLiga
 
         resumen_ligas = []
         for liga_id in ligas_ids:
             pronosticos_liga = [p for p in pronosticos if p.fk_id_liga == liga_id]
             liga = ligas.get(liga_id)
-            ranking = rankings.get(liga_id)
 
             partidos_jugados = len(pronosticos_liga)
             puntos_totales = sum(p.puntos_obtenidos for p in pronosticos_liga)
@@ -374,11 +373,42 @@ def historial_usuario(request):
             resultados_correctos = sum(1 for p in pronosticos_liga if p.puntos_obtenidos == 1)
             fallidos = sum(1 for p in pronosticos_liga if p.puntos_obtenidos == 0 and p.fk_id_partido in partidos and partidos[p.fk_id_partido].estado_partido == 'finalizado')
 
-            # ¿Ganó o perdió la liga? (si hay ranking y posición = 1 => ganó)
-            if ranking and ranking.posicion == 1:
+            # Calcular posición basada en puntos (solo usuarios que han participado)
+            from backend.pronosticos.models import Pronostico
+            from django.db.models import Sum, OuterRef, Subquery
+
+            # Obtener usuarios que han hecho al menos un pronóstico en esta liga
+            usuarios_con_pronosticos = Pronostico.objects.filter(
+                fk_id_liga=liga_id
+            ).values_list('fk_id_usuario', flat=True).distinct()
+
+            # Obtener puntos de cada usuario
+            puntos_subquery = Pronostico.objects.filter(
+                fk_id_usuario=OuterRef('fk_id_usuario'),
+                fk_id_liga=OuterRef('fk_id_liga')
+            ).values('fk_id_usuario').annotate(
+                total=Sum('puntos_obtenidos')
+            ).values('total')[:1]
+
+            # Obtener participantes ordenados por puntos descendentes
+            todos_participantes = ParticipanteLiga.objects.filter(
+                fk_id_liga=liga_id,
+                fk_id_usuario__in=usuarios_con_pronosticos
+            ).annotate(
+                puntos_totales=Subquery(puntos_subquery, output_field=models.IntegerField())
+            ).order_by('-puntos_totales', 'fecha_union')
+
+            # Calcular la posición del usuario (1-based index)
+            posicion = None
+            for idx, participante in enumerate(todos_participantes, start=1):
+                if participante.fk_id_usuario == usuario_id:
+                    posicion = idx
+                    break
+
+            if posicion == 1:
                 estado_liga = "Ganada"
-            elif ranking and ranking.posicion is not None:
-                estado_liga = f"Posición {ranking.posicion}"
+            elif posicion:
+                estado_liga = f"Posición {posicion}"
             else:
                 estado_liga = "Sin posición"
 
@@ -390,7 +420,7 @@ def historial_usuario(request):
                 "marcadores_exactos": marcadores_exactos,
                 "resultados_correctos": resultados_correctos,
                 "fallidos": fallidos,
-                "posicion": ranking.posicion if ranking else None,
+                "posicion": posicion,
                 "estado_liga": estado_liga,
             })
 
