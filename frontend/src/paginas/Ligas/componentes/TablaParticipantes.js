@@ -72,32 +72,20 @@ const TablaParticipantes = ({ liga, onClose }) => {
               <table className="participantes-table">
                 <thead>
                   <tr>
-                    <th>Posición</th>
                     <th>Usuario</th>
                     <th>Email</th>
                     <th>Estado</th>
-                    <th>Puntos</th>
                     <th>Fecha de Unión</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {participantes.map((participante, index) => (
+                  {participantes.map((participante) => (
                     <tr key={participante.id_participante}>
-                      <td>
-                        <span className="posicion-badge">
-                          #{index + 1}
-                        </span>
-                      </td>
                       <td>{participante.usuario_nombre}</td>
                       <td>{participante.usuario_email}</td>
                       <td>
                         <span className={`estado-badge ${participante.estado_participacion.toLowerCase()}`}>
                           {participante.estado_participacion}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="puntos-badge">
-                          {participante.puntos_totales || 0} pts
                         </span>
                       </td>
                       <td>

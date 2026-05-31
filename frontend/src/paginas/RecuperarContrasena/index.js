@@ -110,7 +110,7 @@ const RecuperarContrasenaPage = () => {
       <div className="recovery-background">
         <div className="recovery-panel">
           <div className="recovery-logo">
-            <LogoCopaMundial size={120} />
+            <LogoCopaMundial size={220} />
           </div>
           <div className="recovery-content">
             <h1>{hasToken ? 'Restablece tu contraseña' : 'Recupera tu acceso'}</h1>

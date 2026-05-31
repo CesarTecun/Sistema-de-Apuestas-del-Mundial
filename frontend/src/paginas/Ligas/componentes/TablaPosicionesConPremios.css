@@ -1,0 +1,224 @@
+/* ========================================
+   ESTILOS DE TABLA DE POSICIONES CON PREMIOS
+   ======================================== */
+.tabla-posiciones-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.tabla-posiciones-modal {
+  background: rgba(10, 25, 20, 0.95);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 32px;
+  padding: 30px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 0 0 100px rgba(212, 175, 55, 0.1);
+}
+
+.tabla-posiciones-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.tabla-posiciones-header h2 {
+  color: #d4af37;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #d4af37;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  background: rgba(212, 175, 55, 0.2);
+  transform: scale(1.1);
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.loading-spinner {
+  border: 3px solid rgba(212, 175, 55, 0.3);
+  border-top: 3px solid #d4af37;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  background: rgba(244, 67, 54, 0.2);
+  color: #ffffff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(244, 67, 54, 0.4);
+  font-size: 14px;
+  text-align: center;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.empty-state h3 {
+  color: #d4af37;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.tabla-posiciones-content {
+  width: 100%;
+}
+
+.posiciones-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.posiciones-table thead {
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.posiciones-table th {
+  color: #d4af37;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.posiciones-table td {
+  color: rgba(255, 255, 255, 0.9);
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.posiciones-table tbody tr:hover {
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.posiciones-table tbody tr.mi-participante {
+  background: rgba(212, 175, 55, 0.15);
+  border-left: 3px solid #d4af37;
+}
+
+.posicion-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.puntos-badge {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.recaudado-badge {
+  background: rgba(212, 175, 55, 0.2);
+  color: #ffd700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.mi-badge {
+  background: rgba(212, 175, 55, 0.3);
+  color: #ffd700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+  text-transform: uppercase;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .tabla-posiciones-modal {
+    padding: 20px;
+    max-height: 90vh;
+  }
+
+  .tabla-posiciones-header h2 {
+    font-size: 18px;
+  }
+
+  .posiciones-table th,
+  .posiciones-table td {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .posiciones-table th {
+    font-size: 11px;
+  }
+}

@@ -8,6 +8,7 @@ import LigasHeader from './componentes/LigasHeader';
 import SearchBar from './componentes/SearchBar';
 import LigasModal from './componentes/LigasModal';
 import TablaParticipantes from './componentes/TablaParticipantes';
+import TablaPosicionesConPremios from './componentes/TablaPosicionesConPremios';
 import InvitarPersona from './componentes/InvitarPersona';
 import useNotificaciones from '../../hooks/useNotificaciones';
 import { useLigas } from '../../hooks/useLigas';
@@ -41,6 +42,7 @@ const LigasPage = () => {
   const [editingLiga, setEditingLiga] = useState(null);
   const [viewingLiga, setViewingLiga] = useState(null);
   const [showTablaParticipantes, setShowTablaParticipantes] = useState(null);
+  const [showTablaPosiciones, setShowTablaPosiciones] = useState(null);
   const [showInvitarPersona, setShowInvitarPersona] = useState(null);
   const [alertaConfirmacion, setAlertaConfirmacion] = useState({
     mostrar: false,
@@ -131,6 +133,10 @@ const LigasPage = () => {
 
   const handleVerTabla = (liga) => {
     setShowTablaParticipantes(liga);
+  };
+
+  const handleVerPosiciones = (liga) => {
+    setShowTablaPosiciones(liga);
   };
 
   const handleInvitarPersona = (liga) => {
@@ -240,7 +246,7 @@ const LigasPage = () => {
                       liga={liga}
                       onEdit={handleEditClick}
                       onDelete={handleDeleteLiga}
-                      onView={handleViewLiga}
+                      onView={handleVerPosiciones}
                       onVerTabla={handleVerTabla}
                       onInvitarPersona={handleInvitarPersona}
                     />
@@ -259,6 +265,14 @@ const LigasPage = () => {
               <TablaParticipantes
                 liga={showTablaParticipantes}
                 onClose={() => setShowTablaParticipantes(null)}
+              />
+            )}
+
+            {showTablaPosiciones && (
+              <TablaPosicionesConPremios
+                liga={showTablaPosiciones}
+                user={user}
+                onClose={() => setShowTablaPosiciones(null)}
               />
             )}
 

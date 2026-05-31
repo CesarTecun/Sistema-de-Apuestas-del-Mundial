@@ -43,7 +43,7 @@ const PaginaRegistro = () => {
         <div className="registro-form">
           <div className="logo-container">
             <div className="logo logo-clickable">
-              <LogoCopaMundial size={150} onClick={handleLogoClick} />
+              <LogoCopaMundial size={220} onClick={handleLogoClick} />
             </div>
           </div>
           

@@ -67,20 +67,22 @@ const TarjetaLiga = ({ liga, onEdit, onDelete, onView, onVerTabla, onInvitarPers
       
       <div className="liga-card-footer">
         <div className="liga-card-footer-left">
-          <div className="liga-card-position">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd700" strokeWidth="2">
-              <circle cx="12" cy="8" r="7"></circle>
-              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-            </svg>
-            <span>Posición: {posicion}° lugar</span>
-          </div>
-        </div>
-        <div className="liga-card-footer-right">
-          <button 
+          <button
             className="liga-card-ver-tabla"
             onClick={(e) => {
               e.stopPropagation();
               if (onVerTabla) onVerTabla(liga);
+            }}
+          >
+            Participantes
+          </button>
+        </div>
+        <div className="liga-card-footer-right">
+          <button
+            className="liga-card-ver-posiciones"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onView) onView(liga);
             }}
           >
             Ver Tabla
