@@ -28,7 +28,7 @@ class LigaSerializer(serializers.ModelSerializer):
 
         fields = '__all__'
 
-        read_only_fields = ['updated_at', 'updated_by', 'deleted_by']
+        read_only_fields = ['updated_at', 'updated_by', 'deleted_by', 'monto_total_recaudado']
 
 
 

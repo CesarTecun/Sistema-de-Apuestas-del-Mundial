@@ -7,7 +7,7 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
   const [formData, setFormData] = useState({
     nombre_liga: '',
     fk_administrador: user?.id_usuario || '', // Asignar automáticamente el ID del usuario logueado
-    monto_total_recaudado: '0',
+    cuota_entrada: '0',
     estado: 'Activa',
     tipo_liga: 'Diversion'
   });
@@ -19,7 +19,7 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
       setFormData({
         nombre_liga: initialData.nombre_liga || '',
         fk_administrador: initialData.fk_administrador || user?.id_usuario || '',
-        monto_total_recaudado: initialData.monto_total_recaudado?.toString() || '0',
+        cuota_entrada: initialData.cuota_entrada?.toString() || '0',
         estado: initialData.estado || 'Activa',
         tipo_liga: initialData.tipo_liga || 'Diversion'
       });
@@ -63,8 +63,8 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
       newErrors.estado = 'El estado es requerido';
     }
     
-    if (formData.monto_total_recaudado && isNaN(formData.monto_total_recaudado)) {
-      newErrors.monto_total_recaudado = 'El monto debe ser un número válido';
+    if (formData.cuota_entrada && isNaN(formData.cuota_entrada)) {
+      newErrors.cuota_entrada = 'El monto debe ser un número válido';
     }
     
     setErrors(newErrors);
@@ -82,7 +82,7 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
     const dataToSubmit = {
       nombre_liga: formData.nombre_liga?.trim() || '',
       fk_administrador: user?.id_usuario || parseInt(formData.fk_administrador) || null,
-      monto_total_recaudado: parseFloat(formData.monto_total_recaudado) || 0,
+      cuota_entrada: parseFloat(formData.cuota_entrada) || 0,
       estado: formData.estado || 'Activa',
       tipo_liga: formData.tipo_liga || 'Diversion'
     };
@@ -206,7 +206,7 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
         onChange={handleChange}
       />
 
-      {/* Campo Monto Total Recaudado */}
+      {/* Campo Cuota de Entrada */}
       <div className="form-group">
         <div className="input-group">
           <div className="input-icon">
@@ -217,17 +217,17 @@ const FormularioLiga = ({ onSubmit, onCancel, initialData, isEditing }) => {
           </div>
           <input
             type="number"
-            name="monto_total_recaudado"
-            placeholder="Monto Total Recaudado"
+            name="cuota_entrada"
+            placeholder="Cuota de Entrada por Usuario"
             step="0.01"
             min="0"
-            className={`form-input ${errors.monto_total_recaudado ? 'error' : ''}`}
-            value={formData.monto_total_recaudado}
+            className={`form-input ${errors.cuota_entrada ? 'error' : ''}`}
+            value={formData.cuota_entrada}
             onChange={handleChange}
           />
         </div>
-        {errors.monto_total_recaudado && (
-          <div className="field-error">{errors.monto_total_recaudado}</div>
+        {errors.cuota_entrada && (
+          <div className="field-error">{errors.cuota_entrada}</div>
         )}
       </div>
 

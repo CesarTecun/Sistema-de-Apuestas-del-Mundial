@@ -114,12 +114,19 @@ const TablaPosicionesConPremios = ({ liga, user, onClose }) => {
   };
 
   const premios = calcularPremios(participantes, liga.monto_total_recaudado);
+  const montoTotal = liga.monto_total_recaudado || 0;
 
   return (
     <div className="tabla-posiciones-overlay">
       <div className="tabla-posiciones-modal">
         <div className="tabla-posiciones-header">
-          <h2>Tabla de Posiciones - {liga.nombre_liga}</h2>
+          <div className="header-content">
+            <h2>Tabla de Posiciones - {liga.nombre_liga}</h2>
+            <div className="monto-total-badge">
+              <span className="monto-label">Total Recaudado:</span>
+              <span className="monto-value">{formatearMonto(montoTotal)}</span>
+            </div>
+          </div>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
 

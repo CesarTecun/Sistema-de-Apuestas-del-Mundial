@@ -89,19 +89,20 @@ def log_liga_deletion(sender, instance, **kwargs):
 def log_participante_liga_changes(sender, instance, created, **kwargs):
     """
     Registra cambios en la tabla participante_liga en audit_log.
+    También actualiza el monto total recaudado de la liga cuando un usuario se une.
     """
     try:
         # Obtener datos del objeto
         new_data = {}
         for field in instance._meta.fields:
             new_data[field.name] = getattr(instance, field.name)
-        
+
         # Convertir datetime a string para JSON
         new_data_json = json.dumps(new_data, default=str)
-        
+
         # Determinar la operación
         operation = 'INSERT' if created else 'UPDATE'
-        
+
         # Para UPDATE, intentar obtener los datos anteriores
         old_data_json = None
         if not created:
@@ -110,10 +111,10 @@ def log_participante_liga_changes(sender, instance, created, **kwargs):
                 old_data_json = json.dumps(old_instance, default=str)
             except Exception:
                 pass
-        
+
         # Obtener el usuario que hizo el cambio
         changed_by = getattr(instance, 'updated_by', None) or getattr(instance, 'fk_id_usuario', None) or 'unknown'
-        
+
         AuditLog.objects.create(
             table_name='participante_liga',
             operation=operation,
@@ -123,6 +124,14 @@ def log_participante_liga_changes(sender, instance, created, **kwargs):
             changed_by=str(changed_by),
             changed_at=timezone.now()
         )
+
+        # Actualizar el monto total recaudado de la liga cuando un usuario se une
+        if created and instance.estado_participacion == 'Activo':
+            try:
+                liga = Liga.objects.get(id_liga=instance.fk_id_liga)
+                liga.actualizar_monto_total_recaudado()
+            except Liga.DoesNotExist:
+                pass
     except Exception as e:
         print(f"Error al registrar en AuditLog para ParticipanteLiga: {e}")
 
@@ -131,19 +140,20 @@ def log_participante_liga_changes(sender, instance, created, **kwargs):
 def log_participante_liga_deletion(sender, instance, **kwargs):
     """
     Registra eliminaciones físicas de participante_liga en audit_log.
+    También actualiza el monto total recaudado de la liga cuando un usuario abandona.
     """
     try:
         # Obtener datos del objeto antes de eliminar
         old_data = {}
         for field in instance._meta.fields:
             old_data[field.name] = getattr(instance, field.name)
-        
+
         # Convertir datetime a string para JSON
         old_data_json = json.dumps(old_data, default=str)
-        
+
         # Obtener el usuario que eliminó
         changed_by = getattr(instance, 'deleted_by', None) or getattr(instance, 'updated_by', None) or 'unknown'
-        
+
         AuditLog.objects.create(
             table_name='participante_liga',
             operation='DELETE',
@@ -153,5 +163,12 @@ def log_participante_liga_deletion(sender, instance, **kwargs):
             changed_by=str(changed_by),
             changed_at=timezone.now()
         )
+
+        # Actualizar el monto total recaudado de la liga cuando un usuario abandona
+        try:
+            liga = Liga.objects.get(id_liga=instance.fk_id_liga)
+            liga.actualizar_monto_total_recaudado()
+        except Liga.DoesNotExist:
+            pass
     except Exception as e:
         print(f"Error al registrar eliminación de ParticipanteLiga en AuditLog: {e}")

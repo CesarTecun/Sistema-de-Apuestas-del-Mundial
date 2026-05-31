@@ -38,6 +38,12 @@
   border-bottom: 1px solid rgba(212, 175, 55, 0.3);
 }
 
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .tabla-posiciones-header h2 {
   color: #d4af37;
   font-size: 24px;
@@ -45,6 +51,28 @@
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+.monto-total-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(212, 175, 55, 0.15);
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.monto-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.monto-value {
+  color: #ffd700;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .close-button {
