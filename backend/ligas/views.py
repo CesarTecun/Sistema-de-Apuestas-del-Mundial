@@ -475,10 +475,6 @@ class InvitacionViewSet(SoftDeleteModelViewSet):
         user = self.request.user
         return Invitacion.objects.filter(
             Q(fk_id_usuario_invitado=user.id_usuario) | Q(email_invitado__iexact=user.email)
-        ).annotate(
-            liga_nombre=Subquery(
-                Liga.objects.filter(id_liga=OuterRef('fk_id_liga')).values('nombre_liga')[:1]
-            )
         )
     
     @action(detail=True, methods=['post'], url_path='aceptar')
