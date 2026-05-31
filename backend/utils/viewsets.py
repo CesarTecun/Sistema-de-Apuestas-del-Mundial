@@ -118,7 +118,9 @@ class SoftDeleteModelViewSet(viewsets.ModelViewSet):
         try:
             # Buscar en todos los objetos incluyendo eliminados
             instance = self.queryset.model.all_objects.get(pk=pk)
-            instance.hard_delete()
+            # Pasar el usuario que está eliminando
+            deleted_by = getattr(request.user, 'id_usuario', None) or str(request.user)
+            instance.hard_delete(deleted_by=deleted_by)
             return Response(
                 {'message': 'Registro eliminado físicamente de la base de datos'},
                 status=status.HTTP_200_OK

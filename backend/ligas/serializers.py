@@ -13,6 +13,7 @@ class LigaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Liga
         fields = '__all__'
+        read_only_fields = ['updated_at', 'updated_by', 'deleted_by']
 
     def get_total_participantes(self, obj):
         annotated = getattr(obj, 'total_participantes', None)
@@ -31,6 +32,13 @@ class LigaSerializer(serializers.ModelSerializer):
         total = self.get_total_participantes(obj)
         restantes = obj.cupo_maximo - total
         return restantes if restantes >= 0 else 0
+
+    def update(self, instance, validated_data):
+        # Registrar el usuario que está haciendo la modificación
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and hasattr(request.user, 'id_usuario'):
+            validated_data['updated_by'] = request.user.id_usuario
+        return super().update(instance, validated_data)
 
 
 
@@ -52,9 +60,12 @@ class ParticipanteLigaSerializer(serializers.ModelSerializer):
             'fecha_union',
             'estado_participacion',
             'puntos_totales',
-            'posicion_ranking'
+            'posicion_ranking',
+            'updated_at',
+            'updated_by',
+            'deleted_by'
         ]
-        read_only_fields = ['id_participante', 'fecha_union']
+        read_only_fields = ['id_participante', 'fecha_union', 'updated_at', 'updated_by', 'deleted_by']
 
     def get_usuario_nombre(self, obj):
         try:
@@ -86,7 +97,7 @@ class ParticipanteLigaSerializer(serializers.ModelSerializer):
         """Calcular la posición en el ranking de la liga"""
         try:
             from backend.pronosticos.models import Pronostico
-            
+
             # Obtener todos los participantes de la liga con sus puntos
             participantes_puntos = ParticipanteLiga.objects.filter(
                 fk_id_liga=obj.fk_id_liga,
@@ -99,17 +110,24 @@ class ParticipanteLigaSerializer(serializers.ModelSerializer):
                     ).values('puntos_obtenidos')
                 )
             ).order_by('-puntos')
-            
+
             # Encontrar la posición del usuario actual
             posicion = 1
             for p in participantes_puntos:
                 if p['fk_id_usuario'] == obj.fk_id_usuario:
                     return posicion
                 posicion += 1
-            
+
             return posicion
         except Exception:
             return 0
+
+    def update(self, instance, validated_data):
+        # Registrar el usuario que está haciendo la modificación
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and hasattr(request.user, 'id_usuario'):
+            validated_data['updated_by'] = request.user.id_usuario
+        return super().update(instance, validated_data)
 
 
 class InvitacionSerializer(serializers.ModelSerializer):

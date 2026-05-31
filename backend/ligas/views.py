@@ -235,7 +235,7 @@ class LigaViewSet(SoftDeleteModelViewSet):
                     {'error': 'Solo el administrador de la liga puede editarla'},
                     status=status.HTTP_403_FORBIDDEN
                 )
-            serializer = self.get_serializer(liga, data=request.data, partial=True)
+            serializer = self.get_serializer(liga, data=request.data, partial=True, context={'request': request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
@@ -252,6 +252,9 @@ class LigaViewSet(SoftDeleteModelViewSet):
                     {'error': 'Solo el administrador de la liga puede eliminarla'},
                     status=status.HTTP_403_FORBIDDEN
                 )
+            # Registrar el usuario que elimina antes de hacer soft delete
+            liga.deleted_by = request.user.id_usuario
+            liga.save(update_fields=['deleted_by'])
             liga.delete()
             return Response({'message': 'Liga eliminada correctamente'}, status=status.HTTP_200_OK)
         except Liga.DoesNotExist:
@@ -396,6 +399,35 @@ class ParticipanteLigaViewSet(viewsets.ModelViewSet):
             return super().list(request, *args, **kwargs)
         except Exception as e:
             print(f"[ParticipanteLigaViewSet] Error in list: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def update(self, request, *args, **kwargs):
+        """Actualizar un participante de liga"""
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=True, context={'request': request})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        except Exception as e:
+            print(f"[ParticipanteLigaViewSet] Error in update: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def destroy(self, request, *args, **kwargs):
+        """Eliminar un participante de liga"""
+        try:
+            instance = self.get_object()
+            # Registrar el usuario que elimina antes de hacer soft delete
+            instance.deleted_by = request.user.id_usuario
+            instance.save(update_fields=['deleted_by'])
+            instance.delete()
+            return Response({'message': 'Participante eliminado correctamente'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"[ParticipanteLigaViewSet] Error in destroy: {str(e)}")
             import traceback
             traceback.print_exc()
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

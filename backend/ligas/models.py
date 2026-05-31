@@ -26,6 +26,10 @@ class Liga(SoftDeleteModel):
         default=True,
         help_text='Si está activo, los administradores deben aprobar cada solicitud.'
     )
+    # Campos de auditoría
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.IntegerField(null=True, blank=True, db_index=True)
+    deleted_by = models.IntegerField(null=True, blank=True, db_index=True)
 
     class Meta:
         db_table = 'liga'
@@ -45,6 +49,10 @@ class ParticipanteLiga(SoftDeleteModel):
     fk_id_usuario = models.IntegerField(db_index=True)
     fecha_union = models.DateTimeField(auto_now_add=True)
     estado_participacion = models.CharField(max_length=50, default='Activo')
+    # Campos de auditoría
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.IntegerField(null=True, blank=True, db_index=True)
+    deleted_by = models.IntegerField(null=True, blank=True, db_index=True)
 
     class Meta:
         db_table = 'participante_liga'
