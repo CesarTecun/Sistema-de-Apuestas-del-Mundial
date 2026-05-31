@@ -179,3 +179,37 @@
   color: #ffa726;
   border: 1px solid rgba(255, 152, 0, 0.3);
 }
+
+.posicion-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  background: rgba(212, 175, 55, 0.2);
+  color: #d4af37;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+}
+
+.posicion-badge:first-child {
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  color: #000;
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.puntos-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px var(--spacing-sm);
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  background: rgba(168, 50, 121, 0.2);
+  color: #a83279;
+  border: 1px solid rgba(168, 50, 121, 0.4);
+}

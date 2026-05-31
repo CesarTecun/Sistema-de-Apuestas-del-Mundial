@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.db.models import Sum, F, Window, IntegerField
+from django.db.models.functions import Rank
 
 from .models import Liga, Invitacion, ParticipanteLiga, SolicitudParticipacion
 from backend.usuarios.models import Usuario
@@ -36,6 +38,8 @@ class ParticipanteLigaSerializer(serializers.ModelSerializer):
     """Serializer para gestionar participantes de ligas"""
     usuario_nombre = serializers.SerializerMethodField()
     usuario_email = serializers.SerializerMethodField()
+    puntos_totales = serializers.SerializerMethodField()
+    posicion_ranking = serializers.SerializerMethodField()
 
     class Meta:
         model = ParticipanteLiga
@@ -46,7 +50,9 @@ class ParticipanteLigaSerializer(serializers.ModelSerializer):
             'usuario_nombre',
             'usuario_email',
             'fecha_union',
-            'estado_participacion'
+            'estado_participacion',
+            'puntos_totales',
+            'posicion_ranking'
         ]
         read_only_fields = ['id_participante', 'fecha_union']
 
@@ -63,6 +69,47 @@ class ParticipanteLigaSerializer(serializers.ModelSerializer):
             return usuario.email
         except Usuario.DoesNotExist:
             return None
+
+    def get_puntos_totales(self, obj):
+        """Calcular los puntos totales del usuario en la liga"""
+        try:
+            from backend.pronosticos.models import Pronostico
+            puntos = Pronostico.objects.filter(
+                fk_id_usuario=obj.fk_id_usuario,
+                fk_id_liga=obj.fk_id_liga
+            ).aggregate(total=Sum('puntos_obtenidos'))['total'] or 0
+            return puntos
+        except Exception:
+            return 0
+
+    def get_posicion_ranking(self, obj):
+        """Calcular la posición en el ranking de la liga"""
+        try:
+            from backend.pronosticos.models import Pronostico
+            
+            # Obtener todos los participantes de la liga con sus puntos
+            participantes_puntos = ParticipanteLiga.objects.filter(
+                fk_id_liga=obj.fk_id_liga,
+                estado_participacion='Activo'
+            ).values('fk_id_usuario').annotate(
+                puntos=Sum(
+                    Pronostico.objects.filter(
+                        fk_id_usuario=F('fk_id_usuario'),
+                        fk_id_liga=obj.fk_id_liga
+                    ).values('puntos_obtenidos')
+                )
+            ).order_by('-puntos')
+            
+            # Encontrar la posición del usuario actual
+            posicion = 1
+            for p in participantes_puntos:
+                if p['fk_id_usuario'] == obj.fk_id_usuario:
+                    return posicion
+                posicion += 1
+            
+            return posicion
+        except Exception:
+            return 0
 
 
 class InvitacionSerializer(serializers.ModelSerializer):
