@@ -99,7 +99,8 @@ const BuzonInvitaciones = ({ invitaciones, loading, onInvitacionAceptada }) => {
             <div key={invitacion.id_invitacion} className="invitacion-card">
               <div className="invitacion-info">
                 <div className="invitacion-liga">
-                  <span className="invitacion-label">TE HAN INVITADO A UNA LIGA</span>
+                  <span className="invitacion-label">Liga:</span>
+                  <span className="invitacion-valor">{invitacion.liga_nombre || invitacion.nombre_liga}</span>
                 </div>
                 <div className="invitacion-mensaje">
                   {invitacion.mensaje_invitacion && (
