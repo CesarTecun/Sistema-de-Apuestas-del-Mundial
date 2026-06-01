@@ -12,7 +12,7 @@ const TarjetaLiga = ({ liga, onEdit, onDelete, onView, onVerTabla, onInvitarPers
   };
 
   const isApuesta = liga.tipo_liga?.toLowerCase() === 'apuesta' || liga.tipo_liga?.toLowerCase() === 'dinero' || liga.tipo_liga?.toLowerCase() === 'competitiva';
-  const participantes = liga.numero_participantes || liga.participantes || 0;
+  const participantes = liga.total_participantes || liga.numero_participantes || liga.participantes || 0;
   const posicion = liga.posicion_usuario || 1;
   const esAdministrador = user?.id_usuario === liga.fk_administrador;
 
