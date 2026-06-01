@@ -163,12 +163,11 @@
    CONTENEDOR DEL LOGO
    ======================================== */
 .logo-container {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 10px;
   margin-top: 50px;
-  display: block;
-  align-items: center;
-  justify-content: center;
 }
 
 /* ========================================

@@ -42,9 +42,7 @@ const PaginaLogin = () => {
       <div className="login-background">
         <div className="login-form">
           <div className="logo-container">
-            <div className="logo logo-clickable">
-              <LogoCopaMundial size={220} onClick={handleLogoClick} />
-            </div>
+            <LogoCopaMundial size={220} onClick={handleLogoClick} />
           </div>
           
           <FormularioLogin 
