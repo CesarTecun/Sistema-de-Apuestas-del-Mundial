@@ -31,6 +31,9 @@ const TablaPosicionesConPremios = ({ liga, user, onClose }) => {
       return {};
     }
 
+    // Restar el 5% de la plataforma antes de calcular premios
+    const montoParaPremios = montoTotal * 0.95;
+
     const premios = {};
     const n = participantesOrdenados.length;
 
@@ -50,46 +53,46 @@ const TablaPosicionesConPremios = ({ liga, user, onClose }) => {
     // Calcular premios según reglas (primeros 4 lugares)
     if (empatePrimerLugar > 1) {
       // Empate en primer lugar: 85% se distribuye equitativamente
-      const premioPorGanador = (montoTotal * 0.85) / empatePrimerLugar;
+      const premioPorGanador = (montoParaPremios * 0.85) / empatePrimerLugar;
       for (let i = 0; i < empatePrimerLugar; i++) {
         premios[participantesOrdenados[i].id_participante] = premioPorGanador;
       }
     } else {
       // Primer lugar: 50%
-      premios[participantesOrdenados[0].id_participante] = montoTotal * 0.50;
+      premios[participantesOrdenados[0].id_participante] = montoParaPremios * 0.50;
 
       if (n > 1) {
         if (empateSegundoLugar > 1) {
           // Empate en segundo lugar: 35% se reparte equitativamente
-          const premioPorGanador = (montoTotal * 0.35) / empateSegundoLugar;
+          const premioPorGanador = (montoParaPremios * 0.35) / empateSegundoLugar;
           for (let i = 1; i <= empateSegundoLugar; i++) {
             premios[participantesOrdenados[i].id_participante] = premioPorGanador;
           }
         } else {
           // Segundo lugar: 25%
-          premios[participantesOrdenados[1].id_participante] = montoTotal * 0.25;
+          premios[participantesOrdenados[1].id_participante] = montoParaPremios * 0.25;
 
           if (n > 2) {
             if (empateTercerLugar > 1) {
               // Empate en tercer lugar: 10% se reparte equitativamente
-              const premioPorGanador = (montoTotal * 0.10) / empateTercerLugar;
+              const premioPorGanador = (montoParaPremios * 0.10) / empateTercerLugar;
               for (let i = 2; i < 2 + empateTercerLugar; i++) {
                 premios[participantesOrdenados[i].id_participante] = premioPorGanador;
               }
             } else {
               // Tercer lugar: 10%
-              premios[participantesOrdenados[2].id_participante] = montoTotal * 0.10;
+              premios[participantesOrdenados[2].id_participante] = montoParaPremios * 0.10;
 
               if (n > 3) {
                 if (empateCuartoLugar > 1) {
                   // Empate en cuarto lugar: 10% se reparte equitativamente
-                  const premioPorGanador = (montoTotal * 0.10) / empateCuartoLugar;
+                  const premioPorGanador = (montoParaPremios * 0.10) / empateCuartoLugar;
                   for (let i = 3; i < 3 + empateCuartoLugar; i++) {
                     premios[participantesOrdenados[i].id_participante] = premioPorGanador;
                   }
                 } else {
                   // Cuarto lugar: 10%
-                  premios[participantesOrdenados[3].id_participante] = montoTotal * 0.10;
+                  premios[participantesOrdenados[3].id_participante] = montoParaPremios * 0.10;
                 }
               }
             }
