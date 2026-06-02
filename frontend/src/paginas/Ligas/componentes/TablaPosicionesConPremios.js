@@ -133,13 +133,7 @@ const TablaPosicionesConPremios = ({ liga, user, onClose }) => {
     <div className="tabla-posiciones-overlay">
       <div className="tabla-posiciones-modal">
         <div className="tabla-posiciones-header">
-          <div className="header-content">
-            <h2>Tabla de Posiciones - {liga.nombre_liga}</h2>
-            <div className="monto-total-badge">
-              <span className="monto-label">Total Recaudado:</span>
-              <span className="monto-value">{formatearMonto(montoTotal)}</span>
-            </div>
-          </div>
+          <h2>Tabla de Posiciones - {liga.nombre_liga}</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
 
