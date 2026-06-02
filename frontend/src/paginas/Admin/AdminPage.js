@@ -142,8 +142,6 @@ const Dashboard = () => {
           label="Pronósticos" value={fmt(data?.pronosticos?.total)} />
         <StatCard iconClass="purple" icon={<MultiPathIcon paths={[icons.config]} size={22} />}
           label="Total recaudado" value={fmtMoney(data?.premios?.total_recaudado)} />
-        <StatCard iconClass="green" icon={<MultiPathIcon paths={[icons.config]} size={22} />}
-          label="Total distribuido" value={fmtMoney(data?.premios?.total_distribuido)} />
       </div>
 
       <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', marginTop: 'var(--spacing-lg)' }}>
