@@ -57,6 +57,20 @@ const TablaPosicionesConPremios = ({ liga, user, onClose }) => {
       for (let i = 0; i < empatePrimerLugar; i++) {
         premios[participantesOrdenados[i].id_participante] = premioPorGanador;
       }
+
+      // Dar el 10% al tercer lugar (si hay suficientes participantes)
+      if (n > 2) {
+        if (empateTercerLugar > 1) {
+          // Empate en tercer lugar: 10% se reparte equitativamente
+          const premioPorGanador = (montoParaPremios * 0.10) / empateTercerLugar;
+          for (let i = 2; i < 2 + empateTercerLugar; i++) {
+            premios[participantesOrdenados[i].id_participante] = premioPorGanador;
+          }
+        } else {
+          // Tercer lugar: 10%
+          premios[participantesOrdenados[2].id_participante] = montoParaPremios * 0.10;
+        }
+      }
     } else {
       // Primer lugar: 50%
       premios[participantesOrdenados[0].id_participante] = montoParaPremios * 0.50;
